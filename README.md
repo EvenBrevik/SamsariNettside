@@ -54,22 +54,7 @@ npm run preview
 - Blog listing and blog post pages
 - Contact form UI
 
-## Git Workflow
 
-Typical update flow:
-
-```bash
-git pull
-git status
-git add .
-git commit -m "Describe your change"
-git push
-```
-
-If dependencies change:
-
-```bash
-npm install
 git add package.json package-lock.json
 git commit -m "Update dependencies"
 git push
