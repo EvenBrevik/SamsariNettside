@@ -2,7 +2,6 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Layout } from './components/layout/Layout';
 import { HomePage } from './pages/HomePage';
-import { ServicesPage } from './pages/ServicesPage';
 import { ProductsPage } from './pages/ProductsPage';
 import { CasesPage } from './pages/CasesPage';
 import { BlogPage } from './pages/BlogPage';
@@ -27,7 +26,6 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/services" element={<ServicesPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/cases" element={<CasesPage />} />
           <Route path="/blog" element={<BlogPage />} />

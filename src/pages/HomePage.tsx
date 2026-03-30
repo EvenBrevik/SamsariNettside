@@ -68,6 +68,8 @@ export function HomePage() {
           title: 'Resultater og forretningsverdi',
           subtitle:
             'Når løsninger er godt forankret i drift, merkes effekten i kapasitet, kvalitet og tempo.',
+          description:
+            'Vi jobber for å gi synlige forbedringer i arbeidshverdagen, ikke bare levere ny teknologi. Derfor er effekten ofte knyttet til spart tid, enklere oppfølging og tydeligere eierskap.',
           items: [
             { value: '40%', label: 'mindre manuelt arbeid i typiske prosesser' },
             { value: '4 uker', label: 'fra innsikt til første løsning' },
@@ -78,6 +80,8 @@ export function HomePage() {
           title: 'Results and business value',
           subtitle:
             'When solutions are grounded in real operations, the impact is visible in capacity, quality and speed.',
+          description:
+            'We work to create visible improvement in day-to-day operations, not just deliver new technology. That is why the effect is often measured in time saved, simpler follow-up and clearer ownership.',
           items: [
             { value: '40%', label: 'less manual work in common processes' },
             { value: '4 weeks', label: 'from insight to first solution' },
@@ -91,6 +95,9 @@ export function HomePage() {
           title: 'Hvorfor Samsari',
           subtitle:
             'Vi kombinerer teknisk gjennomføring med forretningsforståelse, slik at løsningene faktisk skaper effekt.',
+          lead: 'En partner som kan tenke helhet fra prosess til produkt.',
+          leadDescription:
+            'Samsari kombinerer rådgivning, produktforståelse og moderne utvikling for å bygge løsninger som er relevante i dag og robuste over tid.',
           items: [
             {
               title: 'Både produkt og utviklingspartner',
@@ -113,6 +120,9 @@ export function HomePage() {
           title: 'Why Samsari',
           subtitle:
             'We combine technical execution with business understanding so the solutions create real operational impact.',
+          lead: 'A partner that can think end-to-end from process to product.',
+          leadDescription:
+            'Samsari combines advisory work, product thinking and modern development to build solutions that are relevant today and robust over time.',
           items: [
             {
               title: 'Both product and development partner',
@@ -150,7 +160,7 @@ export function HomePage() {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink to="/contact">{t.home.hero.primaryCta}</ButtonLink>
-                <ButtonLink to="/services" variant="secondary">
+                <ButtonLink to="/products" variant="secondary">
                   {t.home.hero.secondaryCta}
                 </ButtonLink>
               </div>
@@ -189,14 +199,47 @@ export function HomePage() {
             ? 'Samsari hjelper virksomheter å automatisere, standardisere og bygge løsninger som gir mer flyt i hverdagen.'
             : 'Samsari helps businesses automate, standardize and build solutions that create more flow in day-to-day work.'
         }
-        contentClassName="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
+        contentClassName="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]"
       >
-        {serviceOverview.map((item, index) => (
-          <Reveal key={item.title} delay={index * 70} className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
-            <h3 className="text-lg font-semibold leading-7">{item.title}</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">{item.description}</p>
-          </Reveal>
-        ))}
+        <Reveal className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">
+            {serviceOverview[0].title}
+          </p>
+          <p className="mt-5 max-w-xl text-3xl font-semibold tracking-tight">
+            {language === 'no'
+              ? 'Vi bygger bedre flyt mellom mennesker, prosess og teknologi.'
+              : 'We build better flow between people, process and technology.'}
+          </p>
+          <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--color-text-muted)]">
+            {serviceOverview[0].description}
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {serviceOverview.slice(1).map((item) => (
+              <div key={item.title} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5">
+                <h3 className="text-base font-semibold leading-7">{item.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-[var(--color-text-muted)]">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+
+        <div className="space-y-6">
+          {t.services.map((service, index) => (
+            <Reveal
+              key={service.title}
+              delay={index * 70}
+              className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <h3 className="text-lg font-semibold">{service.title}</h3>
+                <span className="rounded-full bg-[var(--color-tag)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)]">
+                  {language === 'no' ? 'Tjeneste' : 'Service'}
+                </span>
+              </div>
+              <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">{service.value}</p>
+            </Reveal>
+          ))}
+        </div>
       </Section>
 
       <Section
@@ -206,12 +249,14 @@ export function HomePage() {
         contentClassName="grid gap-6 lg:grid-cols-3"
       >
         {t.products.map((product, index) => (
-          <Reveal key={product.title} delay={index * 80} className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">{product.title}</p>
-            <p className="mt-4 text-sm leading-7 text-[var(--color-text-muted)]">{product.description}</p>
+          <Reveal key={product.title} delay={index * 80} className="flex h-full flex-col rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
+            <div className="border-b border-[var(--color-border)] pb-5">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">{product.title}</p>
+              <p className="mt-4 text-sm leading-7 text-[var(--color-text-muted)]">{product.description}</p>
+            </div>
             <ul className="mt-6 space-y-3">
               {product.highlights.map((highlight) => (
-                <li key={highlight} className="border-t border-[var(--color-border)] pt-3 text-sm text-[var(--color-text-subtle)]">
+                <li key={highlight} className="text-sm text-[var(--color-text-subtle)]">
                   {highlight}
                 </li>
               ))}
@@ -228,8 +273,15 @@ export function HomePage() {
       >
         {t.home.process.steps.map((step, index) => (
           <Reveal key={step.step} delay={index * 80} className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
-            <span className="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--color-primary)]">{step.step}</span>
-            <h3 className="mt-4 text-xl font-semibold">{step.title}</h3>
+            <div className="mb-6 flex items-center gap-4">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-sm font-semibold text-[var(--color-primary)]">
+                {step.step}
+              </span>
+              {index < t.home.process.steps.length - 1 ? (
+                <span className="hidden h-px flex-1 bg-[var(--color-border)] xl:block" />
+              ) : null}
+            </div>
+            <h3 className="text-xl font-semibold">{step.title}</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">{step.description}</p>
           </Reveal>
         ))}
@@ -239,28 +291,49 @@ export function HomePage() {
         eyebrow={language === 'no' ? 'Resultater' : 'Results'}
         title={resultsOverview.title}
         subtitle={resultsOverview.subtitle}
-        contentClassName="grid gap-6 md:grid-cols-3"
+        contentClassName="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-8"
       >
-        {resultsOverview.items.map((item, index) => (
-          <Reveal key={item.label} delay={index * 80} className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center">
-            <p className="text-3xl font-semibold tracking-tight text-[var(--color-primary)]">{item.value}</p>
-            <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">{item.label}</p>
+        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+          <Reveal className="max-w-xl">
+            <p className="text-base leading-8 text-[var(--color-text-muted)]">{resultsOverview.description}</p>
           </Reveal>
-        ))}
+          <div className="grid gap-4 sm:grid-cols-3">
+            {resultsOverview.items.map((item, index) => (
+              <Reveal
+                key={item.label}
+                delay={index * 80}
+                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 text-center"
+              >
+                <p className="text-3xl font-semibold tracking-tight text-[var(--color-primary)]">{item.value}</p>
+                <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">{item.label}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
       </Section>
 
       <Section
         eyebrow={language === 'no' ? 'Hvorfor Samsari' : 'Why Samsari'}
         title={whySamsari.title}
         subtitle={whySamsari.subtitle}
-        contentClassName="grid gap-6 lg:grid-cols-3"
+        contentClassName="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]"
       >
-        {whySamsari.items.map((item, index) => (
-          <Reveal key={item.title} delay={index * 80} className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
-            <h3 className="text-xl font-semibold">{item.title}</h3>
-            <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">{item.description}</p>
-          </Reveal>
-        ))}
+        <Reveal className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-8">
+          <p className="text-3xl font-semibold tracking-tight">{whySamsari.lead}</p>
+          <p className="mt-5 text-base leading-8 text-[var(--color-text-muted)]">{whySamsari.leadDescription}</p>
+        </Reveal>
+        <div className="space-y-4">
+          {whySamsari.items.map((item, index) => (
+            <Reveal
+              key={item.title}
+              delay={index * 80}
+              className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6"
+            >
+              <h3 className="text-lg font-semibold">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">{item.description}</p>
+            </Reveal>
+          ))}
+        </div>
       </Section>
 
       <Section

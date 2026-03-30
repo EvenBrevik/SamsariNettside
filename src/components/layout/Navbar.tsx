@@ -11,7 +11,6 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navItemWidths: Record<(typeof appRoutes)[number]['key'], string> = {
     home: 'w-[4.5rem]',
-    services: 'w-[5.75rem]',
     products: 'w-[5.75rem]',
     cases: 'w-[4.5rem]',
     blog: 'w-[4.5rem]',
