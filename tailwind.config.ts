@@ -42,7 +42,7 @@ export default {
         'pulse-soft': 'pulseSoft 6s ease-in-out infinite',
       },
       fontFamily: {
-        sans: ['"Segoe UI"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

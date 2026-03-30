@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: light;
-  --color-bg: #ffffff;
+  --color-bg: #f3f4f6;
   --color-surface: rgba(255, 255, 255, 0.9);
   --color-surface-alt: rgba(255, 255, 255, 0.96);
   --color-surface-elevated: rgba(255, 255, 255, 0.98);
@@ -82,7 +82,7 @@ body {
     radial-gradient(circle at top right, rgba(137, 88, 254, 0.08), transparent 24%),
     var(--color-bg);
   color: var(--color-text);
-  font-family: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
 }
 
 a {

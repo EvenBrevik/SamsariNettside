@@ -2,7 +2,6 @@ export type Language = 'no' | 'en';
 export type BlogCategory = 'Power Platform' | 'AI' | 'Microsoft 365' | 'Automatisering';
 
 type HeroStat = { value: string; label: string };
-type HeroCard = { eyebrow: string; title: string; body: string; bullets: string[] };
 type ValueCard = { title: string; description: string };
 type ServiceItem = { title: string; summary: string; problem: string; value: string };
 type ProductItem = { title: string; description: string; highlights: string[] };
@@ -17,7 +16,7 @@ type SharedLocaleContent = {
     formSuccess: string; footerTagline: string; no: string; en: string; light: string; dark: string;
   };
   home: {
-    hero: { eyebrow: string; title: string; description: string; primaryCta: string; secondaryCta: string; stats: HeroStat[]; card: HeroCard };
+    hero: { eyebrow: string; title: string; description: string; primaryCta: string; secondaryCta: string; stats: HeroStat[]; points: string[] };
     trustLogos: string[];
     valueProps: { title: string; subtitle: string; items: ValueCard[] };
     servicesPreview: { title: string; subtitle: string };
@@ -57,17 +56,16 @@ export const siteContent: Record<Language, SharedLocaleContent> = {
     home: {
       hero: {
         eyebrow: 'Microsoft 365, Power Platform og AI',
-        title: 'Lås opp bedriftens potensial',
-        description: 'Vi hjelper bedrifter med å jobbe smartere ved å automatisere prosesser, redusere manuelt arbeid og hente mer verdi ut av Microsoft 365.',
-        primaryCta: 'Book møte',
+        title: 'Automatiser arbeidsprosesser med Microsoft 365 og AI',
+        description: 'Vi hjelper bedrifter med å redusere manuelt arbeid, skape bedre flyt og få mer ut av verktøyene de allerede bruker.',
+        primaryCta: 'Book gratis kartleggingsmøte',
         secondaryCta: 'Se hva vi kan gjøre for deg',
         stats: [{ value: '4 uker', label: 'Fra innsikt til første løsning' }, { value: '40%', label: 'Mindre manuelt arbeid i typiske prosesser' }, { value: '100%', label: 'Bygget rundt verktøy du allerede bruker' }],
-        card: {
-          eyebrow: 'Premium arbeidsflyt',
-          title: 'Fra manuelle flaskehalser til flyt',
-          body: 'Vi kombinerer forretningsforståelse med Microsoft-teknologi for å skape løsninger som faktisk tas i bruk.',
-          bullets: ['Power Apps og Power Automate', 'AI og Copilot-støttede arbeidsflyter', 'Skreddersydd for norske virksomheter'],
-        },
+        points: [
+          'Automatisering som reduserer manuelt arbeid',
+          'Smartere bruk av Microsoft 365 og Power Platform',
+          'AI-støttede arbeidsflyter med tydelig forretningsverdi',
+        ],
       },
       trustLogos: ['Microsoft 365', 'Power Platform', 'Copilot', 'Dataverse', 'SharePoint'],
       valueProps: {
@@ -137,17 +135,16 @@ export const siteContent: Record<Language, SharedLocaleContent> = {
     home: {
       hero: {
         eyebrow: 'Microsoft 365, Power Platform and AI',
-        title: 'Unlock your company’s potential',
-        description: 'We help businesses work smarter by automating processes, reducing manual work, and unlocking more value from Microsoft 365.',
-        primaryCta: 'Book meeting',
+        title: 'Automate business processes with Microsoft 365 and AI',
+        description: 'We help businesses reduce manual work, create better flow, and get more value from the tools they already use.',
+        primaryCta: 'Book free discovery call',
         secondaryCta: 'See what we can do for you',
         stats: [{ value: '4 weeks', label: 'From insight to first solution' }, { value: '40%', label: 'Less manual work in common processes' }, { value: '100%', label: 'Built around tools you already use' }],
-        card: {
-          eyebrow: 'Premium workflow design',
-          title: 'From manual bottlenecks to operational flow',
-          body: 'We combine business understanding with Microsoft technology to create solutions that teams actually adopt.',
-          bullets: ['Power Apps and Power Automate', 'AI and Copilot-supported workflows', 'Tailored for modern business operations'],
-        },
+        points: [
+          'Automation that reduces manual work',
+          'Smarter use of Microsoft 365 and Power Platform',
+          'AI-supported workflows with clear business value',
+        ],
       },
       trustLogos: ['Microsoft 365', 'Power Platform', 'Copilot', 'Dataverse', 'SharePoint'],
       valueProps: {

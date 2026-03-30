@@ -6,10 +6,20 @@ export function ThemeToggle() {
 
   return (
     <button type="button" onClick={toggleTheme} aria-label={isDark ? t.common.light : t.common.dark} className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
-      <span className="relative block h-5 w-5">
-        <span className={`absolute inset-0 rounded-full border-2 border-current transition ${isDark ? 'scale-100 opacity-100' : 'scale-75 opacity-40'}`} />
-        <span className={`absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current transition ${isDark ? 'opacity-100' : 'opacity-0'}`} />
-      </span>
+      {isDark ? (
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current stroke-2">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"
+          />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current stroke-2">
+          <circle cx="12" cy="12" r="4" />
+          <path strokeLinecap="round" d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07 6.7 17.3M17.3 6.7l1.77-1.77" />
+        </svg>
+      )}
     </button>
   );
 }
