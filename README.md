@@ -54,8 +54,4 @@ npm run preview
 - Blog listing and blog post pages
 - Contact form UI
 
-
-git add package.json package-lock.json
-git commit -m "Update dependencies"
-git push
 ```
