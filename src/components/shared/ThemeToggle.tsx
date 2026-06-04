@@ -5,7 +5,13 @@ export function ThemeToggle() {
   const isDark = theme === 'dark';
 
   return (
-    <button type="button" onClick={toggleTheme} aria-label={isDark ? t.common.light : t.common.dark} className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={isDark ? t.common.light : t.common.dark}
+      aria-pressed={isDark}
+      className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text)] shadow-sm transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:shadow-soft focus-visible:border-[var(--color-accent)]"
+    >
       {isDark ? (
         <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-none stroke-current stroke-2">
           <path
