@@ -15,7 +15,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": ["vite/client"]
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.*", "src/studio-schema"]

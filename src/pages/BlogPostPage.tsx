@@ -95,7 +95,7 @@ function BlogPostContent({ slug }: { slug: string }) {
           <div className="mt-10 space-y-6">
             {body.length > 0 ? (
               <PortableText
-                value={body as Parameters<typeof PortableText>[0]['value']}
+                value={body as unknown as Parameters<typeof PortableText>[0]['value']}
                 components={portableTextComponents}
               />
             ) : (
