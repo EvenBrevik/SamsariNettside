@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Reveal } from '../components/shared/Reveal';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useAppSettings } from '../providers/AppSettingsProvider';
 
 type FormState = { name: string; email: string; company: string; message: string };
@@ -27,7 +27,7 @@ function Field({
 
 export function ContactPage() {
   const { t, language } = useAppSettings();
-  usePageTitle(t.nav.contact);
+  useSEO({ title: language === 'no' ? 'Kontakt' : 'Contact', description: language === 'no' ? 'Ta kontakt med Samsari for en gratis kartleggingssamtale om automatisering og Microsoft 365.' : 'Contact Samsari for a free discovery call about automation and Microsoft 365.', path: '/contact' });
 
   const [form, setForm] = useState<FormState>(empty);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});

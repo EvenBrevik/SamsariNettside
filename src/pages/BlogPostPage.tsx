@@ -1,6 +1,6 @@
 import { PortableText, type PortableTextComponents } from '@portabletext/react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useSanityPost } from '../hooks/useSanityPost';
 import { formatPostDate, getBody, getExcerpt, getTitle } from '../lib/blogUtils';
 import { urlFor } from '../lib/sanityImage';
@@ -52,7 +52,12 @@ const portableTextComponents: PortableTextComponents = {
 function BlogPostContent({ slug }: { slug: string }) {
   const { t, language } = useAppSettings();
   const { post, loading } = useSanityPost(slug);
-  usePageTitle(post ? getTitle(post, language) : '');
+  useSEO({
+    title: post ? getTitle(post, language) : '',
+    description: post ? getExcerpt(post, language) : '',
+    path: post ? `/blog/${slug}` : '/blog',
+    type: 'article',
+  });
 
   if (loading) return <BlogPostSkeleton />;
   if (!post) return <Navigate to="/blog" replace />;

@@ -1,9 +1,9 @@
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useAppSettings } from '../providers/AppSettingsProvider';
 
 export function PrivacyPage() {
   const { language } = useAppSettings();
-  usePageTitle(language === 'no' ? 'Personvernerklæring' : 'Privacy Policy');
+  useSEO({ title: language === 'no' ? 'Personvernerklæring' : 'Privacy Policy', description: language === 'no' ? 'Les Samsaris personvernerklæring om hvordan vi behandler personopplysninger.' : 'Read Samsari privacy policy on how we handle personal data.', path: '/privacy' });
 
   if (language === 'en') return <PrivacyEN />;
   return <PrivacyNO />;

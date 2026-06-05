@@ -1,10 +1,10 @@
 import { ButtonLink } from '../components/shared/ButtonLink';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useAppSettings } from '../providers/AppSettingsProvider';
 
 export function NotFoundPage() {
   const { language } = useAppSettings();
-  usePageTitle('404');
+  useSEO({ title: '404', description: language === 'no' ? 'Siden finnes ikke.' : 'Page not found.' });
 
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center sm:px-6">

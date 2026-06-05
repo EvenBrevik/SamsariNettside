@@ -1,6 +1,6 @@
 import { BOOKING_URL } from '../config';
 import { Reveal } from '../components/shared/Reveal';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useAppSettings } from '../providers/AppSettingsProvider';
 
 const principleIcons = [
@@ -20,7 +20,7 @@ const principleIcons = [
 
 export function AboutPage() {
   const { t, language } = useAppSettings();
-  usePageTitle(t.nav.about);
+  useSEO({ title: language === 'no' ? 'Om oss' : 'About', description: language === 'no' ? 'Samsari er et norsk teknologiselskap som kombinerer prosessforståelse og moderne utvikling for å hjelpe virksomheter jobbe smartere.' : 'Samsari is a Norwegian technology company combining process understanding and modern development to help businesses work smarter.', path: '/about' });
 
   const no = language === 'no';
 

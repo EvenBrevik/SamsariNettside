@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { BOOKING_URL } from '../config';
 import { ButtonLink } from '../components/shared/ButtonLink';
 import { Reveal } from '../components/shared/Reveal';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useSanityCases } from '../hooks/useSanityCases';
 import { getCaseSlug, getMetrics, getResult, getSector } from '../lib/caseUtils';
 import { urlFor } from '../lib/sanityImage';
@@ -10,7 +10,13 @@ import { useAppSettings } from '../providers/AppSettingsProvider';
 
 export function CasesPage() {
   const { t, language } = useAppSettings();
-  usePageTitle(t.nav.cases);
+  useSEO({
+    title: no ? 'Kundecase' : 'Customer cases',
+    description: no
+      ? 'Se hvordan Samsari har hjulpet virksomheter med å automatisere prosesser og skape målbare resultater med Microsoft 365 og Power Platform.'
+      : 'See how Samsari has helped businesses automate processes and create measurable results with Microsoft 365 and Power Platform.',
+    path: '/cases',
+  });
   const { cases: allCases, loading } = useSanityCases();
   const cases = allCases.filter(c => !c.company.toLowerCase().includes('test'));
   const no = language === 'no';

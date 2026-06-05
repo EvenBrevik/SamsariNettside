@@ -1,7 +1,7 @@
 import { BOOKING_URL } from '../config';
 import { ButtonLink } from '../components/shared/ButtonLink';
 import { Reveal } from '../components/shared/Reveal';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useAppSettings } from '../providers/AppSettingsProvider';
 import type { Language } from '../content/siteContent';
 
@@ -244,7 +244,7 @@ function ForgeEngineMock({ language }: { language: Language }) {
 
 export function ProductsPage() {
   const { t, language } = useAppSettings();
-  usePageTitle(t.nav.products);
+  useSEO({ title: language === 'no' ? 'Produkter' : 'Products', description: language === 'no' ? 'Ferdigbygde og skreddersydde applikasjoner fra Samsari, inkludert Prosjektportalen og Forge Engine.' : 'Ready-made and custom applications from Samsari, including the Project Portal and Forge Engine.', path: '/products' });
 
   const heroLabel = language === 'no' ? 'Produkter & løsninger' : 'Products & solutions';
   const catalogLabel = language === 'no' ? 'Produktkatalog' : 'Product catalog';

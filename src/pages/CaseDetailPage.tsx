@@ -3,7 +3,7 @@ import { BOOKING_URL } from '../config';
 import { ButtonLink } from '../components/shared/ButtonLink';
 import { Reveal } from '../components/shared/Reveal';
 import { CTASection } from '../components/shared/CTASection';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useSanityCases } from '../hooks/useSanityCases';
 import { getCaseSlug, getMetrics, getProblem, getResult, getSector, getSolution } from '../lib/caseUtils';
 import { urlFor } from '../lib/sanityImage';
@@ -17,7 +17,16 @@ export function CaseDetailPage() {
 
   const item = cases.find(c => getCaseSlug(c.company) === slug);
 
-  usePageTitle(item ? item.company : (no ? 'Kundecase' : 'Customer case'));
+  useSEO({
+    title: item ? item.company : (no ? 'Kundecase' : 'Customer case'),
+    description: item
+      ? (no
+          ? `Les hvordan Samsari hjalp ${item.company} med å automatisere prosesser og skape bedre arbeidsflyt.`
+          : `Read how Samsari helped ${item.company} automate processes and create better operational flow.`)
+      : '',
+    path: item ? `/cases/${slug}` : '/cases',
+    type: 'article',
+  });
 
   if (loading) {
     return (

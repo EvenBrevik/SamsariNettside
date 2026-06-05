@@ -5,7 +5,7 @@ import { CTASection } from '../components/shared/CTASection';
 import { ButtonLink } from '../components/shared/ButtonLink';
 import { Reveal } from '../components/shared/Reveal';
 import { Section } from '../components/shared/Section';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useSanityCases } from '../hooks/useSanityCases';
 import { useSanityPosts } from '../hooks/useSanityPosts';
 import { formatPostDate, getExcerpt, getTitle } from '../lib/blogUtils';
@@ -130,7 +130,12 @@ function HeroVisual({ language }: { language: Language }) {
 
 export function HomePage() {
   const { t, language } = useAppSettings();
-  usePageTitle(language === 'no' ? 'Hjem' : 'Home');
+  useSEO({
+    description: language === 'no'
+      ? 'Samsari hjelper virksomheter å automatisere arbeidsprosesser, bygge skreddersydde applikasjoner og få mer verdi ut av Microsoft 365 og Power Platform.'
+      : 'Samsari helps businesses automate workflows, build tailored applications and get more value from Microsoft 365 and Power Platform.',
+    path: '/',
+  });
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const { posts: sanityPosts, loading: postsLoading } = useSanityPosts();

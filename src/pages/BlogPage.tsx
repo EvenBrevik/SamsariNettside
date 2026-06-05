@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Reveal } from '../components/shared/Reveal';
 import { blogCategories } from '../content/siteContent';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useSanityPosts } from '../hooks/useSanityPosts';
 import { formatPostDate, getExcerpt, getTitle } from '../lib/blogUtils';
 import type { SanityPost } from '../lib/blogUtils';
@@ -181,7 +181,7 @@ function PostCardSkeleton() {
 /* ── Page ── */
 export function BlogPage() {
   const { t, language } = useAppSettings();
-  usePageTitle(t.nav.blog);
+  useSEO({ title: language === 'no' ? 'Blogg' : 'Blog', description: language === 'no' ? 'Praktiske artikler om Power Platform, Microsoft 365, AI og automatisering fra Samsari.' : 'Practical articles about Power Platform, Microsoft 365, AI and automation from Samsari.', path: '/blog' });
   const [activeCategory, setActiveCategory] = useState<string>(t.common.categoryAll);
   const { posts, loading } = useSanityPosts();
 

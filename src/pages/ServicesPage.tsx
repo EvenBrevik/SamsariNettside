@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { BOOKING_URL } from '../config';
 import { ButtonLink } from '../components/shared/ButtonLink';
 import { Reveal } from '../components/shared/Reveal';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSEO } from '../hooks/useSEO';
 import { useAppSettings } from '../providers/AppSettingsProvider';
 
 /* ── Icons ── */
@@ -67,7 +67,7 @@ const serviceTags = [
 
 export function ServicesPage() {
   const { t, language } = useAppSettings();
-  usePageTitle(t.nav.services);
+  useSEO({ title: language === 'no' ? 'Tjenester' : 'Services', description: language === 'no' ? 'Samsari tilbyr automatisering, Power Apps, AI og Microsoft 365-tjenester som hjelper virksomheter å jobbe smartere.' : 'Samsari offers automation, Power Apps, AI and Microsoft 365 services that help businesses work smarter.', path: '/services' });
 
   const [active, setActive] = useState(0);
   useEffect(() => {
