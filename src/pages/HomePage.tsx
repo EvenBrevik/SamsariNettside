@@ -9,7 +9,7 @@ import { usePageTitle } from '../hooks/usePageTitle';
 import { useSanityCases } from '../hooks/useSanityCases';
 import { useSanityPosts } from '../hooks/useSanityPosts';
 import { formatPostDate, getExcerpt, getTitle } from '../lib/blogUtils';
-import { getMetrics, getResult, getSector } from '../lib/caseUtils';
+import { getCaseSlug, getMetrics, getResult, getSector } from '../lib/caseUtils';
 import { urlFor } from '../lib/sanityImage';
 import { useAppSettings } from '../providers/AppSettingsProvider';
 import type { Language } from '../content/siteContent';
@@ -149,42 +149,26 @@ export function HomePage() {
     language === 'no'
       ? [
           {
-            quote:
-              'Samsari hjalp oss å halvere koordineringstiden for interne forespørsler. Løsningen var enkel å ta i bruk og brukes aktivt i hverdagen.',
-            name: 'Anders Kvist',
-            title: 'Driftsleder, Nordic Drift',
+            quote: 'Samsari forsto behovene våre raskt og leverte løsninger som sparer oss for mange timer hver uke. De kombinerer solid teknisk kompetanse med ekte forståelse for bankdrift.',
+            name: 'Jørn Gudbrandsen',
+            title: 'Chief Technology Officer @ Maritime & Merchant Bank',
           },
           {
-            quote:
-              'Vi hadde prøvd å løse dette problemet i to år. Samsari leverte en løsning vi faktisk bruker, på under en måned.',
-            name: 'Marte Vold',
-            title: 'Prosjektleder, Fjord Prosjekt',
-          },
-          {
-            quote:
-              'Onboarding-prosessen er ikke lenger noe vi gruer oss til. Den bare kjører. Det er nøyaktig det vi trengte.',
-            name: 'Lars Engvik',
-            title: 'HR-direktør, Arctic HR',
+            quote: 'Den beste måten å beskrive de på er at de får jobben gjort',
+            name: 'Kristian Kvernes Hatlen',
+            title: 'Daglig leder @ Flematec',
           },
         ]
       : [
           {
-            quote:
-              'Samsari helped us cut coordination time in half for internal requests. The solution was easy to adopt and has become part of daily work.',
-            name: 'Anders Kvist',
-            title: 'Operations Manager, Nordic Drift',
+            quote: 'Samsari understood our needs quickly and delivered solutions that save us many hours every week. They combine solid technical expertise with genuine understanding of banking operations.',
+            name: 'Jørn Gudbrandsen',
+            title: 'Chief Technology Officer @ Maritime & Merchant Bank',
           },
           {
-            quote:
-              'We had been trying to solve this problem for two years. Samsari delivered something we actually use in under a month.',
-            name: 'Marte Vold',
-            title: 'Project Manager, Fjord Prosjekt',
-          },
-          {
-            quote:
-              'Onboarding is no longer something we dread. It just runs. That is exactly what we needed.',
-            name: 'Lars Engvik',
-            title: 'HR Director, Arctic HR',
+            quote: 'The best way to describe them is that they get the job done',
+            name: 'Kristian Kvernes Hatlen',
+            title: 'CEO @ Flematec',
           },
         ];
 
@@ -244,7 +228,7 @@ export function HomePage() {
   return (
     <>
       {/* Hero — full-screen split layout */}
-      <section className="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 py-24 sm:px-6 lg:px-8">
+      <section className="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 pb-36 pt-24 sm:px-6 lg:px-8">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute inset-0 premium-grid opacity-[0.15]" />
           <div className="absolute left-1/2 top-0 h-[56rem] w-[72rem] -translate-x-1/2 rounded-full bg-[var(--color-primary-soft)] blur-[120px]" />
@@ -255,34 +239,18 @@ export function HomePage() {
           <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16 xl:gap-20">
             {/* Text */}
             <Reveal className="flex-1 text-center lg:text-left">
-              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-primary)]">
+              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)] sm:tracking-[0.3em]">
                 {t.home.hero.eyebrow}
               </p>
-              <h1 className="text-5xl font-semibold tracking-tight sm:text-6xl lg:text-[3.75rem] lg:leading-[1.06]">
+              <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl lg:text-[3.75rem] lg:leading-[1.06]">
                 {t.home.hero.title}
               </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-xl leading-8 text-[var(--color-text-muted)] lg:mx-0">
+              <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[var(--color-text-muted)] sm:text-xl sm:leading-8 lg:mx-0">
                 {t.home.hero.description}
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
                 <ButtonLink to={BOOKING_URL}>{t.home.hero.primaryCta}</ButtonLink>
                 <ButtonLink to="/services" variant="secondary">{t.home.hero.secondaryCta}</ButtonLink>
-              </div>
-              {/* Trust logos */}
-              <div className="mt-12 border-t border-[var(--color-border)] pt-10">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-subtle)]">
-                  {t.common.trustedBy}
-                </p>
-                <div className="mt-5 flex flex-wrap items-center justify-center gap-8 lg:justify-start">
-                  {trustLogos.map((logo) => (
-                    <img
-                      key={logo.src}
-                      src={logo.src}
-                      alt={logo.alt}
-                      className="h-7 w-auto object-contain opacity-50 saturate-0 transition hover:opacity-100 hover:saturate-100"
-                    />
-                  ))}
-                </div>
               </div>
             </Reveal>
 
@@ -293,6 +261,26 @@ export function HomePage() {
           </div>
 
         </div>
+
+        {/* Full-width logo wall */}
+        <div className="absolute inset-x-0 bottom-0 border-t border-[var(--color-border)] bg-[var(--color-surface)] dark:bg-[rgba(255,255,255,0.92)]">
+          <div className="px-4 py-8 sm:px-6 lg:px-8">
+            <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-subtle)] dark:text-[rgba(30,48,58,0.82)]">
+              {t.common.trustedBy}
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              {trustLogos.map((logo) => (
+                <div key={logo.src}>
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    className="h-7 w-auto object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* What we do — dark section with 3 feature cards */}
@@ -302,7 +290,7 @@ export function HomePage() {
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-[var(--color-accent)]">
               {language === 'no' ? 'Hva vi gjør' : 'What we do'}
             </p>
-            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
               {language === 'no'
                 ? 'Vi hjelper virksomheter å jobbe smartere med teknologien de allerede har.'
                 : 'We help businesses work smarter with the technology they already have.'}
@@ -368,26 +356,37 @@ export function HomePage() {
                 </div>
               ))
             : featuredCases.map((item, index) => (
-                <Reveal key={item._id} delay={index * 90} className="group overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] transition hover:-translate-y-1">
-                  {item.mainImage && (
-                    <img
-                      src={urlFor(item.mainImage).width(600).height(300).fit('crop').url()}
-                      alt={item.mainImage.alt ?? item.company}
-                      className="h-44 w-full object-cover"
-                    />
-                  )}
-                  <div className="p-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-subtle)]">{getSector(item, language)}</p>
-                    <h3 className="mt-2 text-2xl font-semibold">{item.company}</h3>
-                    <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">{getResult(item, language)}</p>
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      {getMetrics(item, language).map((metric) => (
-                        <span key={metric} className="rounded-full bg-[var(--color-tag)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
-                          {metric}
-                        </span>
-                      ))}
+                <Reveal key={item._id} delay={index * 90}>
+                  <Link
+                    to={`/cases/${getCaseSlug(item.company)}`}
+                    className="group flex h-full flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] transition hover:-translate-y-1 hover:shadow-premium"
+                  >
+                    {item.mainImage && (
+                      <div className="h-32 overflow-hidden rounded-t-2xl">
+                        <img
+                          src={urlFor(item.mainImage).width(600).height(300).fit('crop').url()}
+                          alt={item.mainImage.alt ?? item.company}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex flex-1 flex-col p-6">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-subtle)]">{getSector(item, language)}</p>
+                      <h3 className="mt-2 text-xl font-semibold">{item.company}</h3>
+                      <p className="mt-3 flex-1 text-sm leading-7 text-[var(--color-text-muted)] line-clamp-3">{getResult(item, language)}</p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {getMetrics(item, language).slice(0, 2).map((metric) => (
+                          <span key={metric} className="rounded-full bg-[var(--color-tag)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                            {metric}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-[var(--color-primary)] transition group-hover:gap-2">
+                        {language === 'no' ? 'Les hele historien' : 'Read the full story'}
+                        <span aria-hidden="true">→</span>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </Reveal>
               ))}
         </div>
@@ -403,7 +402,7 @@ export function HomePage() {
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-[var(--color-accent)]">
               {language === 'no' ? 'Hva kundene sier' : 'What clients say'}
             </p>
-            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
               {language === 'no'
                 ? 'Resultater som merkes i hverdagen'
                 : 'Results that make a difference every day'}

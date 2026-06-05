@@ -32,3 +32,7 @@ export function getResult(c: SanityCase, lang: Language) {
 export function getMetrics(c: SanityCase, lang: Language): string[] {
   return (lang === 'en' && c.metrics_en?.length ? c.metrics_en : c.metrics_no) ?? [];
 }
+
+export function getCaseSlug(company: string): string {
+  return company.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}

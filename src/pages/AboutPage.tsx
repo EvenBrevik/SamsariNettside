@@ -30,14 +30,14 @@ export function AboutPage() {
         statement: 'Fra idé og prosessforståelse til løsninger folk faktisk bruker.',
         what: 'Vi hjelper virksomheter med å automatisere prosesser, utvikle smarte arbeidsflater og få mer ut av Microsoft 365. Vi kombinerer rådgivning, produktforståelse og moderne utvikling for å skape løsninger som fungerer i praksis.',
         originTitle: 'Slik startet Samsari',
-        origin: 'Vi så at mange virksomheter satt med gode verktøy, men manglet struktur, flyt og løsninger som faktisk passet hvordan de jobbet. Samsari ble til for å fylle det gapet — med en tilnærming som starter i forretningsbehovet og slutter i løsninger folk faktisk tar i bruk.',
+        origin: 'Vi så at mange virksomheter satt med gode verktøy, men manglet struktur, flyt og løsninger som faktisk passet hvordan de jobbet. Samsari ble til for å fylle det gapet, med en tilnærming som starter i forretningsbehovet og slutter i løsninger folk faktisk tar i bruk.',
       }
     : {
         eyebrow: 'About Samsari',
         statement: 'From ideas and process understanding to solutions people actually use.',
         what: 'We help businesses automate processes, develop smart workspaces and get more value from Microsoft 365. We combine advisory work, product thinking and modern development to create solutions that work in practice.',
         originTitle: 'How Samsari started',
-        origin: 'We saw that many companies had strong tools but lacked the structure, flow and solutions that matched how they actually worked. Samsari was built to close that gap — with an approach that starts in business need and ends with solutions people genuinely adopt.',
+        origin: 'We saw that many companies had strong tools but lacked the structure, flow and solutions that matched how they actually worked. Samsari was built to close that gap, with an approach that starts in business need and ends with solutions people genuinely adopt.',
       };
 
   const people = no

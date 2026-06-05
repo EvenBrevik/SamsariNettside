@@ -26,7 +26,7 @@ function PrivacyNO() {
               <li><strong>Selskapsnavn:</strong> Samsari</li>
               <li><strong>Organisasjonsnummer:</strong> 936 276 474</li>
               <li><strong>Adresse:</strong> Hagbart Brinchmanns vei 20, 6510 Kristiansund N</li>
-              <li><strong>E-post:</strong> <a href="mailto:hello@samsari.no" className="text-[var(--color-primary)] hover:underline">hello@samsari.no</a></li>
+              <li><strong>E-post:</strong> <a href="mailto:hei@samsari.no" className="text-[var(--color-primary)] hover:underline">hei@samsari.no</a></li>
             </ul>
           </PolicySection>
 
@@ -67,12 +67,12 @@ function PrivacyNO() {
               <li>Trekke tilbake samtykket ditt</li>
               <li>Klage til Datatilsynet (datatilsynet.no)</li>
             </ul>
-            <p className="mt-4">For å bruke rettighetene dine, ta kontakt med oss på <a href="mailto:hello@samsari.no" className="text-[var(--color-primary)] hover:underline">hello@samsari.no</a>.</p>
+            <p className="mt-4">For å bruke rettighetene dine, ta kontakt med oss på <a href="mailto:hei@samsari.no" className="text-[var(--color-primary)] hover:underline">hei@samsari.no</a>.</p>
           </PolicySection>
 
           <PolicySection title="Kontakt">
             <p>Har du spørsmål om behandlingen av personopplysninger, ta gjerne kontakt med oss:</p>
-            <p className="mt-3"><a href="mailto:hello@samsari.no" className="text-[var(--color-primary)] hover:underline">hello@samsari.no</a></p>
+            <p className="mt-3"><a href="mailto:hei@samsari.no" className="text-[var(--color-primary)] hover:underline">hei@samsari.no</a></p>
           </PolicySection>
         </div>
       </div>
@@ -97,7 +97,7 @@ function PrivacyEN() {
               <li><strong>Company:</strong> Samsari</li>
               <li><strong>Organisation number:</strong> 936 276 474</li>
               <li><strong>Address:</strong> Hagbart Brinchmanns vei 20, 6510 Kristiansund N, Norway</li>
-              <li><strong>Email:</strong> <a href="mailto:hello@samsari.no" className="text-[var(--color-primary)] hover:underline">hello@samsari.no</a></li>
+              <li><strong>Email:</strong> <a href="mailto:hei@samsari.no" className="text-[var(--color-primary)] hover:underline">hei@samsari.no</a></li>
             </ul>
           </PolicySection>
 
@@ -138,12 +138,12 @@ function PrivacyEN() {
               <li>Withdraw your consent at any time</li>
               <li>Lodge a complaint with the Norwegian Data Protection Authority (datatilsynet.no)</li>
             </ul>
-            <p className="mt-4">To exercise your rights, contact us at <a href="mailto:hello@samsari.no" className="text-[var(--color-primary)] hover:underline">hello@samsari.no</a>.</p>
+            <p className="mt-4">To exercise your rights, contact us at <a href="mailto:hei@samsari.no" className="text-[var(--color-primary)] hover:underline">hei@samsari.no</a>.</p>
           </PolicySection>
 
           <PolicySection title="Contact">
             <p>If you have questions about how we handle personal data, please reach out:</p>
-            <p className="mt-3"><a href="mailto:hello@samsari.no" className="text-[var(--color-primary)] hover:underline">hello@samsari.no</a></p>
+            <p className="mt-3"><a href="mailto:hei@samsari.no" className="text-[var(--color-primary)] hover:underline">hei@samsari.no</a></p>
           </PolicySection>
         </div>
       </div>

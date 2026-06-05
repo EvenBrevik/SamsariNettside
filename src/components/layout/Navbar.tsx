@@ -19,16 +19,6 @@ export function Navbar() {
       : language === 'no'
         ? 'Åpne meny'
         : 'Open menu';
-  const navItemWidths: Record<(typeof appRoutes)[number]['key'], string> = {
-    home: 'w-[4.5rem]',
-    services: 'w-[5.5rem]',
-    products: 'w-[5.75rem]',
-    cases: 'w-[4.5rem]',
-    blog: 'w-[4.5rem]',
-    about: 'w-[5rem]',
-    contact: 'w-[5rem]',
-  };
-
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
@@ -40,13 +30,13 @@ export function Navbar() {
           <img src="/samsari-logo-dark.png" alt="Samsari" className="h-8 max-w-none object-contain dark:hidden sm:h-9" />
           <img src="/samsari-logo-light.png" alt="Samsari" className="hidden h-8 max-w-none object-contain dark:block sm:h-9" />
         </Link>
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center lg:flex">
           {appRoutes.map((route) => (
             <NavLink
               key={route.key}
               to={route.path}
               className={({ isActive }) =>
-                `${navItemWidths[route.key]} whitespace-nowrap px-2 py-2 text-center text-sm font-medium transition ${
+                `whitespace-nowrap px-3 py-2 text-sm font-medium transition ${
                   isActive
                     ? 'text-[var(--color-primary)]'
                     : 'text-[var(--color-text-subtle)] hover:text-[var(--color-text)]'
