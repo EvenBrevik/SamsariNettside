@@ -80,9 +80,9 @@ export function CaseDetailPage() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="-mt-8 overflow-hidden rounded-2xl shadow-premium">
             <img
-              src={urlFor(item.mainImage).width(1200).height(600).fit('crop').url()}
+              src={urlFor(item.mainImage).width(1200).fit('max').url()}
               alt={item.mainImage.alt ?? item.company}
-              className="h-64 w-full object-cover sm:h-96"
+              className="h-64 w-full object-contain p-6 sm:h-80"
             />
           </div>
         </div>

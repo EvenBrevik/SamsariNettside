@@ -84,9 +84,9 @@ export function CasesPage() {
                       <div className="relative h-36 overflow-hidden rounded-t-2xl bg-[var(--color-dark)] shrink-0">
                         {item.mainImage ? (
                           <img
-                            src={urlFor(item.mainImage).width(600).height(320).fit('crop').url()}
+                            src={urlFor(item.mainImage).width(600).fit('max').url()}
                             alt={item.mainImage.alt ?? item.company}
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-contain p-4"
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center">

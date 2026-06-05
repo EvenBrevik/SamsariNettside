@@ -364,9 +364,9 @@ export function HomePage() {
                     {item.mainImage && (
                       <div className="h-32 overflow-hidden rounded-t-2xl">
                         <img
-                          src={urlFor(item.mainImage).width(600).height(300).fit('crop').url()}
+                          src={urlFor(item.mainImage).width(600).fit('max').url()}
                           alt={item.mainImage.alt ?? item.company}
-                          className="h-full w-full object-cover"
+                          className="h-full w-full object-contain p-4"
                         />
                       </div>
                     )}
