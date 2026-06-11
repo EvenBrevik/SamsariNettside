@@ -10,6 +10,7 @@ import { useAppSettings } from '../providers/AppSettingsProvider';
 
 export function CasesPage() {
   const { t, language } = useAppSettings();
+  const no = language === 'no';
   useSEO({
     title: no ? 'Kundecase' : 'Customer cases',
     description: no
@@ -19,7 +20,6 @@ export function CasesPage() {
   });
   const { cases: allCases, loading } = useSanityCases();
   const cases = allCases.filter(c => !c.company.toLowerCase().includes('test'));
-  const no = language === 'no';
 
   return (
     <>
@@ -111,7 +111,7 @@ export function CasesPage() {
 
                       {/* Content */}
                       <div className="flex flex-1 flex-col p-6">
-                        <h2 className="text-xl font-semibold">{item.company}</h2>
+                        <h3 className="text-xl font-semibold">{item.company}</h3>
                         <p className="mt-2 flex-1 text-sm leading-7 text-[var(--color-text-muted)] line-clamp-3">
                           {getResult(item, language)}
                         </p>

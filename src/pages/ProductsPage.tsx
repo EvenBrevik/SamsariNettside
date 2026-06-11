@@ -425,8 +425,6 @@ export function ProductsPage() {
                       {t.products[0].url && (
                         <a
                           href={t.products[0].url}
-                          target="_blank"
-                          rel="noreferrer"
                           className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-primary-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--color-primary)] transition hover:bg-[var(--color-primary)] hover:text-white"
                         >
                           {openLabel}
@@ -487,8 +485,6 @@ export function ProductsPage() {
                       {t.products[1].url && (
                         <a
                           href={t.products[1].url}
-                          target="_blank"
-                          rel="noreferrer"
                           className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 px-3 py-1.5 text-xs font-semibold text-[var(--color-accent)] transition hover:bg-[var(--color-accent)] hover:text-white"
                         >
                           {openLabel}

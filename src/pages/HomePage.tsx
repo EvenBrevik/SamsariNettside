@@ -233,42 +233,43 @@ export function HomePage() {
   return (
     <>
       {/* Hero — full-screen split layout */}
-      <section className="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 pb-36 pt-24 sm:px-6 lg:px-8">
+      <section className="relative flex min-h-screen flex-col overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute inset-0 premium-grid opacity-[0.15]" />
           <div className="absolute left-1/2 top-0 h-[56rem] w-[72rem] -translate-x-1/2 rounded-full bg-[var(--color-primary-soft)] blur-[120px]" />
           <div className="absolute right-0 top-0 h-full w-[32rem] rounded-full bg-[var(--color-accent-soft)] blur-[100px]" />
         </div>
 
-        <div className="mx-auto w-full max-w-7xl">
-          <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16 xl:gap-20">
-            {/* Text */}
-            <Reveal className="flex-1 text-center lg:text-left">
-              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)] sm:tracking-[0.3em]">
-                {t.home.hero.eyebrow}
-              </p>
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl lg:text-[3.75rem] lg:leading-[1.06]">
-                {t.home.hero.title}
-              </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[var(--color-text-muted)] sm:text-xl sm:leading-8 lg:mx-0">
-                {t.home.hero.description}
-              </p>
-              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-                <ButtonLink to={BOOKING_URL}>{t.home.hero.primaryCta}</ButtonLink>
-                <ButtonLink to="/services" variant="secondary">{t.home.hero.secondaryCta}</ButtonLink>
-              </div>
-            </Reveal>
+        <div className="flex flex-1 items-center px-4 pb-12 pt-24 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16 xl:gap-20">
+              {/* Text */}
+              <Reveal className="flex-1 text-center lg:text-left">
+                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)] sm:tracking-[0.3em]">
+                  {t.home.hero.eyebrow}
+                </p>
+                <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl lg:text-[3.75rem] lg:leading-[1.06]">
+                  {t.home.hero.title}
+                </h1>
+                <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[var(--color-text-muted)] sm:text-xl sm:leading-8 lg:mx-0">
+                  {t.home.hero.description}
+                </p>
+                <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+                  <ButtonLink to={BOOKING_URL}>{t.home.hero.primaryCta}</ButtonLink>
+                  <ButtonLink to="/services" variant="secondary">{t.home.hero.secondaryCta}</ButtonLink>
+                </div>
+              </Reveal>
 
-            {/* Visual */}
-            <Reveal delay={120} className="w-full max-w-md shrink-0 lg:w-[440px] xl:w-[480px]">
-              <HeroVisual language={language} />
-            </Reveal>
+              {/* Visual */}
+              <Reveal delay={120} className="w-full max-w-md shrink-0 lg:w-[440px] xl:w-[480px]">
+                <HeroVisual language={language} />
+              </Reveal>
+            </div>
           </div>
-
         </div>
 
         {/* Full-width logo wall */}
-        <div className="absolute inset-x-0 bottom-0 border-t border-[var(--color-border)] bg-[var(--color-surface)] dark:bg-[rgba(255,255,255,0.92)]">
+        <div className="border-t border-[var(--color-border)] bg-[var(--color-surface)] dark:bg-[rgba(255,255,255,0.92)]">
           <div className="px-4 py-8 sm:px-6 lg:px-8">
             <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-subtle)] dark:text-[rgba(30,48,58,0.82)]">
               {t.common.trustedBy}
