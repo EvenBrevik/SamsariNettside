@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import WhatWeDo from '../components/WhatWeDo.astro';
+import Products from '../components/Products.astro';
+import { BOOKING_URL } from '../data/site';
+---
+<Base
+  headerTone="dark"
+  description="Samsari utvikler egne produkter og skreddersydde systemer for arbeid som skal flyte bedre."
+>
+  <div data-home-hero>
+    <PageHero
+      title="Teknologi som får arbeidet videre."
+      body="Vi utvikler egne produkter og bygger skreddersydde systemer rundt måten virksomheten faktisk jobber på."
+      image="/hero-workspace-v1.png"
+      tone="dark"
+      tall
+      primaryLabel="Se hva vi gjør"
+      primaryHref="#hva-vi-gjor"
+      secondaryLabel="Book en prat"
+      secondaryHref={BOOKING_URL}
+    />
+  </div>
+
+  <WhatWeDo />
+
+  <Products />
+
+  <script>
+    // Slår siden fra mørkt til lyst tema når hero-bunnen har passert 45 % av viewporten.
+    // De to tersklene ligger med vilje et stykke fra hverandre: uten det ville små
+    // scrollbevegelser rundt ett punkt få temaet til å blinke fram og tilbake.
+    const homeHero = document.querySelector('[data-home-hero]');
+
+    if (homeHero) {
+      const LIGHT_BELOW = 0.45;
+      const DARK_ABOVE = 0.6;
+      let isLight = false;
+      let ticking = false;
+
+      const updateHomeTheme = () => {
+        const viewport = window.innerHeight;
+        const heroBottom = homeHero.getBoundingClientRect().bottom;
+
+        if (!isLight && heroBottom <= LIGHT_BELOW * viewport) isLight = true;
+        else if (isLight && heroBottom >= DARK_ABOVE * viewport) isLight = false;
+
+        document.documentElement.classList.toggle('home-is-light', isLight);
+        ticking = false;
+      };
+
+      const requestThemeUpdate = () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateHomeTheme);
+          ticking = true;
+        }
+      };
+
+      updateHomeTheme();
+      window.addEventListener('scroll', requestThemeUpdate, { passive: true });
+      window.addEventListener('resize', requestThemeUpdate, { passive: true });
+
+      // Direktelenke til #hva-vi-gjor: hopp dit uten smooth scroll, og still temaet med én gang.
+      if (window.location.hash === '#hva-vi-gjor') {
+        const jumpToPaths = () => {
+          window.requestAnimationFrame(() => {
+            const target = document.querySelector('#hva-vi-gjor');
+            const previousBehavior = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = 'auto';
+            target?.scrollIntoView({ block: 'start' });
+            document.documentElement.style.scrollBehavior = previousBehavior;
+            updateHomeTheme();
+          });
+        };
+
+        if (document.readyState === 'complete') jumpToPaths();
+        else window.addEventListener('load', jumpToPaths, { once: true });
+      }
+    }
+  </script>
+</Base>

@@ -1,0 +1,57 @@
+---
+// Seksjon 2: hva vi gjør. Venstrestilt overskriftsblokk og en rad rolige kort.
+// Kortene har ingen knapp — tjenestene har ingen egen side å peke til ennå.
+const services = [
+  {
+    title: 'Systemutvikling',
+    body: 'Apper og systemer bygget rundt måten dere faktisk jobber på.',
+    icon: 'code',
+  },
+  {
+    title: 'Integrasjoner',
+    body: 'Systemene dere allerede har, koblet sammen så data flyter av seg selv.',
+    icon: 'link',
+  },
+  {
+    title: 'Automasjon',
+    body: 'Manuelle steg i arbeidsflyten erstattet med noe som går av seg selv.',
+    icon: 'bolt',
+  },
+];
+---
+
+<section id="hva-vi-gjor" class="home-intro px-5 pb-20 pt-24 sm:px-7 sm:pb-24 sm:pt-28 lg:px-9 lg:pb-32 lg:pt-36">
+  <div class="mx-auto max-w-[80rem]">
+    <p class="home-accent text-xs font-semibold uppercase tracking-[.18em]">Hva vi gjør</p>
+    <h2 class="mt-5 max-w-2xl text-[clamp(1.9rem,3.4vw,3.1rem)] font-medium leading-[1.12] tracking-[-.035em]">
+      Produkter, systemer og integrasjoner
+    </h2>
+    <p class="home-muted mt-5 max-w-xl text-base leading-7">
+      Samsari utvikler egne produkter og bygger skreddersydde systemer rundt måten virksomheten faktisk jobber på.
+    </p>
+
+    <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {services.map((service) => (
+        <article class="home-card flex min-h-[21rem] flex-col rounded-2xl border p-8">
+          <span class="home-muted" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="h-7 w-7">
+              {service.icon === 'code' && <path d="M9 7.5 4 12l5 4.5M15 7.5 20 12l-5 4.5" />}
+              {service.icon === 'link' && (
+                <>
+                  <path d="M10.5 13.5a3.5 3.5 0 0 1 0-4.95l2.05-2.05a3.5 3.5 0 0 1 4.95 4.95l-1.1 1.1" />
+                  <path d="M13.5 10.5a3.5 3.5 0 0 1 0 4.95l-2.05 2.05a3.5 3.5 0 0 1-4.95-4.95l1.1-1.1" />
+                </>
+              )}
+              {service.icon === 'bolt' && <path d="M13 3 5.5 13.5H11L10 21l7.5-10.5H12z" />}
+            </svg>
+          </span>
+
+          <div class="mt-auto pt-16">
+            <h3 class="text-xl font-semibold tracking-[-.015em]">{service.title}</h3>
+            <p class="home-muted mt-3 max-w-xs text-[15px] leading-6">{service.body}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

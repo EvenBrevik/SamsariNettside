@@ -1,0 +1,132 @@
+@import '@fontsource/poppins/latin-400.css';
+@import '@fontsource/poppins/latin-500.css';
+@import '@fontsource/poppins/latin-600.css';
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: #f4f7f8;
+  --color-surface: #ffffff;
+  --color-ink: #07131b;
+  --color-muted: #60707b;
+  --color-line: #dbe3e7;
+  --color-accent: #078bd2;
+  --color-accent-hover: #006fae;
+  --color-accent-soft: #e4f5fd;
+  --color-night: #07131b;
+  --color-night-soft: #0d1b24;
+  --color-signal: #b8f23d;
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 2px rgba(7, 19, 27, 0.04), 0 18px 50px rgba(7, 19, 27, 0.07);
+  --shadow-float: 0 30px 80px rgba(7, 19, 27, 0.22);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; overflow-x: hidden; background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  h1, h2, h3 { text-wrap: balance; letter-spacing: -0.045em; }
+  p { text-wrap: pretty; }
+  a, button, summary { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+  summary::-webkit-details-marker { display: none; }
+  summary { list-style: none; cursor: pointer; }
+}
+
+@layer utilities {
+  .text-display { font-size: clamp(2.65rem, 7vw, 6.7rem); line-height: 0.94; letter-spacing: -0.07em; }
+  .text-title { font-size: clamp(2.1rem, 4.5vw, 4.5rem); line-height: 1; letter-spacing: -0.06em; }
+  .tech-grid { background-image: linear-gradient(rgba(7,19,27,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(7,19,27,.055) 1px,transparent 1px); background-size: 44px 44px; }
+  .tech-grid-dark { background-image: linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px); background-size: 44px 44px; }
+  .dot-field { background-image: radial-gradient(rgba(7,19,27,.14) 1px,transparent 1px); background-size: 18px 18px; }
+  .grain::after { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitchTiles'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E"); content: ''; opacity: .08; mix-blend-mode: soft-light; }
+  .card-lift { transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease; }
+  .card-lift:hover { transform: translateY(-3px); box-shadow: 0 24px 60px rgba(7,19,27,.11); }
+  .arrow-link svg { transition: transform 180ms ease; }
+  .arrow-link:hover svg { transform: translateX(4px); }
+  .section-pad { padding-block: clamp(4.75rem, 9vw, 8rem); }
+}
+
+.article-body { color: var(--color-muted); font-size: 1.0625rem; line-height: 1.85; }
+.article-body > * + * { margin-top: 1.25rem; }
+.article-body h2, .article-body h3 { color: var(--color-ink); font-weight: 600; margin-top: 2.75rem; }
+.article-body h2 { font-size: 1.65rem; }
+.article-body h3 { font-size: 1.3rem; }
+.article-body strong { color: var(--color-ink); font-weight: 600; }
+.article-body a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+.article-body ul, .article-body ol { padding-left: 1.5rem; }
+.article-body ul { list-style: disc; }
+.article-body ol { list-style: decimal; }
+.article-body li + li { margin-top: .5rem; }
+.article-body blockquote { border-left: 2px solid var(--color-accent); padding-left: 1.25rem; font-style: italic; }
+.article-body img { border-radius: var(--radius-card); }
+
+@keyframes float-soft { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.float-soft { animation: float-soft 7s ease-in-out infinite; }
+
+/* Overgangen fra hero til lyst tema.
+   Scroll-scriptet slår .home-is-light av eller på ved ett punkt, og CSS animerer skiftet.
+   Bevisst ikke scroll-drevet: da ble siden stående i en halvveis blandet mellomtilstand
+   hvis du stoppet midt i overgangen. Nå lander den alltid på mørkt eller lyst.
+   easeInOutCubic er raskest på midten, så blandingsfargene passeres fort. */
+.home-shell,
+.home-intro,
+.home-intro-divider,
+.home-intro-copy,
+.home-muted,
+.home-accent,
+.home-card,
+.home-theme-header,
+.home-header-cta,
+.home-logo-light,
+.home-logo-dark,
+body {
+  transition-duration: 480ms;
+  transition-timing-function: cubic-bezier(.65, 0, .35, 1);
+  transition-property: background-color, color, border-color, box-shadow, opacity, backdrop-filter;
+}
+
+.home-shell { background-color: #082f38; }
+
+.home-intro {
+  margin-top: -1px;
+  background-color: #082f38;
+  color: #ffffff;
+}
+
+.home-intro-divider { border-color: rgba(255, 255, 255, .13); }
+.home-intro-copy { color: rgba(255, 255, 255, .62); }
+.home-muted { color: rgba(255, 255, 255, .6); }
+.home-accent { color: #79cef4; }
+.home-card { background-color: rgba(255, 255, 255, .045); border-color: rgba(255, 255, 255, .1); }
+
+.home-theme-header { background-color: #082f38; color: #ffffff; }
+.home-header-cta { background-color: #79cef4; color: #082f38; }
+.home-logo-light { opacity: 1; }
+.home-logo-dark { opacity: 0; }
+
+html.home-is-light body { background-color: #f7f9fa; }
+html.home-is-light .home-shell { background-color: #f7f9fa; }
+html.home-is-light .home-intro { background-color: #f7f9fa; color: var(--color-ink); }
+html.home-is-light .home-intro-divider { border-color: rgba(7, 19, 27, .1); }
+html.home-is-light .home-intro-copy { color: var(--color-muted); }
+html.home-is-light .home-muted { color: var(--color-muted); }
+html.home-is-light .home-accent { color: var(--color-accent); }
+html.home-is-light .home-card { background-color: #f5f6f7; border-color: rgba(7, 19, 27, .07); }
+html.home-is-light .home-theme-header {
+  background-color: rgba(247, 249, 250, .94);
+  color: var(--color-ink);
+  box-shadow: 0 1px 0 rgba(7, 19, 27, .06);
+  backdrop-filter: blur(18px);
+}
+html.home-is-light .home-logo-light { opacity: 0; }
+html.home-is-light .home-logo-dark { opacity: 1; }
+html.home-is-light .home-header-cta { background-color: var(--color-ink); color: #ffffff; }
+
+@media (max-width: 639px) {
+  .tech-grid, .tech-grid-dark { background-size: 32px 32px; }
+  .card-lift:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,*::before,*::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

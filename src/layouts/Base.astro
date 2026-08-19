@@ -1,0 +1,81 @@
+---
+import Seo from '../components/Seo.astro';
+import Header from '../components/Header.astro';
+import { PUBLIC_CF_ANALYTICS_TOKEN } from 'astro:env/client';
+import { site, contact, social } from '../data/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+  image?: string;
+  noindex?: boolean;
+  headerTone?: 'dark' | 'light';
+}
+
+const { title, description, type, image, noindex, headerTone = 'light' } = Astro.props;
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.name,
+  url: site.url,
+  logo: `${site.url}/samsari-logo-dark.png`,
+  description: site.defaultDescription,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: contact.address.street,
+    postalCode: contact.address.postalCode,
+    addressLocality: contact.address.city,
+    addressCountry: contact.address.country,
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: contact.generalEmail,
+    telephone: contact.phone,
+    contactType: 'customer service',
+  },
+  sameAs: [social.linkedin, social.instagram, social.facebook],
+};
+---
+
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/Favicon_blue_32x32.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <Seo title={title} description={description} type={type} image={image} noindex={noindex} />
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(organizationSchema)}
+    />
+    <slot name="head" />
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#innhold"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded-card focus:bg-canvas focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-card"
+    >
+      Hopp til innhold
+    </a>
+    <Header tone={headerTone} />
+    <main id="innhold" class="flex-1">
+      <slot />
+    </main>
+
+    {
+      PUBLIC_CF_ANALYTICS_TOKEN && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={`{"token": "${PUBLIC_CF_ANALYTICS_TOKEN}"}`}
+        />
+      )
+    }
+  </body>
+</html>

@@ -12,13 +12,19 @@ export const sanityCase = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'slug',
+      title: 'Slug (URL)',
+      type: 'slug',
+      description:
+        'Adressen casen får: /kundecase/<slug>. Klikk "Generate" for å lage den fra bedriftsnavnet. Endrer du den senere, dør gamle lenker.',
+      options: { source: 'company', maxLength: 96 },
+    }),
+    defineField({
       name: 'mainImage',
       title: 'Forsidebilde',
       type: 'image',
       options: { hotspot: true },
-      fields: [
-        defineField({ name: 'alt', title: 'Alternativ tekst', type: 'string' }),
-      ],
+      fields: [defineField({ name: 'alt', title: 'Alternativ tekst', type: 'string' })],
     }),
     defineField({
       name: 'order',
@@ -26,23 +32,46 @@ export const sanityCase = defineType({
       type: 'number',
       description: 'Lavere tall vises først (f.eks. 1, 2, 3)',
     }),
-    // --- Norsk ---
-    defineField({ name: 'sector_no', title: 'Bransje (Norsk)', type: 'string', validation: (Rule) => Rule.required() }),
-    defineField({ name: 'problem_no', title: 'Problem (Norsk)', type: 'text', rows: 3, validation: (Rule) => Rule.required() }),
-    defineField({ name: 'solution_no', title: 'Løsning (Norsk)', type: 'text', rows: 3, validation: (Rule) => Rule.required() }),
-    defineField({ name: 'result_no', title: 'Resultat (Norsk)', type: 'text', rows: 3, validation: (Rule) => Rule.required() }),
-    defineField({ name: 'metrics_no', title: 'Nøkkeltall (Norsk)', type: 'array', of: [{ type: 'string' }], description: 'F.eks. "34% raskere behandling"' }),
-    // --- English ---
-    defineField({ name: 'sector_en', title: 'Sector (English)', type: 'string' }),
-    defineField({ name: 'problem_en', title: 'Problem (English)', type: 'text', rows: 3 }),
-    defineField({ name: 'solution_en', title: 'Solution (English)', type: 'text', rows: 3 }),
-    defineField({ name: 'result_en', title: 'Result (English)', type: 'text', rows: 3 }),
-    defineField({ name: 'metrics_en', title: 'Key metrics (English)', type: 'array', of: [{ type: 'string' }] }),
+    defineField({
+      name: 'sector_no',
+      title: 'Bransje',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'problem_no',
+      title: 'Problem',
+      type: 'text',
+      rows: 5,
+      description: 'Skill avsnitt med en blank linje.',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'solution_no',
+      title: 'Løsning',
+      type: 'text',
+      rows: 5,
+      description: 'Skill avsnitt med en blank linje.',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'result_no',
+      title: 'Resultat',
+      type: 'text',
+      rows: 5,
+      description: 'Skill avsnitt med en blank linje.',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'metrics_no',
+      title: 'Nøkkeltall',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Korte stikkord, f.eks. "10+ timer spart per uke". Maks tre stykker vises.',
+    }),
   ],
   preview: {
     select: { title: 'company', subtitle: 'sector_no', media: 'mainImage' },
   },
-  orderings: [
-    { title: 'Rekkefølge', name: 'order', by: [{ field: 'order', direction: 'asc' }] },
-  ],
+  orderings: [{ title: 'Rekkefølge', name: 'order', by: [{ field: 'order', direction: 'asc' }] }],
 });

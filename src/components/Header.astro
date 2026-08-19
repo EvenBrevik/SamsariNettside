@@ -1,0 +1,44 @@
+---
+import { BOOKING_URL } from '../data/site';
+
+interface Props { tone?: 'dark' | 'light'; }
+
+const { tone = 'light' } = Astro.props;
+const dark = tone === 'dark';
+---
+<header
+  class:list={[
+    'z-50',
+    // Fargene på den mørke headeren styres av .home-theme-header, som følger scrollen.
+    dark ? 'home-theme-header sticky top-0' : 'relative border-b border-ink/8 bg-white text-ink',
+  ]}
+>
+  <!-- Samme sidemarg som rammen rundt hero-bildet, så logo og CTA flukter med bildekanten. -->
+  <div class="flex h-[84px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+    <a
+      href="/"
+      aria-label="Samsari, til forsiden"
+      class:list={['shrink-0', dark && 'relative block h-7 w-[140px] sm:h-8']}
+    >
+      {dark ? (
+        <>
+          <img src="/samsari-logo-light.png" alt="Samsari" width="140" height="36" class="home-logo-light absolute inset-0 h-7 w-auto sm:h-8" />
+          <img src="/samsari-logo-dark.png" alt="" width="140" height="36" class="home-logo-dark absolute inset-0 h-7 w-auto opacity-0 transition-opacity duration-500 sm:h-8" aria-hidden="true" />
+        </>
+      ) : (
+        <img src="/samsari-logo-dark.png" alt="Samsari" width="140" height="36" class="h-7 w-auto sm:h-8" />
+      )}
+    </a>
+    <a
+      href={BOOKING_URL}
+      target="_blank"
+      rel="noreferrer"
+      class:list={[
+        'inline-flex min-h-11 items-center rounded-full px-5 text-sm font-medium transition-transform duration-200 hover:-translate-y-0.5 sm:min-h-12 sm:px-6',
+        dark ? 'home-header-cta' : 'bg-ink text-white',
+      ]}
+    >
+      Book en prat
+    </a>
+  </div>
+</header>

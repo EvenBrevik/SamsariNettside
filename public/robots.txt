@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://samsari.no/sitemap.xml
+Sitemap: https://samsari.no/sitemap-index.xml
