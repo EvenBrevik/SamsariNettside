@@ -1,5 +1,14 @@
 ---
 import { site } from '../data/site';
+import {
+  LOCALES,
+  LOCALE_META,
+  DEFAULT_LOCALE,
+  localeFromPath,
+  stripLocale,
+  localizePath,
+} from '../i18n/config';
+import { SITE_META } from '../i18n/meta';
 
 interface Props {
   title?: string;
@@ -7,38 +16,78 @@ interface Props {
   type?: 'website' | 'article';
   image?: string;
   noindex?: boolean;
+  /** Overstyrer canonical der en side finnes på flere URL-er. */
+  canonical?: string;
+  /**
+   * Språk siden finnes på. Utelatt betyr «alle» — sett den kun når en side
+   * mangler oversettelser, ellers lover hreflang sider som ikke finnes.
+   */
+  availableLocales?: readonly string[];
 }
 
 const {
   title,
-  description = site.defaultDescription,
+  description,
   type = 'website',
   image = site.ogImage,
   noindex = false,
+  canonical: canonicalOverride,
+  availableLocales = LOCALES,
 } = Astro.props;
 
-// Forside bruker full tittel; undersider får " | Samsari" bak seg.
-const fullTitle = title ? `${title} | ${site.name}` : site.defaultTitle;
-const canonical = new URL(Astro.url.pathname, site.url).href.replace(/\/$/, '') || site.url;
+const locale = localeFromPath(Astro.url.pathname);
+const meta = LOCALE_META[locale];
+const localeMeta = SITE_META[locale];
+
+// Forsiden bruker full tittel; undersider får " | Samsari" bak seg.
+const fullTitle = title ? `${title} | ${site.name}` : localeMeta.defaultTitle;
+const metaDescription = description ?? localeMeta.defaultDescription;
+
+/** Absolutt URL uten trailing slash — men aldri tom, forsiden må bli site.url. */
+const absolute = (path: string) =>
+  new URL(path, site.url).href.replace(/\/$/, '') || site.url;
+
+const canonical = canonicalOverride ?? absolute(Astro.url.pathname);
+
+// Den språknøytrale ruten, brukt til å regne ut søskensidene på tvers av språk.
+const basePath = stripLocale(Astro.url.pathname);
+
+const alternates = LOCALES.filter((l) => availableLocales.includes(l)).map((l) => ({
+  hreflang: LOCALE_META[l].hreflang,
+  href: absolute(localizePath(basePath, l)),
+}));
+
 const imageUrl = new URL(image, site.url).href;
 ---
 
 <title>{fullTitle}</title>
-<meta name="description" content={description} />
+<meta name="description" content={metaDescription} />
 <link rel="canonical" href={canonical} />
+<meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
 
-{noindex && <meta name="robots" content="noindex, follow" />}
-{!noindex && <meta name="robots" content="index, follow" />}
+{
+  /* hreflang: forteller Google at dette er samme side på ulike språk, slik at
+     de ikke konkurrerer med hverandre. x-default peker på norsk. Droppes på
+     noindex-sider — der finnes det ingenting å knytte sammen. */
+  !noindex && (
+    <>
+      {alternates.map((alt) => (
+        <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+      ))}
+      <link rel="alternate" hreflang="x-default" href={absolute(localizePath(basePath, DEFAULT_LOCALE))} />
+    </>
+  )
+}
 
 <meta property="og:site_name" content={site.name} />
 <meta property="og:type" content={type} />
 <meta property="og:title" content={fullTitle} />
-<meta property="og:description" content={description} />
+<meta property="og:description" content={metaDescription} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={imageUrl} />
-<meta property="og:locale" content="nb_NO" />
+<meta property="og:locale" content={meta.ogLocale} />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={imageUrl} />

@@ -1,7 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
+import { useTranslations } from '../i18n/utils';
+import { DEFAULT_LOCALE } from '../i18n/config';
+
+// 404 serveres for ukjente stier i alle språk, så den kan ikke lese språk fra
+// URL-en slik andre sider gjør. Den er derfor alltid på norsk.
+const t = useTranslations(DEFAULT_LOCALE);
 ---
-<Base title="Siden finnes ikke" noindex>
-  <PageHero title="Denne adressen førte ingen steder." body="Siden kan ha blitt flyttet, eller lenken kan være feil." tone="light" primaryLabel="Gå til forsiden" primaryHref="/" />
+
+<Base title={t('notFound.title')} noindex>
+  <h1>{t('notFound.title')}</h1>
+  <p><a href="/">{t('notFound.back')}</a></p>
 </Base>

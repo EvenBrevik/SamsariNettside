@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import { LOCALES, DEFAULT_LOCALE } from '../../i18n/config';
+
+// Forsiden på de oversatte språkene. Norsk ligger på rot og er ikke med her.
+export function getStaticPaths() {
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map((locale) => ({
+    params: { locale },
+  }));
+}
+---
+
+<Base>
+  <h1>Samsari</h1>
+</Base>

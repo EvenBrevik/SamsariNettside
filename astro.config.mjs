@@ -4,10 +4,34 @@ import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
+import react from '@astrojs/react';
+
 export default defineConfig({
   site: 'https://samsari.no',
   adapter: cloudflare(),
-  integrations: [sitemap()],
+
+  // Norsk ligger på rot (/om-oss), øvrige språk får prefiks (/en/about).
+  // `redirectToDefaultLocale: false` hindrer at /nb/... blir en duplikat-URL.
+  i18n: {
+    defaultLocale: 'nb',
+    locales: ['nb', 'en', 'da', 'sv'],
+    routing: {
+      prefixDefaultLocale: false,
+      redirectToDefaultLocale: false,
+    },
+  },
+
+  integrations: [
+    react(),
+    sitemap({
+      // Gir Google hreflang-alternativene direkte i sitemapet, i tillegg til
+      // <link rel="alternate"> i <head>. Nøklene må være språkkoder, ikke landkoder.
+      i18n: {
+        defaultLocale: 'nb',
+        locales: { nb: 'nb-NO', en: 'en', da: 'da-DK', sv: 'sv-SE' },
+      },
+    }),
+  ],
 
   env: {
     schema: {
@@ -30,6 +54,24 @@ export default defineConfig({
         context: 'client',
         access: 'public',
         optional: true,
+      }),
+
+      // Sanity — kilden til redaksjonelt innhold. Datasettet er offentlig lesbart,
+      // så her trengs ingen token; verdiene er satt som default og kan overstyres.
+      SANITY_PROJECT_ID: envField.string({
+        context: 'server',
+        access: 'public',
+        default: 'iahqo8w0',
+      }),
+      SANITY_DATASET: envField.string({
+        context: 'server',
+        access: 'public',
+        default: 'production',
+      }),
+      SANITY_API_VERSION: envField.string({
+        context: 'server',
+        access: 'public',
+        default: '2024-01-01',
       }),
 
       // Resend — utsending av e-post fra skjemaet.

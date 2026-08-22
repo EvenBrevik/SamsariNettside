@@ -2,16 +2,19 @@
 
 Markedsnettsted for Samsari. Statisk generert med Astro, publisert på Cloudflare Workers.
 
+> **Status: fundament.** Siden er revet og bygges opp på nytt på branchen
+> `complete-rework`. Det som står nå er rammeverket — ruting, flerspråklighet,
+> SEO og innholdskilde. Det finnes ingen design, layout eller innholdssider ennå;
+> forsiden er en tom plassholder.
+
 ## Stack
 
 - **Astro 7:** alle sider prerendres til HTML ved bygg
-- **Tailwind CSS 4:** CSS-først, tokens i `src/styles/global.css`
-- **Sanity:** kundecase og blogg, hentet ved byggtid
-- **Cloudflare Workers:** statiske assets + ett API-endepunkt
-- **Resend + Turnstile:** kontaktskjema med spamfilter
-
-Ingen React, ingen klientside-ruting. Eneste JavaScript i nettleseren er
-kontaktskjemaet og Turnstile-widgeten; mobilmenyen bruker native `<details>`.
+- **React:** tilgjengelig for interaktive øyer, lastes kun der det faktisk brukes
+- **Tailwind CSS 4:** CSS-først, designtokens legges i `src/styles/global.css`
+- **Sanity:** kilde til redaksjonelt innhold, hentes ved byggtid
+- **Cloudflare Workers:** statiske assets + plass til API-endepunkter
+- **Resend + Turnstile:** konfigurert for kontaktskjema (skjemaet er ikke bygget ennå)
 
 ## Kom i gang
 
@@ -21,46 +24,79 @@ cp .env.example .env   # fyll inn nøkler, se under
 npm run dev            # http://localhost:4321
 ```
 
-| Kommando          | Hva den gjør                                     |
-| ----------------- | ------------------------------------------------ |
-| `npm run dev`     | Utviklingsserver med hot reload                  |
-| `npm run build`   | Bygger til `dist/`                               |
-| `npm run preview` | Bygger og kjører mot ekte Workers-runtime        |
-| `npm run deploy`  | Bygger og deployer til Cloudflare                |
-| `npm run check`   | Typesjekk av `.astro`- og `.ts`-filer            |
+| Kommando          | Hva den gjør                              |
+| ----------------- | ----------------------------------------- |
+| `npm run dev`     | Utviklingsserver med hot reload           |
+| `npm run build`   | Bygger til `dist/`                        |
+| `npm run preview` | Bygger og kjører mot ekte Workers-runtime |
+| `npm run deploy`  | Bygger og deployer til Cloudflare         |
+| `npm run check`   | Typesjekk av `.astro`- og `.ts`-filer     |
+
+> **Windows/OneDrive:** ligger repoet i en OneDrive-mappe, kan `node_modules/.vite`
+> bli låst under synkronisering og bygget feile med `EBUSY`. Kjør da
+> `npx astro build --force`, eller flytt Vite-cachen ut av OneDrive med
+> `VITE_CACHE_DIR`.
+
+## Språk
+
+Fire språk, med norsk på rot og prefiks på de øvrige:
+
+| Språk   | Kode | URL       |
+| ------- | ---- | --------- |
+| Norsk   | `nb` | `/`       |
+| Engelsk | `en` | `/en/…`   |
+| Dansk   | `da` | `/da/…`   |
+| Svensk  | `sv` | `/sv/…`   |
+
+Rutingen er Astros innebygde i18n — ingen runtime-bibliotek, null JavaScript
+sendt til nettleseren for oversettelse. Hvert språk får sin egen statiske side,
+som er det Google trenger for å indeksere dem hver for seg.
+
+Legge til en tekst:
+
+1. Legg nøkkelen i `src/i18n/ui/nb.ts` (norsk er kilden og definerer typen)
+2. TypeScript gir feil i `en.ts`, `da.ts` og `sv.ts` til alle har samme nøkkel
+3. Bruk den med `const t = useTranslations(locale)` og `t('min.nokkel')`
+
+Nye sider legges to steder: `src/pages/<rute>.astro` for norsk, og
+`src/pages/[locale]/<rute>.astro` for de tre andre.
+
+**SEO per språk** håndteres av `Seo.astro`: `hreflang` mellom alle språkversjoner
+pluss `x-default` på norsk, riktig `og:locale`, språksatt `<html lang>` og
+oversatt tittel/beskrivelse fra `src/i18n/meta.ts`. Sitemapet får de samme
+koblingene. Har en side ikke alle oversettelser, send inn `availableLocales` —
+ellers lover `hreflang` sider som ikke finnes.
 
 ## Struktur
 
 ```
 src/
   pages/           en fil per rute
-    api/kontakt.ts eneste ruten som kjører som Worker
-  layouts/         Base.astro: head, SEO, header, footer
-  components/      Header, Footer, Section, Button, Faq, CtaBand, Seo
-  lib/sanity.ts    Sanity-klient og spørringer (kjøres ved bygg)
-  data/site.ts     kontaktinfo, navigasjon, booking-URL
-  styles/          designtokens og brødtekststiler
+    index.astro          norsk forside
+    [locale]/index.astro forside på en, da, sv
+    404.astro
+  layouts/Base.astro   html-skall, head, SEO, skip-link
+  components/Seo.astro  meta, Open Graph, hreflang
+  i18n/
+    config.ts      språkkoder og sti-hjelpere
+    utils.ts       useTranslations()
+    meta.ts        tittel/beskrivelse per språk
+    ui/            ordbøker: nb (kilde), en, da, sv
+  lib/sanity.ts    Sanity-klient og bilde-URL-bygger
+  data/
+    site.ts        språknøytrale fakta: kontakt, sosiale profiler
+    schema.ts      JSON-LD om organisasjonen
+  styles/global.css  reset og tilgjengelighet — designtokens kommer
 public/
   _redirects       301-er fra de gamle engelske URL-ene
+  robots.txt
 studio-samsari-studio/   Sanity Studio (eget prosjekt)
 ```
 
-## Ruter
-
-| URL                 | Innhold                        |
-| ------------------- | ------------------------------ |
-| `/`                 | Forside                        |
-| `/tjenester`        | Tjenester og produkter         |
-| `/kundecase`        | Oversikt (Sanity)              |
-| `/kundecase/[slug]` | Detalj (Sanity)                |
-| `/blogg`            | Oversikt (Sanity)              |
-| `/blogg/[slug]`     | Artikkel (Sanity)              |
-| `/om-oss`           | Om oss                         |
-| `/kontakt`          | Kontaktskjema                  |
-| `/personvern`       | Personvernerklæring            |
-
-Bloggen skjules automatisk i menyen så lenge Sanity ikke har publiserte
-artikler. Lenken dukker opp av seg selv ved neste bygg etter publisering.
+`public/_redirects` peker på norske ruter (`/tjenester`, `/kundecase`, `/blogg`
+med flere) som ennå ikke er bygget. Reglene er beholdt fordi de bærer opptjent
+ranking fra de gamle engelske URL-ene, og blir riktige igjen etter hvert som
+sidene kommer på plass.
 
 ## Miljøvariabler
 
@@ -72,17 +108,15 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 npx wrangler secret put RESEND_API_KEY
 ```
 
-De offentlige (`PUBLIC_*`, `CONTACT_*`) bakes inn ved bygg og må derfor være satt
-i byggmiljøet.
-
-Mangler Turnstile- eller Resend-nøkkel, avviser `/api/kontakt` innsendinger med
-en tydelig feilmelding i stedet for å slippe dem gjennom uten spamfilter.
+De offentlige (`PUBLIC_*`, `CONTACT_*`, `SANITY_*`) bakes inn ved bygg og må
+derfor være satt i byggmiljøet. Sanity-verdiene har fungerende defaults i
+`astro.config.mjs` og trengs bare hvis du peker mot et annet prosjekt.
 
 ## Innhold
 
-Kundecase og blogginnlegg redigeres i Sanity Studio og hentes **ved byggtid**.
-Nytt innhold blir ikke synlig før siden bygges på nytt. Sett opp en webhook i
-Sanity mot en Cloudflare deploy hook, ellers må du deploye manuelt.
+Redaksjonelt innhold redigeres i Sanity Studio og hentes **ved byggtid**. Nytt
+innhold blir ikke synlig før siden bygges på nytt. Sett opp en webhook i Sanity
+mot en Cloudflare deploy hook, ellers må du deploye manuelt.
 
 ## Deploy
 
