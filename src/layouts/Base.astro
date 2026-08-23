@@ -1,6 +1,7 @@
 ---
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import { PUBLIC_CF_ANALYTICS_TOKEN } from 'astro:env/client';
 import { organizationSchema } from '../data/schema';
 import { LOCALE_META, localeFromPath } from '../i18n/config';
@@ -50,6 +51,8 @@ const t = useTranslations(locale);
     <main id="innhold" class="flex-1">
       <slot />
     </main>
+
+    <Footer />
 
     {
       /* Cookieløs besøksstatistikk. Uten token lastes ingen sporing i det hele tatt. */

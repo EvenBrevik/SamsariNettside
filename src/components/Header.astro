@@ -242,28 +242,17 @@ const homeHref = localizePath('/', locale);
     position: relative;
     display: block;
     padding: 0.5rem 0.875rem;
-    border-radius: 0.5rem;
     color: var(--color-ink-soft);
     font-size: 0.9375rem;
     font-weight: 500;
     text-decoration: none;
-    transition:
-      color 180ms ease,
-      background-color 180ms ease;
+    transition: color 180ms ease;
   }
 
-  .site-header__nav a:hover {
-    color: var(--color-ink);
-    background: var(--color-canvas);
-  }
-
-  .site-header__nav a[aria-current='page'] {
-    color: var(--color-brand);
-  }
-
-  /* Understreken vokser ut fra midten. transform i stedet for width, så den
-     animeres på GPU-en og ikke utløser ny layout for hver frame. */
-  .site-header__nav a[aria-current='page']::after {
+  /* Streken ligger klar på alle valg, flat til null bredde. Hover/klikk drar
+     den ut fra venstre i stedet for boksen vi hadde før — ingen flate bak
+     teksten, bare denne ene linjen som beveger seg. */
+  .site-header__nav a::after {
     content: '';
     position: absolute;
     left: 0.875rem;
@@ -272,6 +261,33 @@ const homeHref = localizePath('/', locale);
     height: 2px;
     border-radius: 2px;
     background: var(--color-brand);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Effekten er forbeholdt hover/fokus/klikk. Den aktive siden har sin egen
+     faste markering rett under og skal ikke i tillegg reagere på hover. */
+  .site-header__nav a:not([aria-current='page']):hover,
+  .site-header__nav a:not([aria-current='page']):focus-visible,
+  .site-header__nav a:not([aria-current='page']):active {
+    color: var(--color-ink);
+  }
+
+  .site-header__nav a:not([aria-current='page']):hover::after,
+  .site-header__nav a:not([aria-current='page']):focus-visible::after,
+  .site-header__nav a:not([aria-current='page']):active::after {
+    transform: scaleX(1);
+  }
+
+  .site-header__nav a[aria-current='page'] {
+    color: var(--color-brand);
+  }
+
+  /* Understreken for den aktive siden vokser ut fra midten ved innlasting —
+     motsatt bevegelse av hover-streken, så de to aldri kan forveksles. */
+  .site-header__nav a[aria-current='page']::after {
+    transform-origin: center;
     animation: nav-underline 320ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 

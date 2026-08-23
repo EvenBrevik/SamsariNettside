@@ -23,6 +23,17 @@ export const sv: Record<UIKeys, string> = {
   'hero.primary': 'Boka ett samtal',
   'hero.secondary': 'Se vad vi gör',
   'hero.imageAlt': 'Ett team samlat runt ett mötesbord med laptops, surfplattor och rapporter',
+
+  'clients.title': 'Företag som litar på oss',
+
+  'footer.menuHeading': 'Meny',
+  'footer.contactHeading': 'Kontakt',
+  'footer.ctaHeading': 'Låt oss prata',
+  'footer.ctaBody': 'Har du ett projekt i tankarna? Vi hjälper gärna till.',
+  'footer.rights': 'Alla rättigheter förbehållna.',
+
   'notFound.title': 'Sidan finns inte',
+  'notFound.body':
+    'Sidan du letar efter finns inte längre, har bytt adress, eller skrevs aldrig in helt rätt.',
   'notFound.back': 'Gå till startsidan',
 };

@@ -23,6 +23,17 @@ export const en: Record<UIKeys, string> = {
   'hero.primary': 'Book a chat',
   'hero.secondary': 'See what we do',
   'hero.imageAlt': 'A team gathered around a meeting table with laptops, tablets and reports',
+
+  'clients.title': 'Companies that trust us',
+
+  'footer.menuHeading': 'Menu',
+  'footer.contactHeading': 'Contact',
+  'footer.ctaHeading': "Let's talk",
+  'footer.ctaBody': 'Got a project in mind? We would love to help.',
+  'footer.rights': 'All rights reserved.',
+
   'notFound.title': 'Page not found',
+  'notFound.body':
+    "The page you're looking for no longer exists, has moved, or the address was never quite right.",
   'notFound.back': 'Go to the front page',
 };

@@ -1,14 +1,162 @@
 ---
 import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
 import { useTranslations } from '../i18n/utils';
-import { DEFAULT_LOCALE } from '../i18n/config';
+import { LOCALES, DEFAULT_LOCALE, LOCALE_META, localizePath } from '../i18n/config';
+import { site } from '../data/site';
 
-// 404 serveres for ukjente stier i alle språk, så den kan ikke lese språk fra
-// URL-en slik andre sider gjør. Den er derfor alltid på norsk.
+// 404-siden bygges som statisk HTML og serveres av Cloudflare for enhver
+// ukjent sti — den kjører aldri på ny for hver forespørsel, så den kan ikke
+// lese språk fra URL-en på serveren slik andre sider gjør. Markup-en under
+// er derfor alltid norsk i utgangspunktet; inline-scriptet nederst leser
+// den faktiske adressen i nettleseren og bytter tekstene om besøkende kom
+// fra en språksti (samme knep som LocaleRedirect.astro bruker).
 const t = useTranslations(DEFAULT_LOCALE);
+
+const translations = Object.fromEntries(
+  LOCALES.map((locale) => {
+    const tl = useTranslations(locale);
+    return [
+      locale,
+      {
+        title: tl('notFound.title'),
+        body: tl('notFound.body'),
+        back: tl('notFound.back'),
+        lang: LOCALE_META[locale].htmlLang,
+        home: localizePath('/', locale),
+      },
+    ];
+  }),
+);
+
+const config = { locales: LOCALES, defaultLocale: DEFAULT_LOCALE, translations, siteName: site.name };
 ---
 
 <Base title={t('notFound.title')} noindex>
-  <h1>{t('notFound.title')}</h1>
-  <p><a href="/">{t('notFound.back')}</a></p>
+  <section class="notfound">
+    <div class="notfound__inner">
+      <p class="notfound__code" aria-hidden="true">404</p>
+
+      <h1 class="notfound__title" data-i18n="title">{t('notFound.title')}</h1>
+      <p class="notfound__body" data-i18n="body">{t('notFound.body')}</p>
+
+      <Button href="/" class="notfound__cta">{t('notFound.back')}</Button>
+    </div>
+  </section>
+
+  <script is:inline define:vars={{ config }}>
+    (function () {
+      try {
+        var segment = window.location.pathname.split('/').filter(Boolean)[0];
+        var locale =
+          segment && config.locales.indexOf(segment) !== -1 ? segment : config.defaultLocale;
+        if (locale === config.defaultLocale) return;
+
+        var t = config.translations[locale];
+        if (!t) return;
+
+        document.documentElement.lang = t.lang;
+        document.title = t.title + ' | ' + config.siteName;
+
+        var titleEl = document.querySelector('[data-i18n="title"]');
+        if (titleEl) titleEl.textContent = t.title;
+
+        var bodyEl = document.querySelector('[data-i18n="body"]');
+        if (bodyEl) bodyEl.textContent = t.body;
+
+        var cta = document.querySelector('.notfound__cta');
+        if (cta) {
+          cta.setAttribute('href', t.home);
+          var label = cta.querySelector('.btn__label');
+          if (label) label.textContent = t.back;
+        }
+      } catch (e) {
+        // Feiler noe her, blir besøkende stående på norsk. Det er en grei utgang.
+      }
+    })();
+  </script>
 </Base>
+
+<style>
+  .notfound {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Fyller det som er igjen av vinduet under den faste headeren, slik at
+       innholdet står midt i det synlige feltet i stedet for høyt oppe. */
+    min-height: calc(100vh - var(--header-height));
+    min-height: calc(100dvh - var(--header-height));
+    overflow: hidden;
+    text-align: center;
+  }
+
+  /* Samme aksent-idé som resten av siden — myke sirkler av merkefargen i
+     hjørnene — så 404-siden føles som en del av nettstedet og ikke en
+     generisk feilside satt utenpå. */
+  .notfound::before,
+  .notfound::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .notfound::before {
+    top: -16rem;
+    right: -12rem;
+    width: 40rem;
+    height: 40rem;
+    opacity: 0.75;
+  }
+
+  .notfound::after {
+    bottom: -14rem;
+    left: -12rem;
+    width: 30rem;
+    height: 30rem;
+    opacity: 0.5;
+  }
+
+  .notfound__inner {
+    position: relative;
+    max-width: 34rem;
+    margin: 0 auto;
+    padding: 3rem 1.25rem;
+  }
+
+  .notfound__code {
+    margin: 0;
+    /* Tallet er dekorasjon, ikke informasjon — meldingen under sier alt en
+       skjermleser trenger, derfor aria-hidden på elementet i markup-en.
+       Lav opacity i stedet for --color-brand-soft direkte, siden den tonen
+       er laget for flater og blir usynlig svak brukt som tekst. */
+    color: var(--color-brand);
+    opacity: 0.14;
+    font-size: clamp(6rem, 18vw, 10rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .notfound__title {
+    margin: 0.5rem 0 0;
+    color: var(--color-ink);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .notfound__body {
+    max-width: 30ch;
+    margin: 1rem auto 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .notfound :global(.btn) {
+    margin-top: 2.25rem;
+  }
+</style>

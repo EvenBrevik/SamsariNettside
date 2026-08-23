@@ -23,7 +23,18 @@ export const nb = {
   'hero.primary': 'Book en prat',
   'hero.secondary': 'Se hva vi gjør',
   'hero.imageAlt': 'Et team samlet rundt et møtebord med laptoper, nettbrett og rapporter',
+
+  'clients.title': 'Selskaper som stoler på oss',
+
+  'footer.menuHeading': 'Meny',
+  'footer.contactHeading': 'Kontakt',
+  'footer.ctaHeading': 'La oss snakke sammen',
+  'footer.ctaBody': 'Har du et prosjekt i tankene? Vi hjelper deg gjerne videre.',
+  'footer.rights': 'Alle rettigheter reservert.',
+
   'notFound.title': 'Siden finnes ikke',
+  'notFound.body':
+    'Siden du leter etter finnes ikke lenger, har byttet adresse, eller ble aldri skrevet riktig inn.',
   'notFound.back': 'Gå til forsiden',
 } as const;
 

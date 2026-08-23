@@ -23,6 +23,17 @@ export const da: Record<UIKeys, string> = {
   'hero.primary': 'Book en snak',
   'hero.secondary': 'Se hvad vi laver',
   'hero.imageAlt': 'Et team samlet omkring et mødebord med bærbare computere, tablets og rapporter',
+
+  'clients.title': 'Virksomheder der stoler på os',
+
+  'footer.menuHeading': 'Menu',
+  'footer.contactHeading': 'Kontakt',
+  'footer.ctaHeading': 'Lad os tale sammen',
+  'footer.ctaBody': 'Har du et projekt i tankerne? Vi hjælper gerne videre.',
+  'footer.rights': 'Alle rettigheder forbeholdes.',
+
   'notFound.title': 'Siden findes ikke',
+  'notFound.body':
+    'Siden du leder efter findes ikke længere, har skiftet adresse, eller blev aldrig skrevet helt rigtigt.',
   'notFound.back': 'Gå til forsiden',
 };

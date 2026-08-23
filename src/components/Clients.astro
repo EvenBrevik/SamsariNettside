@@ -1,0 +1,252 @@
+---
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const logos = [
+  { src: '/Ecoxy_web.png', alt: 'Ecoxy', width: 2000, height: 402, href: 'https://ecoxy.no/' },
+  { src: '/Flematec.png', alt: 'Flematec', width: 560, height: 77, href: 'https://flematec.no/' },
+  {
+    src: '/NidarosLogo.png',
+    alt: 'Nidaros Sparebank',
+    width: 833,
+    height: 238,
+    href: 'https://www.nidaros-sparebank.no/',
+  },
+  {
+    src: '/mmbanklogo.png',
+    alt: 'Maritime & Merchant Bank',
+    width: 1129,
+    height: 160,
+    href: 'https://www.mmbank.no/',
+  },
+];
+---
+
+<section class="clients" data-clients>
+  <div class="clients__inner">
+    <h2 class="clients__title">{t('clients.title')}</h2>
+
+    <ul class="clients__grid">
+      {
+        logos.map((logo, index) => (
+          <li class="clients__item" style={`--i: ${index}`}>
+            <a href={logo.href} target="_blank" rel="noreferrer" aria-label={logo.alt}>
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                width={logo.width}
+                height={logo.height}
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  // Fargen og innholdet ligger i ro til seksjonen faktisk er i sikte — først da
+  // får duken og logoene tone inn, i stedet for å være ferdig malt før man har
+  // rukket å scrolle dit.
+  const section = document.querySelector<HTMLElement>('[data-clients]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section) {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      section.classList.add('is-visible');
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              section.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.2 },
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  .clients {
+    position: relative;
+    /* Starter som den hvite heroen over — duken i canvas-tonen tones først inn
+       når seksjonen kommer i sikte, styrt av .is-visible fra scriptet under. */
+    background: var(--color-surface);
+    transition: background-color 1100ms ease;
+    overflow: hidden;
+  }
+
+  .clients.is-visible {
+    background: var(--color-canvas);
+  }
+
+  /* Samme aksent-idé som i heroen — en myk sirkel av merkefargen — men lagt
+     motsatt hjørne og svakere, så seksjonene henger sammen uten å gjenta seg.
+     Et andre, mindre punkt øverst til høyre gir seksjonen sin egen rytme i
+     stedet for å speile heroen helt. Begge skalerer inn sammen med duken. */
+  .clients::before,
+  .clients::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.75);
+    transition:
+      opacity 1200ms ease,
+      transform 1200ms ease;
+  }
+
+  .clients::before {
+    bottom: -14rem;
+    left: -10rem;
+    width: 34rem;
+    height: 34rem;
+  }
+
+  .clients::after {
+    top: -8rem;
+    right: -6rem;
+    width: 20rem;
+    height: 20rem;
+    transition-delay: 150ms;
+  }
+
+  .clients.is-visible::before,
+  .clients.is-visible::after {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  .clients__inner {
+    position: relative;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 4rem 1.25rem;
+    text-align: center;
+  }
+
+  @media (min-width: 40rem) {
+    .clients__inner {
+      padding: 5rem 2rem;
+    }
+  }
+
+  .clients__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.375rem, 2.4vw, 1.75rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 700ms ease 80ms,
+      transform 700ms ease 80ms;
+  }
+
+  .clients.is-visible .clients__title {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .clients__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    justify-items: center;
+    gap: 1.5rem;
+    margin: 3rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .clients__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  .clients__item {
+    width: 100%;
+    height: 5.5rem;
+    /* Samme asymmetriske hjørnespråk som hero-rammen, bare mye mindre og
+       usynlig til man hovrer — logoene skal virke som ren tekst i ro. */
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+    opacity: 0;
+    transform: translateY(14px);
+    /* --i (satt inline per logo) forskyver inntoningen, så de fire logoene
+       ikke dukker opp samtidig som én flate, men vandrer inn etter hverandre. */
+    transition:
+      opacity 600ms ease calc(160ms + var(--i) * 90ms),
+      transform 600ms ease calc(160ms + var(--i) * 90ms),
+      background-color 220ms ease,
+      box-shadow 220ms ease;
+  }
+
+  .clients.is-visible .clients__item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Lenken fyller hele flisen, så hele det klikkbare området matcher det man
+     ser — ikke bare logoen selv. */
+  .clients__item a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  .clients__item:hover,
+  .clients__item:focus-within {
+    background: var(--color-surface);
+    box-shadow: 0 1px 2px rgb(36 51 59 / 0.05), 0 12px 28px rgb(36 51 59 / 0.08);
+    transform: translateY(-2px);
+  }
+
+  .clients__item img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: 2rem;
+    object-fit: contain;
+    /* Gråtonet i ro, slik at logoene oppfører seg som én rolig rekke i stedet
+       for fire ulike merkefarger som konkurrerer med resten av siden. */
+    filter: grayscale(1) opacity(0.55);
+    transition: filter 220ms ease;
+  }
+
+  @media (min-width: 40rem) {
+    .clients__item img {
+      height: 2.25rem;
+    }
+  }
+
+  .clients__item:hover img,
+  .clients__item:focus-within img {
+    filter: grayscale(0) opacity(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .clients__item,
+    .clients__item:hover {
+      transform: none;
+    }
+  }
+</style>

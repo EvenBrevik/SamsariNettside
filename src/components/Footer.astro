@@ -1,0 +1,284 @@
+---
+import Button from './Button.astro';
+import { mainNav } from '../data/navigation';
+import { site, contact, social, BOOKING_URL } from '../data/site';
+import { SITE_META } from '../i18n/meta';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const navLinks = mainNav.map((item) => ({
+  label: t(item.labelKey),
+  href: localizePath(item.path, locale),
+}));
+
+const homeHref = localizePath('/', locale);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <span class="site-footer__glow" aria-hidden="true"></span>
+
+  <div class="site-footer__top">
+    <div class="site-footer__brand">
+      <a href={homeHref} class="site-footer__logo" aria-label={t('nav.toHome')}>
+        <img src="/samsari-logo-light.png" alt="Samsari" width="1582" height="294" loading="lazy" decoding="async" />
+      </a>
+
+      <p class="site-footer__tagline">{SITE_META[locale].defaultDescription}</p>
+
+      <ul class="site-footer__social">
+        <li>
+          <a href={social.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+              <rect x="2" y="9" width="4" height="12" />
+              <circle cx="4" cy="4" r="2" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href={social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href={social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <nav class="site-footer__nav" aria-label={t('footer.menuHeading')}>
+      <p class="site-footer__heading">{t('footer.menuHeading')}</p>
+      <ul>
+        {
+          navLinks.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="site-footer__contact">
+      <p class="site-footer__heading">{t('footer.contactHeading')}</p>
+      <address>
+        <a href={contact.phoneHref}>{contact.phone}</a>
+        <a href={`mailto:${contact.generalEmail}`}>{contact.generalEmail}</a>
+        <span>{contact.address.street}</span>
+        <span>{contact.address.postalCode} {contact.address.city}</span>
+      </address>
+    </div>
+
+    <div class="site-footer__cta">
+      <p class="site-footer__heading">{t('footer.ctaHeading')}</p>
+      <p class="site-footer__cta-body">{t('footer.ctaBody')}</p>
+      <Button href={BOOKING_URL} external>{t('hero.primary')}</Button>
+    </div>
+  </div>
+
+  <div class="site-footer__bottom">
+    <p>© {year} {site.name}. {t('footer.rights')}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    /* Den mørke blågråen er hentet fra samme ordmerke som --color-ink — footeren
+       bruker altså logoens egen mørke tone i stedet for en tilfeldig svart,
+       så merkevaren strekker seg helt til bunnen av siden. */
+    background: var(--color-ink);
+    color: rgb(255 255 255 / 0.68);
+    overflow: hidden;
+    --footer-line: rgb(255 255 255 / 0.12);
+  }
+
+  /* Et mykt merkefarget skjær øverst — samme aksent-idé som resten av siden,
+     men her fungerer det som et «glød»-punkt over en mørk flate i stedet for
+     en sirkel bak et bilde. Den tekniske følelsen kommer nettopp av det: lys
+     som brytes over mørkt, ikke enda en dekorativ boble. */
+  .site-footer__glow {
+    position: absolute;
+    top: -18rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44rem;
+    height: 30rem;
+    background: radial-gradient(ellipse at center, rgb(17 131 206 / 0.35) 0%, transparent 68%);
+    pointer-events: none;
+  }
+
+  .site-footer__top {
+    position: relative;
+    display: grid;
+    gap: 3rem;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 4.5rem 1.25rem 3.5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer__top {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: 5rem 2rem 3.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer__top {
+      /* Merkevarespalten får dobbelt så mye plass som de tre andre — den bærer
+         både logo, ingress og sosiale lenker og trenger pusterom. */
+      grid-template-columns: 1.6fr 0.8fr 1fr 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  /* --- Merkevare --- */
+
+  .site-footer__logo {
+    display: inline-flex;
+    border-radius: 4px;
+  }
+
+  .site-footer__logo img {
+    display: block;
+    width: auto;
+    height: 1.75rem;
+  }
+
+  .site-footer__tagline {
+    max-width: 32ch;
+    margin: 1.25rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  .site-footer__social {
+    display: flex;
+    gap: 0.625rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer__social a {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--footer-line);
+    color: rgb(255 255 255 / 0.75);
+    transition:
+      color 180ms ease,
+      border-color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .site-footer__social a:hover {
+    color: #fff;
+    border-color: transparent;
+    background: var(--color-brand);
+  }
+
+  .site-footer__social svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  /* --- Overskrifter, felles for nav/kontakt/CTA --- */
+
+  .site-footer__heading {
+    margin: 0 0 1.25rem;
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* --- Meny --- */
+
+  .site-footer__nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer__nav a {
+    color: inherit;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  .site-footer__nav a:hover {
+    color: #fff;
+  }
+
+  /* --- Kontakt --- */
+
+  .site-footer__contact address {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.9375rem;
+    font-style: normal;
+    line-height: 1.6;
+  }
+
+  .site-footer__contact a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  .site-footer__contact a:hover {
+    color: #fff;
+  }
+
+  /* --- CTA --- */
+
+  .site-footer__cta-body {
+    max-width: 26ch;
+    margin: 0 0 1.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  /* --- Bunnlinje --- */
+
+  .site-footer__bottom {
+    position: relative;
+    border-top: 1px solid var(--footer-line);
+  }
+
+  .site-footer__bottom p {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem;
+    color: rgb(255 255 255 / 0.5);
+    font-size: 0.8125rem;
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer__bottom p {
+      padding: 1.5rem 2rem;
+    }
+  }
+</style>
