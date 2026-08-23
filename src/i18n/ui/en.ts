@@ -24,13 +24,34 @@ export const en: Record<UIKeys, string> = {
   'hero.secondary': 'See what we do',
   'hero.imageAlt': 'A team gathered around a meeting table with laptops, tablets and reports',
 
-  'clients.title': 'Companies that trust us',
+  'clients.title': 'Some of our clients',
+
+  'services.title': 'Our core expertise',
+  'services.body':
+    'Samsari specializes in AI and Microsoft 365. We work with everything AI — development, chatbots, integrations and tools like Claude — and help you get more value out of the Microsoft platform you already have.',
+  'services.cta': 'See all services',
+  'services.imagePlaceholder': 'Image coming soon',
+  'services.ai.title': 'AI development & chatbots',
+  'services.ai.body':
+    'We build custom AI solutions and chatbots tailored to your business — from idea to something your team actually uses.',
+  'services.training.title': 'AI implementation & training',
+  'services.training.body':
+    'We help you put AI to work in practice, and train your team on tools like Claude, so the whole organization knows how to use it.',
+  'services.mcp.title': 'AI integrations',
+  'services.mcp.body':
+    'We connect AI to your own systems, including with MCP servers and Skills for tools like Claude.',
+  'services.platform.title': 'M365 & Power Platform',
+  'services.platform.body':
+    'SharePoint setup and Power Apps development, so you get more out of the Microsoft platform you already pay for.',
 
   'footer.menuHeading': 'Menu',
   'footer.contactHeading': 'Contact',
   'footer.ctaHeading': "Let's talk",
   'footer.ctaBody': 'Got a project in mind? We would love to help.',
+  'footer.orgNumber': 'Company reg. no.',
   'footer.rights': 'All rights reserved.',
+  'footer.privacyLink': 'Privacy policy',
+  'footer.designLink': 'Design',
 
   'notFound.title': 'Page not found',
   'notFound.body':

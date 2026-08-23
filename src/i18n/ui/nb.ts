@@ -24,13 +24,34 @@ export const nb = {
   'hero.secondary': 'Se hva vi gjør',
   'hero.imageAlt': 'Et team samlet rundt et møtebord med laptoper, nettbrett og rapporter',
 
-  'clients.title': 'Selskaper som stoler på oss',
+  'clients.title': 'Noen av våre kunder',
+
+  'services.title': 'Vår spisskompetanse',
+  'services.body':
+    'Samsari er eksperter på AI og Microsoft 365. Vi jobber med alt innen kunstig intelligens — AI-utvikling, chatbotter, integrasjoner og verktøy som Claude — og henter mer verdi ut av Microsoft-plattformen dere allerede har.',
+  'services.cta': 'Se alle tjenester',
+  'services.imagePlaceholder': 'Bilde kommer',
+  'services.ai.title': 'AI-utvikling & chatbotter',
+  'services.ai.body':
+    'Vi utvikler skreddersydde AI-løsninger og chatbotter tilpasset deres bedrift — fra idé til noe som faktisk brukes i hverdagen.',
+  'services.training.title': 'AI-implementering & opplæring',
+  'services.training.body':
+    'Vi hjelper dere i gang med AI i praksis, og lærer opp teamet i verktøy som Claude, slik at hele organisasjonen vet hvordan de skal bruke det.',
+  'services.mcp.title': 'AI-integrasjoner',
+  'services.mcp.body':
+    'Vi kobler AI til deres egne systemer, blant annet med MCP-servere og Skills til verktøy som Claude.',
+  'services.platform.title': 'M365 & Power Platform',
+  'services.platform.body':
+    'Oppsett av SharePoint og utvikling av Power Apps, slik at dere får mer ut av Microsoft-plattformen dere allerede betaler for.',
 
   'footer.menuHeading': 'Meny',
   'footer.contactHeading': 'Kontakt',
   'footer.ctaHeading': 'La oss snakke sammen',
   'footer.ctaBody': 'Har du et prosjekt i tankene? Vi hjelper deg gjerne videre.',
+  'footer.orgNumber': 'Org.nr.',
   'footer.rights': 'Alle rettigheter reservert.',
+  'footer.privacyLink': 'Personvernerklæring',
+  'footer.designLink': 'Design',
 
   'notFound.title': 'Siden finnes ikke',
   'notFound.body':

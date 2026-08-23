@@ -8,6 +8,8 @@ export const site = {
   url: 'https://samsari.no',
   // Byttes ut når det finnes et delebilde igjen. Ligger i /public.
   ogImage: '/og-default.png',
+  // Formatert i tregrupper slik Brønnøysundregistrene skriver det.
+  orgNumber: '936 276 474',
 } as const;
 
 export const contact = {

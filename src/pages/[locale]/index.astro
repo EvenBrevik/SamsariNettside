@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
 import Clients from '../../components/Clients.astro';
+import Services from '../../components/Services.astro';
 import { LOCALES, DEFAULT_LOCALE } from '../../i18n/config';
 
 // Forsiden på de oversatte språkene. Norsk ligger på rot og er ikke med her.
@@ -15,4 +16,5 @@ export function getStaticPaths() {
 <Base>
   <Hero />
   <Clients />
+  <Services />
 </Base>

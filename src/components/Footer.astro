@@ -16,11 +16,16 @@ const navLinks = mainNav.map((item) => ({
 
 const homeHref = localizePath('/', locale);
 const year = new Date().getFullYear();
+
+// Sidene finnes ikke ennå — samme mønster som mainNav i navigation.ts. Lenkene
+// står klare til sidene kommer på plass.
+const legalLinks = [
+  { label: t('footer.privacyLink'), href: localizePath('/personvern', locale) },
+  { label: t('footer.designLink'), href: localizePath('/design', locale) },
+];
 ---
 
 <footer class="site-footer">
-  <span class="site-footer__glow" aria-hidden="true"></span>
-
   <div class="site-footer__top">
     <div class="site-footer__brand">
       <a href={homeHref} class="site-footer__logo" aria-label={t('nav.toHome')}>
@@ -79,6 +84,8 @@ const year = new Date().getFullYear();
         <span>{contact.address.street}</span>
         <span>{contact.address.postalCode} {contact.address.city}</span>
       </address>
+
+      <p class="site-footer__org">{t('footer.orgNumber')} {site.orgNumber}</p>
     </div>
 
     <div class="site-footer__cta">
@@ -89,39 +96,33 @@ const year = new Date().getFullYear();
   </div>
 
   <div class="site-footer__bottom">
-    <p>© {year} {site.name}. {t('footer.rights')}</p>
+    <div class="site-footer__bottom-inner">
+      <p>© {year} {site.name}. {t('footer.rights')}</p>
+
+      <ul class="site-footer__legal">
+        {
+          legalLinks.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    position: relative;
     /* Den mørke blågråen er hentet fra samme ordmerke som --color-ink — footeren
        bruker altså logoens egen mørke tone i stedet for en tilfeldig svart,
        så merkevaren strekker seg helt til bunnen av siden. */
     background: var(--color-ink);
     color: rgb(255 255 255 / 0.68);
-    overflow: hidden;
     --footer-line: rgb(255 255 255 / 0.12);
   }
 
-  /* Et mykt merkefarget skjær øverst — samme aksent-idé som resten av siden,
-     men her fungerer det som et «glød»-punkt over en mørk flate i stedet for
-     en sirkel bak et bilde. Den tekniske følelsen kommer nettopp av det: lys
-     som brytes over mørkt, ikke enda en dekorativ boble. */
-  .site-footer__glow {
-    position: absolute;
-    top: -18rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 44rem;
-    height: 30rem;
-    background: radial-gradient(ellipse at center, rgb(17 131 206 / 0.35) 0%, transparent 68%);
-    pointer-events: none;
-  }
-
   .site-footer__top {
-    position: relative;
     display: grid;
     gap: 3rem;
     max-width: 80rem;
@@ -252,6 +253,14 @@ const year = new Date().getFullYear();
     color: #fff;
   }
 
+  /* Litt mindre og svakere enn adressen — registreringsnummeret er informasjon
+     man slår opp, ikke noe som skal konkurrere med telefon og e-post. */
+  .site-footer__org {
+    margin: 1rem 0 0;
+    color: rgb(255 255 255 / 0.5);
+    font-size: 0.8125rem;
+  }
+
   /* --- CTA --- */
 
   .site-footer__cta-body {
@@ -264,21 +273,49 @@ const year = new Date().getFullYear();
   /* --- Bunnlinje --- */
 
   .site-footer__bottom {
-    position: relative;
     border-top: 1px solid var(--footer-line);
   }
 
-  .site-footer__bottom p {
+  .site-footer__bottom-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     max-width: 80rem;
     margin: 0 auto;
     padding: 1.5rem 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer__bottom-inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 2rem;
+    }
+  }
+
+  .site-footer__bottom-inner p {
+    margin: 0;
     color: rgb(255 255 255 / 0.5);
     font-size: 0.8125rem;
   }
 
-  @media (min-width: 40rem) {
-    .site-footer__bottom p {
-      padding: 1.5rem 2rem;
-    }
+  .site-footer__legal {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer__legal a {
+    color: rgb(255 255 255 / 0.5);
+    font-size: 0.8125rem;
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  .site-footer__legal a:hover {
+    color: #fff;
   }
 </style>

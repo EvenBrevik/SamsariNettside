@@ -1,0 +1,349 @@
+---
+import Button from './Button.astro';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// SVG-innholdet er rå markup (ikke JSX) fordi frontmatter-blokken ikke støtter
+// JSX-fragmenter — det gjør derimot malen under, via set:html.
+const pillars = [
+  {
+    titleKey: 'services.ai.title',
+    bodyKey: 'services.ai.body',
+    icon: `
+      <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+      <rect x="9" y="9" width="6" height="6" />
+      <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+    `,
+  },
+  {
+    titleKey: 'services.training.title',
+    bodyKey: 'services.training.body',
+    icon: `
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    `,
+  },
+  {
+    titleKey: 'services.mcp.title',
+    bodyKey: 'services.mcp.body',
+    icon: `
+      <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+      <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+      <line x1="6" y1="6" x2="6.01" y2="6" />
+      <line x1="6" y1="18" x2="6.01" y2="18" />
+    `,
+  },
+  {
+    titleKey: 'services.platform.title',
+    bodyKey: 'services.platform.body',
+    icon: `
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+    `,
+  },
+] as const;
+---
+
+<section class="services" data-services>
+  <div class="services__inner">
+    <div class="services__intro">
+      <div class="services__copy">
+        <h2 class="services__title">{t('services.title')}</h2>
+        <p class="services__body">{t('services.body')}</p>
+        <Button href={localizePath('/tjenester', locale)} variant="secondary">
+          {t('services.cta')}
+        </Button>
+      </div>
+
+      <div class="services__media">
+        <span class="services__accent" aria-hidden="true"></span>
+
+        <!-- Midlertidig plassholder — bytt ut med et ekte bilde når vi har ett. -->
+        <div class="services__placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          <span>{t('services.imagePlaceholder')}</span>
+        </div>
+      </div>
+    </div>
+
+    <ul class="services__grid">
+      {
+        pillars.map((pillar, index) => (
+          <li class="services__card" style={`--i: ${index}`}>
+            <span class="services__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={pillar.icon} />
+            </span>
+            <h3>{t(pillar.titleKey)}</h3>
+            <p>{t(pillar.bodyKey)}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  // Samme inntoning-på-scroll som kundeseksjonen — konsekvent bevegelsesspråk
+  // gjennom siden i stedet for at hver seksjon finner opp sin egen.
+  const section = document.querySelector<HTMLElement>('[data-services]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section) {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      section.classList.add('is-visible');
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              section.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.15 },
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  .services {
+    background: var(--color-surface);
+  }
+
+  .services__inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 5rem 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .services__inner {
+      padding: 6rem 2rem;
+    }
+  }
+
+  /* --- Intro: tekst + bilde --- */
+
+  .services__intro {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 56rem) {
+    .services__intro {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+      gap: clamp(3rem, 6vw, 5rem);
+    }
+  }
+
+  .services__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease,
+      transform 700ms ease;
+  }
+
+  .services.is-visible .services__title {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .services__body {
+    max-width: 46ch;
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 80ms,
+      transform 700ms ease 80ms;
+  }
+
+  .services.is-visible .services__body {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .services__copy :global(.btn) {
+    margin-top: 2rem;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 140ms,
+      transform 700ms ease 140ms;
+  }
+
+  .services.is-visible .services__copy :global(.btn) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* --- Bilde-plassholder --- */
+
+  .services__media {
+    position: relative;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 100ms,
+      transform 700ms ease 100ms;
+  }
+
+  .services.is-visible .services__media {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Samme aksentflate-idé som i heroen, men speilvendt — den binder de to
+     seksjonene sammen uten at det ene bildet ser ut som en kopi av det andre. */
+  .services__accent {
+    position: absolute;
+    z-index: 0;
+    right: -1.25rem;
+    top: -1.25rem;
+    width: 55%;
+    height: 52%;
+    border-radius: 5rem 0.5rem 5rem 0.5rem;
+    background: var(--color-brand);
+    opacity: 0.1;
+  }
+
+  .services__placeholder {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    aspect-ratio: 4 / 3.4;
+    border-radius: 0.5rem 4rem 0.5rem 4rem;
+    /* Diagonalt stripemønster gjør det umulig å forveksle flaten med et ferdig
+       bilde — tydelig plassholder til et ekte foto er på plass. */
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--color-canvas),
+      var(--color-canvas) 10px,
+      var(--color-surface) 10px,
+      var(--color-surface) 20px
+    );
+    border: 1px solid var(--color-line);
+    color: var(--color-muted);
+  }
+
+  .services__placeholder svg {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .services__placeholder span {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* --- Kortgrid --- */
+
+  .services__grid {
+    display: grid;
+    gap: 1.25rem;
+    margin: 4.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .services__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .services__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .services__card {
+    padding: 1.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 600ms ease calc(200ms + var(--i) * 90ms),
+      transform 600ms ease calc(200ms + var(--i) * 90ms),
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      transform 220ms ease;
+  }
+
+  .services.is-visible .services__card {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .services__card:hover {
+    border-color: transparent;
+    box-shadow: 0 1px 2px rgb(36 51 59 / 0.05), 0 16px 32px rgb(36 51 59 / 0.08);
+    transform: translateY(-3px);
+  }
+
+  .services__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 1.25rem;
+    border-radius: 0.75rem;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+  }
+
+  .services__icon svg {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .services__card h3 {
+    margin: 0 0 0.5rem;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .services__card p {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .services__card:hover {
+      transform: none;
+    }
+  }
+</style>
