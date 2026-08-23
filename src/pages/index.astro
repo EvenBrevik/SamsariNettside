@@ -1,7 +1,64 @@
 ---
 import Base from '../layouts/Base.astro';
+import LocaleRedirect from '../components/LocaleRedirect.astro';
 ---
 
 <Base>
-  <h1>Samsari</h1>
+  <LocaleRedirect slot="head" />
+  <!-- Midlertidig innhold. Står her bare for å gi headeren noe å scrolle over
+       til forsiden bygges. Erstattes i sin helhet. -->
+  <section class="placeholder">
+    <p class="placeholder__eyebrow">Fundament</p>
+    <h1>Headeren er på plass</h1>
+    <p class="placeholder__body">
+      Scroll for å se hvordan headeren løfter seg fra innholdet.
+    </p>
+  </section>
+
+  <div class="placeholder__filler"></div>
 </Base>
+
+<style>
+  .placeholder {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 6rem 1.25rem 4rem;
+  }
+
+  @media (min-width: 40rem) {
+    .placeholder {
+      padding: 8rem 2rem 5rem;
+    }
+  }
+
+  .placeholder__eyebrow {
+    margin: 0;
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .placeholder h1 {
+    margin: 1rem 0 0;
+    max-width: 20ch;
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .placeholder__body {
+    margin: 1.25rem 0 0;
+    max-width: 42ch;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  /* Gir siden nok høyde til at scroll-tilstanden faktisk kan testes. */
+  .placeholder__filler {
+    height: 120vh;
+  }
+</style>

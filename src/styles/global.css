@@ -1,19 +1,44 @@
+@import '@fontsource/poppins/latin-400.css';
+@import '@fontsource/poppins/latin-500.css';
+@import '@fontsource/poppins/latin-600.css';
 @import 'tailwindcss';
 
-/* Fundament — bevisst uten farger, typografi eller designtokens.
-   Her ligger bare det som gjelder uansett hvilket uttrykk siden ender med:
-   grunnleggende oppførsel, tilgjengelighet og respekt for redusert bevegelse.
-   Designsystemet legges inn i @theme når det er bestemt. */
+/* Designtokens. Fargene er hentet rett ut av logoen: den blå fra S-monogrammet
+   og den mørke blågrå fra ordmerket, slik at grensesnittet og logoen hører
+   sammen i stedet for å ligge ved siden av hverandre. */
+@theme {
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand: #1183ce;
+  --color-brand-dark: #0d6ba8;
+  --color-brand-soft: #eaf4fc;
+
+  --color-ink: #24333b;
+  --color-ink-soft: #55666f;
+  --color-muted: #7d8c94;
+
+  --color-surface: #ffffff;
+  --color-canvas: #f6f8f9;
+  --color-line: #e6ebee;
+
+  --header-height: 4.5rem;
+}
 
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Ankerlenker skal lande under den faste headeren, ikke bak den. */
+    scroll-padding-top: calc(var(--header-height) + 1rem);
   }
 
   body {
     margin: 0;
     overflow-x: hidden;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -35,8 +60,9 @@
   }
 
   :focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 4px;
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
   summary {
@@ -60,10 +86,13 @@
 .skip-link:focus {
   left: 1rem;
   top: 1rem;
-  padding: 0.5rem 1rem;
-  background: #ffffff;
-  color: #000000;
+  padding: 0.625rem 1.125rem;
+  background: var(--color-brand);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
   border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgb(17 131 206 / 0.3);
 }
 
 @media (prefers-reduced-motion: reduce) {

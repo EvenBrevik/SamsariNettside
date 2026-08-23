@@ -1,0 +1,64 @@
+---
+import { LOCALES, DEFAULT_LOCALE } from '../i18n/config';
+
+// Sender førstegangsbesøkende til språket nettleseren deres er satt til.
+//
+// Kjøres bevisst i nettleseren, ikke på serveren: en server-redirect ville
+// også truffet Googlebot, som kommer med amerikansk IP og engelsk Accept-Language.
+// Da ville hele nettstedet blitt indeksert som engelsk, og hreflang-oppsettet
+// ville pekt på sider crawleren aldri fikk se.
+//
+// Skriptet står inline i <head> og kjører før siden tegnes, slik at den som
+// skal videre slipper å se norsk innhold blafre forbi først.
+const config = {
+  locales: LOCALES,
+  defaultLocale: DEFAULT_LOCALE,
+  // Språk vi ikke støtter havner på engelsk, ikke på norsk.
+  fallback: 'en',
+  storageKey: 'samsari:locale',
+};
+---
+
+<script is:inline define:vars={{ config }}>
+  (function () {
+    try {
+      // Bare fra rot. Er brukeren allerede på en språkside, er valget tatt.
+      if (window.location.pathname !== '/') return;
+
+      // Et tidligere valg vinner alltid over nettleserinnstillingen.
+      var stored = null;
+      try {
+        stored = window.localStorage.getItem(config.storageKey);
+      } catch (e) {
+        // Blokkerte cookies eller privat modus: fortsett uten lagret valg.
+      }
+
+      var target = stored;
+
+      if (!target) {
+        // navigator.languages er prioritert rekkefølge — første treff vinner.
+        var preferred = navigator.languages || [navigator.language];
+        for (var i = 0; i < preferred.length && !target; i++) {
+          if (!preferred[i]) continue;
+          var tag = String(preferred[i]).toLowerCase();
+          var base = tag.split('-')[0];
+
+          // «no», «nn» og «nb» er alle norsk.
+          if (base === 'no' || base === 'nn' || base === 'nb') target = 'nb';
+          else if (config.locales.indexOf(base) !== -1) target = base;
+        }
+
+        // Ukjent språk: engelsk, ikke norsk.
+        if (!target) target = config.fallback;
+      }
+
+      if (!target || target === config.defaultLocale) return;
+      if (config.locales.indexOf(target) === -1) return;
+
+      // replace() så tilbakeknappen ikke havner i en løkke mellom / og /en.
+      window.location.replace('/' + target + window.location.search + window.location.hash);
+    } catch (e) {
+      // Feiler noe her, blir brukeren stående på norsk. Det er en grei utgang.
+    }
+  })();
+</script>

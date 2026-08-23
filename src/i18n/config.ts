@@ -5,7 +5,10 @@ export type Locale = (typeof LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = 'nb';
 
-/** Metadata per språk. `htmlLang` går i <html lang>, `ogLocale` i og:locale. */
+/**
+ * Metadata per språk. `htmlLang` går i <html lang>, `ogLocale` i og:locale.
+ * Flaggene tegnes av Flag.astro — se kommentaren der for hvorfor ikke emoji.
+ */
 export const LOCALE_META: Record<
   Locale,
   { label: string; htmlLang: string; ogLocale: string; hreflang: string }

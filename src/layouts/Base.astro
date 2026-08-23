@@ -1,5 +1,6 @@
 ---
 import Seo from '../components/Seo.astro';
+import Header from '../components/Header.astro';
 import { PUBLIC_CF_ANALYTICS_TOKEN } from 'astro:env/client';
 import { organizationSchema } from '../data/schema';
 import { LOCALE_META, localeFromPath } from '../i18n/config';
@@ -40,6 +41,8 @@ const t = useTranslations(locale);
   </head>
   <body class="flex min-h-screen flex-col">
     <a href="#innhold" class="skip-link">{t('skip.toContent')}</a>
+
+    <Header />
 
     <main id="innhold" class="flex-1">
       <slot />

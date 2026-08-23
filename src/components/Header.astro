@@ -1,0 +1,387 @@
+---
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { mainNav } from '../data/navigation';
+import { localeFromPath, localizePath, stripLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Sammenlign uten språkprefiks, ellers ville /en/tjenester aldri regnes som aktiv.
+const currentPath = stripLocale(Astro.url.pathname).replace(/\/$/, '') || '/';
+
+const links = mainNav.map((item) => ({
+  label: t(item.labelKey),
+  href: localizePath(item.path, locale),
+  // Undersider skal også markere forelderen sin i menyen.
+  isActive: currentPath === item.path || currentPath.startsWith(`${item.path}/`),
+}));
+
+const homeHref = localizePath('/', locale);
+---
+
+<header class="site-header" data-header>
+  <div class="site-header__inner">
+    <a href={homeHref} class="site-header__logo" aria-label={t('nav.toHome')}>
+      <img
+        src="/samsari-logo-dark.png"
+        alt="Samsari"
+        width="1583"
+        height="294"
+        fetchpriority="high"
+      />
+    </a>
+
+    <nav class="site-header__nav" aria-label={t('nav.home')}>
+      <ul>
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href} aria-current={link.isActive ? 'page' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <button type="button" class="site-header__search" aria-label={t('search.open')} data-search-open>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+      </button>
+
+      <LanguageSwitcher />
+
+      <button
+        type="button"
+        class="site-header__toggle"
+        aria-label={t('nav.openMenu')}
+        aria-expanded="false"
+        aria-controls="hovedmeny"
+        data-menu-toggle
+        data-close-label={t('nav.closeMenu')}
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobilmeny. Ligger utenfor .site-header__inner så den kan gå i full bredde. -->
+  <div class="site-header__mobile" id="hovedmeny" hidden data-mobile-menu>
+    <nav aria-label={t('nav.home')}>
+      <ul>
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href} aria-current={link.isActive ? 'page' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Headeren er fast. Skygge og kantlinje kommer først når siden er scrollet,
+  // slik at den ligger flatt mot innholdet på toppen og løfter seg over det etterpå.
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-mobile-menu]');
+
+  if (header) {
+    let ticking = false;
+
+    const updateScrollState = () => {
+      header.classList.toggle('is-scrolled', window.scrollY > 8);
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScrollState);
+        ticking = true;
+      }
+    };
+
+    updateScrollState();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  if (toggle && menu) {
+    const labels = {
+      open: toggle.getAttribute('aria-label') ?? 'Åpne meny',
+      // Settes fra data-attributtet under, så teksten følger språket.
+      close: toggle.dataset.closeLabel ?? 'Lukk meny',
+    };
+
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? labels.close : labels.open);
+      menu.hidden = !open;
+      header?.classList.toggle('is-open', open);
+      // Låser bakgrunnen mens menyen dekker skjermen.
+      document.body.style.overflow = open ? 'hidden' : '';
+    };
+
+    toggle.addEventListener('click', () => {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Escape lukker menyen, og fokus føres tilbake til knappen.
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Menyen er bare for smale skjermer. Blir vinduet bredt mens den står åpen,
+    // må den lukkes — ellers blir body liggende låst uten synlig meny.
+    const wide = window.matchMedia('(min-width: 60rem)');
+    wide.addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--color-surface);
+    /* Kantlinjen er alltid der, men usynlig før scroll. Da endres bare fargen,
+       ikke layouten, og innholdet under flytter seg ikke når skyggen kommer. */
+    border-bottom: 1px solid transparent;
+    transition:
+      border-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .site-header.is-scrolled {
+    border-bottom-color: var(--color-line);
+    box-shadow: 0 1px 3px rgb(36 51 59 / 0.04), 0 8px 24px rgb(36 51 59 / 0.04);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: var(--header-height);
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .site-header__inner {
+      padding: 0 2rem;
+    }
+  }
+
+  .site-header__logo {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 4px;
+  }
+
+  .site-header__logo img {
+    display: block;
+    width: auto;
+    height: 1.75rem;
+  }
+
+  @media (min-width: 40rem) {
+    .site-header__logo img {
+      height: 2rem;
+    }
+  }
+
+  /* --- Skrivebordsmeny --- */
+
+  .site-header__nav {
+    display: none;
+    flex: 1;
+  }
+
+  @media (min-width: 60rem) {
+    .site-header__nav {
+      display: block;
+    }
+  }
+
+  .site-header__nav ul {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-header__nav a {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .site-header__nav a:hover {
+    color: var(--color-ink);
+    background: var(--color-canvas);
+  }
+
+  .site-header__nav a[aria-current='page'] {
+    color: var(--color-brand);
+  }
+
+  /* Understreken vokser ut fra midten. transform i stedet for width, så den
+     animeres på GPU-en og ikke utløser ny layout for hver frame. */
+  .site-header__nav a[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 0.875rem;
+    right: 0.875rem;
+    bottom: -0.4rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-brand);
+    animation: nav-underline 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes nav-underline {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* --- Handlinger til høyre --- */
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  .site-header__search {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0.625rem;
+    background: transparent;
+    color: var(--color-ink-soft);
+    cursor: pointer;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .site-header__search:hover {
+    color: var(--color-brand);
+    background: var(--color-brand-soft);
+  }
+
+  .site-header__search svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* --- Hamburgerknapp --- */
+
+  .site-header__toggle {
+    display: grid;
+    place-content: center;
+    gap: 5px;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0.625rem;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  @media (min-width: 60rem) {
+    .site-header__toggle {
+      display: none;
+    }
+  }
+
+  .site-header__toggle span {
+    display: block;
+    width: 1.125rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-ink);
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* De to strekene møtes på midten og krysser hverandre. */
+  .site-header.is-open .site-header__toggle span:first-child {
+    transform: translateY(3.5px) rotate(45deg);
+  }
+
+  .site-header.is-open .site-header__toggle span:last-child {
+    transform: translateY(-3.5px) rotate(-45deg);
+  }
+
+  /* --- Mobilmeny --- */
+
+  .site-header__mobile {
+    border-top: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+
+  @media (min-width: 60rem) {
+    .site-header__mobile {
+      display: none;
+    }
+  }
+
+  .site-header__mobile ul {
+    margin: 0;
+    padding: 0.5rem 1.25rem 1.25rem;
+    list-style: none;
+  }
+
+  .site-header__mobile a {
+    display: block;
+    padding: 0.875rem 0.5rem;
+    border-radius: 0.5rem;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .site-header__mobile a[aria-current='page'] {
+    color: var(--color-brand);
+  }
+
+  .site-header__mobile a:hover {
+    background: var(--color-canvas);
+  }
+</style>

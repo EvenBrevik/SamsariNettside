@@ -1,0 +1,205 @@
+---
+import Flag from './Flag.astro';
+import { LOCALES, LOCALE_META, localeFromPath, localizePath, stripLocale } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Peker på samme side i det andre språket, ikke på forsiden — den som bytter
+// språk midt i en artikkel skal bli stående i artikkelen.
+const basePath = stripLocale(Astro.url.pathname);
+
+const options = LOCALES.map((code) => ({
+  code,
+  label: LOCALE_META[code].label,
+  href: localizePath(basePath, code),
+  isCurrent: code === locale,
+}));
+
+const current = LOCALE_META[locale];
+---
+
+<div class="lang" data-lang>
+  <button
+    type="button"
+    class="lang__trigger"
+    aria-label={t('lang.switcher')}
+    aria-expanded="false"
+    aria-controls="sprakvalg"
+    data-lang-trigger
+  >
+    <Flag locale={locale} />
+    <span class="lang__name">{current.label}</span>
+    <svg class="lang__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  </button>
+
+  <ul class="lang__menu" id="sprakvalg" hidden data-lang-menu>
+    {
+      options.map((option) => (
+        <li>
+          <a
+            href={option.href}
+            hreflang={option.code}
+            lang={option.code}
+            aria-current={option.isCurrent ? 'true' : undefined}
+          >
+            <Flag locale={option.code} />
+            {option.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-lang]');
+  const trigger = root?.querySelector<HTMLButtonElement>('[data-lang-trigger]');
+  const menu = root?.querySelector<HTMLElement>('[data-lang-menu]');
+
+  if (root && trigger && menu) {
+    // Et bevisst språkvalg må huskes, ellers ville automatikken i
+    // LocaleRedirect overstyrt brukeren neste gang de kommer til rot.
+    menu.querySelectorAll<HTMLAnchorElement>('a[hreflang]').forEach((link) => {
+      link.addEventListener('click', () => {
+        try {
+          window.localStorage.setItem('samsari:locale', link.hreflang);
+        } catch {
+          // Privat modus eller blokkerte cookies: valget gjelder for denne økten.
+        }
+      });
+    });
+
+    const setOpen = (open: boolean) => {
+      trigger.setAttribute('aria-expanded', String(open));
+      menu.hidden = !open;
+      root.classList.toggle('is-open', open);
+    };
+
+    trigger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      setOpen(trigger.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Klikk utenfor lukker menyen.
+    document.addEventListener('click', (event) => {
+      if (!root.contains(event.target as Node)) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && trigger.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        trigger.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .lang {
+    position: relative;
+  }
+
+  .lang__trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 2.75rem;
+    padding: 0 0.75rem;
+    border: 0;
+    border-radius: 0.625rem;
+    background: transparent;
+    color: var(--color-ink-soft);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .lang__trigger:hover,
+  .lang.is-open .lang__trigger {
+    color: var(--color-brand);
+    background: var(--color-brand-soft);
+  }
+
+  .lang__chevron {
+    width: 0.875rem;
+    height: 0.875rem;
+    opacity: 0.5;
+    transition: transform 200ms ease;
+  }
+
+  .lang.is-open .lang__chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Språknavnet er nyttig, men ikke verdt plassen på de smaleste skjermene —
+     der bærer flagget betydningen alene. */
+  .lang__name {
+    display: none;
+  }
+
+  @media (min-width: 30rem) {
+    .lang__name {
+      display: inline;
+    }
+  }
+
+  .lang__menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    z-index: 10;
+    min-width: 10rem;
+    margin: 0;
+    padding: 0.375rem;
+    list-style: none;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    background: var(--color-surface);
+    box-shadow: 0 4px 6px rgb(36 51 59 / 0.04), 0 12px 32px rgb(36 51 59 / 0.1);
+    animation: lang-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes lang-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .lang__menu a {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .lang__menu a:hover {
+    color: var(--color-ink);
+    background: var(--color-canvas);
+  }
+
+  .lang__menu a[aria-current='true'] {
+    color: var(--color-brand);
+    background: var(--color-brand-soft);
+  }
+</style>
