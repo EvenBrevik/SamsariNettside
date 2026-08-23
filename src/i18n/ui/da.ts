@@ -16,6 +16,13 @@ export const da: Record<UIKeys, string> = {
   'search.placeholder': 'Søg …',
   'search.close': 'Luk søgning',
   'lang.switcher': 'Vælg sprog',
+
+  'hero.title': 'Moderne teknologi der skaber reel værdi',
+  'hero.body':
+    'Vi hjælper virksomheder med at tage AI i brug, udvikler skræddersyede systemer og bygger løsninger med Power Platform, Microsoft 365 og egne SaaS-produkter.',
+  'hero.primary': 'Book en snak',
+  'hero.secondary': 'Se hvad vi laver',
+  'hero.imageAlt': 'Et team samlet omkring et mødebord med bærbare computere, tablets og rapporter',
   'notFound.title': 'Siden findes ikke',
   'notFound.back': 'Gå til forsiden',
 };

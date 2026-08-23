@@ -157,18 +157,28 @@ const homeHref = localizePath('/', locale);
     position: sticky;
     top: 0;
     z-index: 50;
-    background: var(--color-surface);
-    /* Kantlinjen er alltid der, men usynlig før scroll. Da endres bare fargen,
-       ikke layouten, og innholdet under flytter seg ikke når skyggen kommer. */
+    /* Gjennomsiktig på toppen, så heroens gradient får gå ubrutt opp bak
+       headeren. Blir hvit først når siden scrolles og innhold skal passere under.
+       Kantlinjen ligger der hele tiden og skifter bare farge, slik at layouten
+       ikke hopper når den dukker opp. */
+    background: transparent;
     border-bottom: 1px solid transparent;
     transition:
+      background-color 240ms ease,
       border-color 240ms ease,
       box-shadow 240ms ease;
   }
 
   .site-header.is-scrolled {
+    background: var(--color-surface);
     border-bottom-color: var(--color-line);
     box-shadow: 0 1px 3px rgb(36 51 59 / 0.04), 0 8px 24px rgb(36 51 59 / 0.04);
+  }
+
+  /* Mobilmenyen trenger en ugjennomsiktig flate bak seg selv om headeren
+     ellers er gjennomsiktig — ellers ville lenkene ligge oppå innholdet. */
+  .site-header.is-open {
+    background: var(--color-surface);
   }
 
   .site-header__inner {

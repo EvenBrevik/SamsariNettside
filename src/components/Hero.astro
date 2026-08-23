@@ -1,0 +1,207 @@
+---
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import heroImage from '../assets/hero-team.jpg';
+import { BOOKING_URL } from '../data/site';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+---
+
+<section class="hero">
+  <div class="hero__inner">
+    <div class="hero__copy">
+      <h1 class="hero__title">{t('hero.title')}</h1>
+
+      <p class="hero__body">{t('hero.body')}</p>
+
+      <div class="hero__actions">
+        <Button href={BOOKING_URL} external>{t('hero.primary')}</Button>
+        <Button href={localizePath('/tjenester', locale)} variant="secondary">
+          {t('hero.secondary')}
+        </Button>
+      </div>
+    </div>
+
+    <div class="hero__media">
+      <!-- Aksentflaten ligger forskjøvet bak bildet og gir dybde uten å ta
+           oppmerksomhet. Dekorativ, derfor skjult for skjermlesere. -->
+      <span class="hero__accent" aria-hidden="true"></span>
+
+      <div class="hero__frame">
+        <!-- width begrenser fallback-src. Uten den peker src på originalen i
+             full oppløsning (3202×3840, 1,8 MB), som er det nettlesere uten
+             srcset-støtte og enhver feilende bildetjeneste faller tilbake til. -->
+        <Image
+          src={heroImage}
+          alt={t('hero.imageAlt')}
+          width={1040}
+          widths={[480, 720, 1040, 1440]}
+          sizes="(min-width: 64rem) 46vw, (min-width: 40rem) 80vw, 92vw"
+          format="webp"
+          quality={78}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    /* Trekkes opp bak den gjennomsiktige headeren, slik at gradienten går
+       ubrutt helt til toppen av vinduet. */
+    margin-top: calc(var(--header-height) * -1);
+    /* Fyller skjermen. min-height, ikke height, så innholdet får vokse forbi
+       den på lave vinduer i stedet for å bli avkuttet. dvh følger mobilens
+       adressefelt når det trekker seg inn. */
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  /* Et svakt fargeskjær øverst til høyre, bak bildet. Holder den øvre delen
+     av siden fra å bli helt flat hvit uten å legge på en synlig flate. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -16rem;
+    right: -12rem;
+    width: 46rem;
+    height: 46rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 68%);
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  .hero__inner {
+    position: relative;
+    display: grid;
+    gap: 3.5rem;
+    align-items: center;
+    width: 100%;
+    max-width: 80rem;
+    margin: 0 auto;
+    /* Headeren er gjennomsiktig og ligger over heroen, så toppolstringen må
+       også dekke headerhøyden — ellers havner innholdet bak logo og meny.
+       Bunnen får like mye, slik at blokken står optisk midt i skjermen. */
+    padding: calc(var(--header-height) + 2rem) 1.25rem 3rem;
+  }
+
+  @media (min-width: 40rem) {
+    .hero__inner {
+      padding: calc(var(--header-height) + 2.5rem) 2rem 3.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .hero__inner {
+      /* Tekstspalten er smalere enn bildet, så den brede luften mellom dem
+         får plass uten at noen av delene blir trange. */
+      grid-template-columns: minmax(0, 0.78fr) minmax(0, 1fr);
+      /* Bred luft mellom spaltene. clamp() gjør at avstanden gir etter på
+         mindre skjermer i stedet for å presse begge kolonnene sammen. */
+      gap: clamp(5rem, 18vw, 22rem);
+      padding: calc(var(--header-height) + 2rem) 2rem 3rem;
+    }
+  }
+
+  /* --- Tekst --- */
+
+  .hero__title {
+    margin: 0;
+    font-size: clamp(2.25rem, 4.4vw, 3.625rem);
+    font-weight: 600;
+    line-height: 1.06;
+    letter-spacing: -0.04em;
+  }
+
+  @media (min-width: 64rem) {
+    /* Overskriften får strekke seg ut over tekstspalten og inn i luften mot
+       bildet. Brødteksten under holdes smal, så de to har ulik målebredde og
+       overskriften leses som det dominerende elementet.
+       max-content med tak: aldri bredere enn den trenger, aldri forbi bildet. */
+    .hero__title {
+      width: max-content;
+      max-width: min(150%, 20ch);
+    }
+  }
+
+  .hero__body {
+    margin: 1.75rem 0 0;
+    /* Bevisst smalere enn overskriften — kontrasten mellom de to breddene er
+       det som gir overskriften tyngde. */
+    max-width: 42ch;
+    color: var(--color-ink-soft);
+    font-size: clamp(1rem, 1.5vw, 1.1875rem);
+    line-height: 1.7;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+    margin-top: 2.5rem;
+  }
+
+  /* --- Bilde --- */
+
+  .hero__media {
+    position: relative;
+  }
+
+  .hero__frame {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    /* Asymmetrisk radius: skarpt hjørne øverst til venstre, mykt ellers.
+       Gir formen retning i stedet for å bli en nøytral boks. */
+    border-radius: 0.5rem 6rem 0.5rem 6rem;
+    box-shadow: 0 2px 8px rgb(36 51 59 / 0.06), 0 24px 60px rgb(36 51 59 / 0.14);
+  }
+
+  /* :global fordi <Image> er en egen komponent — scoped CSS ville lagt på et
+     data-attributt som bildet ikke har, og regelen ville aldri truffet. */
+  .hero__frame :global(img) {
+    display: block;
+    width: 100%;
+    /* Bildet er stående, men heroen vil ha noe bredere. Beskjæringen forankres
+       mot toppen, der menneskene og handlingen er. */
+    aspect-ratio: 4 / 3.4;
+    object-fit: cover;
+    object-position: 50% 28%;
+  }
+
+  @media (min-width: 64rem) {
+    .hero__frame :global(img) {
+      aspect-ratio: 4 / 4.3;
+    }
+  }
+
+  /* Aksentflaten stikker ut nede til venstre og bryter opp rektangelet. */
+  .hero__accent {
+    position: absolute;
+    z-index: 0;
+    left: -1.25rem;
+    bottom: -1.25rem;
+    width: 58%;
+    height: 55%;
+    border-radius: 0.5rem 5rem 0.5rem 5rem;
+    background: var(--color-brand);
+    opacity: 0.1;
+  }
+
+  @media (min-width: 64rem) {
+    .hero__accent {
+      left: -2rem;
+      bottom: -2rem;
+    }
+  }
+</style>

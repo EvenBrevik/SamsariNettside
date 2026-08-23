@@ -16,6 +16,13 @@ export const en: Record<UIKeys, string> = {
   'search.placeholder': 'Search …',
   'search.close': 'Close search',
   'lang.switcher': 'Choose language',
+
+  'hero.title': 'Modern technology that creates real value',
+  'hero.body':
+    'We help businesses adopt AI, develop tailored systems and build solutions with Power Platform, Microsoft 365 and our own SaaS products.',
+  'hero.primary': 'Book a chat',
+  'hero.secondary': 'See what we do',
+  'hero.imageAlt': 'A team gathered around a meeting table with laptops, tablets and reports',
   'notFound.title': 'Page not found',
   'notFound.back': 'Go to the front page',
 };

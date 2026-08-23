@@ -16,6 +16,13 @@ export const nb = {
   'search.placeholder': 'Søk …',
   'search.close': 'Lukk søk',
   'lang.switcher': 'Velg språk',
+
+  'hero.title': 'Moderne teknologi som skaper reell verdi',
+  'hero.body':
+    'Vi hjelper bedrifter med å ta i bruk AI, utvikler skreddersydde systemer og bygger løsninger med Power Platform, Microsoft 365 og egne SaaS-produkter.',
+  'hero.primary': 'Book en prat',
+  'hero.secondary': 'Se hva vi gjør',
+  'hero.imageAlt': 'Et team samlet rundt et møtebord med laptoper, nettbrett og rapporter',
   'notFound.title': 'Siden finnes ikke',
   'notFound.back': 'Gå til forsiden',
 } as const;
