@@ -6,6 +6,7 @@ export const nb = {
   'nav.services': 'Tjenester',
   'nav.products': 'Produkter',
   'nav.cases': 'Kundecase',
+  'nav.insights': 'Innsikt',
   'nav.about': 'Om oss',
   'nav.contact': 'Kontakt',
   'nav.toHome': 'Samsari, til forsiden',
@@ -43,6 +44,29 @@ export const nb = {
   'services.platform.title': 'M365 & Power Platform',
   'services.platform.body':
     'Oppsett av SharePoint og utvikling av Power Apps, slik at dere får mer ut av Microsoft-plattformen dere allerede betaler for.',
+
+  'products.title': 'Produktene våre',
+  'products.body':
+    'I tillegg til skreddersydde løsninger for kundene våre, bygger vi egne produkter — klare til å tas i bruk.',
+  'products.cta': 'Se alle produkter',
+  'products.visit': 'Besøk nettsiden',
+  'products.portal.body': 'En samlet portal for å følge prosjekter, oppgaver og fremdrift i sanntid.',
+  'products.savas.body':
+    'Et SaaS-produkt fra Samsari, bygget for å gjøre daglige rutiner enklere og mer effektive.',
+  'products.forge.body': 'En fleksibel motor for å bygge og automatisere skreddersydde arbeidsflyter.',
+
+  'insights.title': 'Innsikt',
+  'insights.body': 'Tanker, guider og erfaringer fra arbeidet vårt med AI og Microsoft 365.',
+  'insights.cta': 'Se alle artikler',
+  'insights.readMore': 'Les mer',
+  'insights.post1.category': 'AI',
+  'insights.post1.title': 'Slik kommer dere i gang med Claude i bedriften',
+  'insights.post1.excerpt':
+    'Praktiske steg for å ta i bruk AI uten at det blir kaotisk — fra første pilot til noe hele teamet bruker.',
+  'insights.post2.category': 'Microsoft 365',
+  'insights.post2.title': 'Få mer ut av SharePoint og Power Platform',
+  'insights.post2.excerpt':
+    'Enkle grep som gjør at dere utnytter mer av plattformen dere allerede betaler for.',
 
   'footer.menuHeading': 'Meny',
   'footer.contactHeading': 'Kontakt',

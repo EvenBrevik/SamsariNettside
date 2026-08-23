@@ -6,6 +6,7 @@ export const sv: Record<UIKeys, string> = {
   'nav.services': 'Tjänster',
   'nav.products': 'Produkter',
   'nav.cases': 'Kundcase',
+  'nav.insights': 'Insikt',
   'nav.about': 'Om oss',
   'nav.contact': 'Kontakt',
   'nav.toHome': 'Samsari, till startsidan',
@@ -43,6 +44,29 @@ export const sv: Record<UIKeys, string> = {
   'services.platform.title': 'M365 & Power Platform',
   'services.platform.body':
     'Uppsättning av SharePoint och utveckling av Power Apps, så att ni får ut mer av Microsoft-plattformen ni redan betalar för.',
+
+  'products.title': 'Våra produkter',
+  'products.body':
+    'Utöver skräddarsydda lösningar för våra kunder bygger vi egna produkter — redo att användas.',
+  'products.cta': 'Se alla produkter',
+  'products.visit': 'Besök webbplatsen',
+  'products.portal.body': 'En samlad portal för att följa projekt, uppgifter och framsteg i realtid.',
+  'products.savas.body':
+    'En SaaS-produkt från Samsari, byggd för att göra vardagliga rutiner enklare och mer effektiva.',
+  'products.forge.body': 'En flexibel motor för att bygga och automatisera skräddarsydda arbetsflöden.',
+
+  'insights.title': 'Insikt',
+  'insights.body': 'Tankar, guider och erfarenheter från vårt arbete med AI och Microsoft 365.',
+  'insights.cta': 'Se alla artiklar',
+  'insights.readMore': 'Läs mer',
+  'insights.post1.category': 'AI',
+  'insights.post1.title': 'Så kommer ni igång med Claude i företaget',
+  'insights.post1.excerpt':
+    'Praktiska steg för att använda AI utan att det blir kaotiskt — från första piloten till något hela teamet använder.',
+  'insights.post2.category': 'Microsoft 365',
+  'insights.post2.title': 'Få ut mer av SharePoint och Power Platform',
+  'insights.post2.excerpt':
+    'Enkla grepp som gör att ni utnyttjar mer av plattformen ni redan betalar för.',
 
   'footer.menuHeading': 'Meny',
   'footer.contactHeading': 'Kontakt',

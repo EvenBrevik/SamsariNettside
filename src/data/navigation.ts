@@ -17,6 +17,7 @@ export const mainNav: readonly NavItem[] = [
   { labelKey: 'nav.services', path: '/tjenester' },
   { labelKey: 'nav.products', path: '/produkter' },
   { labelKey: 'nav.cases', path: '/kundecase' },
+  { labelKey: 'nav.insights', path: '/blogg' },
   { labelKey: 'nav.about', path: '/om-oss' },
   { labelKey: 'nav.contact', path: '/kontakt' },
 ] as const;

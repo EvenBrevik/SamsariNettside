@@ -1,0 +1,313 @@
+---
+import Button from './Button.astro';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Ingen artikler er publisert i Sanity ennå (blogPost-typen i studioet står
+// tom). Disse to er derfor plassholdere som viser hvordan seksjonen fungerer
+// — bytt ut med et ekte Sanity-søk mot blogPost når de første innleggene er
+// skrevet, og la href peke på /blogg/<slug> for hvert innlegg.
+const blogHref = localizePath('/blogg', locale);
+
+const posts = [
+  { categoryKey: 'insights.post1.category', titleKey: 'insights.post1.title', bodyKey: 'insights.post1.excerpt' },
+  { categoryKey: 'insights.post2.category', titleKey: 'insights.post2.title', bodyKey: 'insights.post2.excerpt' },
+] as const;
+---
+
+<section class="insights" data-insights>
+  <div class="insights__inner">
+    <div class="insights__intro">
+      <h2 class="insights__title">{t('insights.title')}</h2>
+      <p class="insights__body">{t('insights.body')}</p>
+      <Button href={blogHref} variant="secondary">
+        {t('insights.cta')}
+      </Button>
+    </div>
+
+    <ul class="insights__grid">
+      {
+        posts.map((post, index) => (
+          <li class="insights__card" style={`--i: ${index}`}>
+            <a class="insights__link" href={blogHref}>
+              <span class="insights__media">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+                <span>{t('services.imagePlaceholder')}</span>
+              </span>
+
+              <span class="insights__body-wrap">
+                <span class="insights__category">{t(post.categoryKey)}</span>
+                <span class="insights__post-title">{t(post.titleKey)}</span>
+                <p class="insights__excerpt">{t(post.bodyKey)}</p>
+                <span class="insights__read-more">
+                  {t('insights.readMore')}
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 8h10M9 4l4 4-4 4" />
+                  </svg>
+                </span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  // Samme inntoning-på-scroll som de andre forsideseksjonene.
+  const section = document.querySelector<HTMLElement>('[data-insights]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section) {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      section.classList.add('is-visible');
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              section.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.15 },
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  .insights {
+    background: var(--color-surface);
+  }
+
+  .insights__inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 5rem 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .insights__inner {
+      padding: 6rem 2rem;
+    }
+  }
+
+  /* --- Intro --- */
+
+  .insights__intro {
+    max-width: 40rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .insights__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease,
+      transform 700ms ease;
+  }
+
+  .insights.is-visible .insights__title {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .insights__body {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 80ms,
+      transform 700ms ease 80ms;
+  }
+
+  .insights.is-visible .insights__body {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .insights__intro :global(.btn) {
+    margin-top: 1.75rem;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 140ms,
+      transform 700ms ease 140ms;
+  }
+
+  .insights.is-visible .insights__intro :global(.btn) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* --- Kortgrid --- */
+
+  .insights__grid {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 56rem;
+    margin: 4rem auto 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .insights__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .insights__card {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 600ms ease calc(200ms + var(--i) * 100ms),
+      transform 600ms ease calc(200ms + var(--i) * 100ms);
+  }
+
+  .insights.is-visible .insights__card {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .insights__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid var(--color-line);
+    border-radius: 2.5rem 0.5rem 2.5rem 0.5rem;
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      transform 220ms ease;
+  }
+
+  .insights__link:hover,
+  .insights__link:focus-visible {
+    border-color: transparent;
+    box-shadow: 0 1px 2px rgb(36 51 59 / 0.05), 0 20px 40px rgb(36 51 59 / 0.1);
+    transform: translateY(-3px);
+  }
+
+  /* --- Bilde --- */
+
+  .insights__media {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    aspect-ratio: 16 / 9;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--color-canvas),
+      var(--color-canvas) 10px,
+      var(--color-surface) 10px,
+      var(--color-surface) 20px
+    );
+    color: var(--color-muted);
+  }
+
+  .insights__media svg {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .insights__media span {
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  /* --- Tekst --- */
+
+  .insights__body-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.5rem;
+  }
+
+  .insights__category {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .insights__post-title {
+    display: block;
+    margin-top: 0.875rem;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+
+  .insights__excerpt {
+    margin: 0.5rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .insights__read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: auto;
+    padding-top: 1.25rem;
+    color: var(--color-brand);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .insights__read-more svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .insights__link:hover .insights__read-more svg,
+  .insights__link:focus-visible .insights__read-more svg {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .insights__link:hover {
+      transform: none;
+    }
+
+    .insights__link:hover .insights__read-more svg {
+      transform: none;
+    }
+  }
+</style>
