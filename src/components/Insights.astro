@@ -2,20 +2,42 @@
 import Button from './Button.astro';
 import { localeFromPath, localizePath } from '../i18n/config';
 import { useTranslations } from '../i18n/utils';
+import { urlFor } from '../lib/sanity';
+import { getAllPosts, type BlogPost } from '../lib/posts';
 
 const locale = localeFromPath(Astro.url.pathname);
 const t = useTranslations(locale);
 
-// Ingen artikler er publisert i Sanity ennå (blogPost-typen i studioet står
-// tom). Disse to er derfor plassholdere som viser hvordan seksjonen fungerer
-// — bytt ut med et ekte Sanity-søk mot blogPost når de første innleggene er
-// skrevet, og la href peke på /blogg/<slug> for hvert innlegg.
 const blogHref = localizePath('/blogg', locale);
 
-const posts = [
-  { categoryKey: 'insights.post1.category', titleKey: 'insights.post1.title', bodyKey: 'insights.post1.excerpt' },
-  { categoryKey: 'insights.post2.category', titleKey: 'insights.post2.title', bodyKey: 'insights.post2.excerpt' },
-] as const;
+// Samme henting som bloggoversikten, slik at språkfiltreringen gjelder her
+// også — uten den viste forsiden både norske og engelske artikler samtidig.
+// De to nyeste vises.
+type InsightPost = Pick<BlogPost, '_id' | 'title' | 'slug' | 'category' | 'excerpt' | 'mainImage'>;
+
+const posts: InsightPost[] = (await getAllPosts(locale)).slice(0, 2);
+
+// Plassholdere dersom Sanity er utilgjengelig eller ingen artikler er publisert
+// på dette språket, slik at forsiden aldri får en tom seksjon.
+const items: InsightPost[] =
+  posts.length > 0
+    ? posts
+    : [
+        {
+          _id: 'fallback-1',
+          title: t('insights.post1.title'),
+          slug: null,
+          category: t('insights.post1.category'),
+          excerpt: t('insights.post1.excerpt'),
+        },
+        {
+          _id: 'fallback-2',
+          title: t('insights.post2.title'),
+          slug: null,
+          category: t('insights.post2.category'),
+          excerpt: t('insights.post2.excerpt'),
+        },
+      ];
 ---
 
 <section class="insights" data-insights>
@@ -30,23 +52,41 @@ const posts = [
 
     <ul class="insights__grid">
       {
-        posts.map((post, index) => (
+        items.map((post, index) => (
           <li class="insights__card" style={`--i: ${index}`}>
-            <a class="insights__link" href={blogHref}>
+            <a
+              class="insights__link"
+              href={post.slug ? localizePath(`/blogg/${post.slug}`, locale) : blogHref}
+            >
               <span class="insights__media">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                </svg>
-                <span>{t('services.imagePlaceholder')}</span>
+                {
+                  post.mainImage?.asset?._ref ? (
+                    <img
+                      src={urlFor(post.mainImage).width(960).height(540).fit('crop').auto('format').url()}
+                      alt={post.mainImage.alt ?? post.title}
+                      width="960"
+                      height="540"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                      </svg>
+                      <span>{t('services.imagePlaceholder')}</span>
+                    </>
+                  )
+                }
               </span>
 
               <span class="insights__body-wrap">
-                <span class="insights__category">{t(post.categoryKey)}</span>
-                <span class="insights__post-title">{t(post.titleKey)}</span>
-                <p class="insights__excerpt">{t(post.bodyKey)}</p>
+                <span class="insights__category">{post.category}</span>
+                <span class="insights__post-title">{post.title}</span>
+                <p class="insights__excerpt">{post.excerpt}</p>
                 <span class="insights__read-more">
                   {t('insights.readMore')}
                   <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -234,6 +274,13 @@ const posts = [
   .insights__media svg {
     width: 2rem;
     height: 2rem;
+  }
+
+  .insights__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .insights__media span {

@@ -1,0 +1,56 @@
+---
+import Base from '../../layouts/Base.astro';
+import ServicesContent from '../../components/ServicesContent.astro';
+import { breadcrumbSchema, faqSchema, servicesSchema } from '../../data/schema';
+import { site } from '../../data/site';
+import { LOCALES, DEFAULT_LOCALE, isLocale, localizePath } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import type { UIKeys } from '../../i18n/ui/nb';
+
+export function getStaticPaths() {
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale: param } = Astro.params;
+const locale = param && isLocale(param) ? param : DEFAULT_LOCALE;
+const t = useTranslations(locale);
+
+const pageUrl = new URL(localizePath('/tjenester', locale), site.url).href;
+
+const faqLd = faqSchema(
+  Array.from({ length: 7 }, (_, i) => ({
+    question: t(`sv.faq.q${i + 1}` as UIKeys),
+    answer: t(`sv.faq.a${i + 1}` as UIKeys),
+  })),
+);
+
+// De åtte leveransene som tjenestekatalog, slik at Google ser hva vi faktisk
+// tilbyr og ikke bare at siden heter «Tjenester».
+const servicesLd = servicesSchema({
+  name: t('nav.services'),
+  description: t('sv.seoDescription'),
+  url: pageUrl,
+  locale,
+  offers: Array.from({ length: 8 }, (_, i) => ({
+    name: t(`sv.deliver.d${i + 1}.title` as UIKeys),
+    description: t(`sv.deliver.d${i + 1}.body` as UIKeys),
+  })),
+});
+
+const breadcrumbLd = breadcrumbSchema(
+  [{ name: t('nav.services'), url: pageUrl }],
+  t('nav.home'),
+);
+---
+
+<Base title={t('sv.seoTitle')} description={t('sv.seoDescription')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(servicesLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(faqLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <ServicesContent />
+</Base>

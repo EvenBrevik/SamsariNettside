@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductsContent from '../components/ProductsContent.astro';
+import { breadcrumbSchema, servicesSchema } from '../data/schema';
+import { site } from '../data/site';
+import { DEFAULT_LOCALE } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import type { UIKeys } from '../i18n/ui/nb';
+
+const t = useTranslations(DEFAULT_LOCALE);
+
+const pageUrl = new URL('/produkter', site.url).href;
+
+// De tre produktene som katalog, slik at Google ser hva vi tilbyr og ikke bare
+// at siden heter «Produkter».
+const productsLd = servicesSchema({
+  name: t('nav.products'),
+  description: t('pr.seoDescription'),
+  url: pageUrl,
+  locale: DEFAULT_LOCALE,
+  offers: (['portal', 'forge', 'savas'] as const).map((key) => ({
+    name: t(`pr.${key}.name` as UIKeys),
+    description: t(`pr.${key}.body` as UIKeys),
+  })),
+});
+
+const breadcrumbLd = breadcrumbSchema([{ name: t('nav.products'), url: pageUrl }], t('nav.home'));
+---
+
+<Base title={t('pr.seoTitle')} description={t('pr.seoDescription')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(productsLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <ProductsContent />
+</Base>

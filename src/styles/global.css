@@ -9,11 +9,25 @@
 @theme {
   --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand: #1183ce;
+  /* Merkefargene. --color-brand og --color-ink er hentet rett fra logoen;
+     --color-accent (lilla) og --color-sky (lys blå) er de to øvrige i paletten.
+     De avledede tonene under er regnet ut fra disse. */
+  --color-brand: #1184cd;
   --color-brand-dark: #0d6ba8;
   --color-brand-soft: #eaf4fc;
 
-  --color-ink: #24333b;
+  /* Lilla er aksentfarge, ikke en andre merkefarge: den brukes bare der noe
+     skal skille seg ut fra den blå grunntonen — AI, og det som er utvalgt.
+     --color-accent-deep er den samme fargen mørknet nok til å holde
+     kontrastkravet som liten tekst på hvit flate (7,5:1 mot 4,3:1). */
+  --color-accent: #8958fe;
+  --color-accent-deep: #5b2bd9;
+  --color-accent-soft: #f1ecff;
+
+  --color-sky: #73b8e3;
+  --color-sky-soft: #eaf4fb;
+
+  --color-ink: #1e303a;
   --color-ink-soft: #55666f;
   --color-muted: #7d8c94;
 
@@ -92,7 +106,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   border-radius: 0.5rem;
-  box-shadow: 0 8px 24px rgb(17 131 206 / 0.3);
+  box-shadow: 0 8px 24px rgb(17 132 205 / 0.3);
 }
 
 @media (prefers-reduced-motion: reduce) {

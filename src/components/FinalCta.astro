@@ -1,0 +1,266 @@
+---
+import Button from './Button.astro';
+import { BOOKING_URL, contact } from '../data/site';
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+---
+
+<section class="cta" data-cta>
+  <div class="cta__inner">
+    <div class="cta__panel">
+      <!-- Dekorativt bakgrunnsmønster. Rutenettet og de konsentriske buene
+           gir panelet dybde uten et fotografi. preserveAspectRatio="none" ville
+           strukket sirklene til ellipser, derfor slice: mønsteret beskjæres i
+           stedet, slik at buene holder formen på alle bredder. -->
+      <svg
+        class="cta__pattern"
+        viewBox="0 0 800 400"
+        preserveAspectRatio="xMaxYMid slice"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <defs>
+          <linearGradient id="cta-fade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0.5" />
+          </linearGradient>
+
+          <pattern id="cta-grid" width="34" height="34" patternUnits="userSpaceOnUse">
+            <path d="M34 0H0v34" fill="none" stroke="#fff" stroke-opacity="0.14" stroke-width="1" />
+          </pattern>
+        </defs>
+
+        <rect width="800" height="400" fill="url(#cta-grid)" />
+
+        <g fill="none" stroke="url(#cta-fade)" stroke-width="1.5">
+          <circle cx="660" cy="200" r="80" />
+          <circle cx="660" cy="200" r="132" />
+          <circle cx="660" cy="200" r="184" />
+        </g>
+      </svg>
+
+      <div class="cta__content">
+        <h2 class="cta__title">{t('finalCta.title')}</h2>
+        <p class="cta__body">{t('finalCta.body')}</p>
+
+        <div class="cta__actions">
+          <Button href={BOOKING_URL} external>{t('finalCta.button')}</Button>
+
+          <a class="cta__mail" href={`mailto:${contact.generalEmail}`}>
+            {t('finalCta.secondary')}
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Samme inntoning-på-scroll som de andre forsideseksjonene.
+  const section = document.querySelector<HTMLElement>('[data-cta]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section) {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      section.classList.add('is-visible');
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              section.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.25 },
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  /* Approach over ligger på canvas, footeren under er mørk. Denne står i hvitt,
+     slik at det fargede panelet får luft rundt seg og blir sidens siste,
+     tydelige punkt før footeren. */
+  .cta {
+    background: var(--color-surface);
+  }
+
+  .cta__inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 5rem 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .cta__inner {
+      padding: 6rem 2rem;
+    }
+  }
+
+  .cta__panel {
+    position: relative;
+    padding: 3.5rem 1.75rem;
+    /* Samme asymmetriske hjørnespråk som resten av siden, men i største skala —
+       dette er den siste flaten før footeren. */
+    border-radius: 1rem 5rem 1rem 5rem;
+    /* Blå til lilla. Dette er den eneste flaten på siden der de to
+       merkefargene møtes — det gjør avslutningen til sidens mest markante
+       punkt uten å legge på ekstra elementer. */
+    background: linear-gradient(135deg, var(--color-brand) 0%, #4a3fd4 62%, var(--color-accent) 100%);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 700ms ease,
+      transform 700ms ease;
+  }
+
+  .cta.is-visible .cta__panel {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (min-width: 48rem) {
+    .cta__panel {
+      padding: 4.5rem 3.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .cta__panel {
+      padding: 5rem 4.5rem;
+    }
+  }
+
+  /* --- Mønster --- */
+
+  .cta__pattern {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* Mønsteret tegner seg inn litt etter panelet, så flaten lander først og
+     dekoren følger. */
+  .cta__pattern {
+    opacity: 0;
+    transition: opacity 1100ms ease 260ms;
+  }
+
+  .cta.is-visible .cta__pattern {
+    opacity: 1;
+  }
+
+  /* På smale skjermer ville mønsteret ligget under teksten og gjort den
+     urolig — der holder gradienten alene. */
+  @media (max-width: 40rem) {
+    .cta__pattern {
+      display: none;
+    }
+  }
+
+  /* --- Innhold --- */
+
+  .cta__content {
+    position: relative;
+    max-width: 34rem;
+  }
+
+  .cta__title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(1.625rem, 3.4vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .cta__body {
+    margin: 1.25rem 0 0;
+    max-width: 46ch;
+    color: rgb(255 255 255 / 0.85);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.875rem 1.75rem;
+    margin-top: 2.5rem;
+  }
+
+  /* Den primære knappen er blå på hvit ellers på siden. Her ligger den på
+     blått, så den snus: hvit flate med merkefargen som tekst. */
+  .cta__actions :global(.btn--primary) {
+    background: #fff;
+    color: var(--color-brand);
+    box-shadow: 0 2px 6px rgb(9 46 74 / 0.18), 0 14px 30px rgb(9 46 74 / 0.22);
+  }
+
+  .cta__actions :global(.btn--primary:hover) {
+    background: var(--color-brand-soft);
+    color: var(--color-brand-dark);
+  }
+
+  /* Standard fokusring er merkefargen, som forsvinner mot dette panelet. */
+  .cta__actions :global(.btn:focus-visible) {
+    outline-color: #fff;
+  }
+
+  /* --- Sekundær lenke --- */
+
+  .cta__mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    /* Understreken ligger litt ned og tegnes tynt — rolig, men tydelig at det
+       er en lenke. */
+    text-decoration: underline;
+    text-decoration-color: rgb(255 255 255 / 0.4);
+    text-underline-offset: 0.3em;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color 200ms ease;
+  }
+
+  .cta__mail:hover,
+  .cta__mail:focus-visible {
+    text-decoration-color: #fff;
+  }
+
+  .cta__mail:focus-visible {
+    outline-color: #fff;
+  }
+
+  .cta__mail svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cta__mail:hover svg {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cta__mail:hover svg {
+      transform: none;
+    }
+  }
+</style>

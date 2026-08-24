@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import CaseDetail from '../../components/CaseDetail.astro';
+import {
+  getCasesWithSlug,
+  metaDescription,
+  shareImageSource,
+  refDimensions,
+  type CaseStudy,
+} from '../../lib/cases';
+import { urlFor } from '../../lib/sanity';
+import { breadcrumbSchema, caseArticleSchema } from '../../data/schema';
+import { site } from '../../data/site';
+import { DEFAULT_LOCALE } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+
+export async function getStaticPaths() {
+  const cases = await getCasesWithSlug(DEFAULT_LOCALE);
+  return cases.map((study) => ({
+    params: { slug: study.slug! },
+    props: { study },
+  }));
+}
+
+interface Props {
+  study: CaseStudy;
+}
+
+const { study } = Astro.props;
+const t = useTranslations(DEFAULT_LOCALE);
+
+// SEO-tittelen fra studioet vinner. Uten den bygges en som sier hva siden er,
+// ikke bare hvem den handler om — «kundecase» og bransjen gir søkeresultatet
+// kontekst og treffer søk som «kundecase bank».
+const title =
+  study.seoTitle?.trim() ||
+  (study.sector
+    ? `${study.company} — kundecase innen ${study.sector.toLowerCase()}`
+    : `${study.company} — kundecase`);
+
+const description = metaDescription(study);
+
+const pageUrl = new URL(`/kundecase/${study.slug}`, site.url).href;
+const overviewUrl = new URL('/kundecase', site.url).href;
+
+// Delingsbildet må være 1200×630 — formatet LinkedIn, Facebook og X forventer.
+// `fillmax` skalerer bildet ned til det får plass og fyller resten med hvitt,
+// i stedet for å beskjære. Viktig her: logoene er brede og smale, og `fill`
+// ville kuttet dem til en midtstripe etter hotspot-innstillingen i Sanity.
+const shareSource = shareImageSource(study);
+// .rect() over hele bildeflaten overstyrer hotspot-utsnittet, som ellers
+// følger med fra asset-dokumentet og kutter brede logoer til en midtstripe.
+const shareDims = refDimensions(shareSource?._ref);
+const shareImage = shareSource
+  ? (() => {
+      let b = urlFor(shareSource).width(1200).height(630).fit('fillmax').bg('ffffff');
+      if (shareDims) b = b.rect(0, 0, shareDims.width, shareDims.height);
+      return b.auto('format').url();
+    })()
+  : undefined;
+
+const articleLd = caseArticleSchema({
+  headline: title,
+  description,
+  url: pageUrl,
+  image: shareImage,
+  clientName: study.company,
+  locale: DEFAULT_LOCALE,
+  // Redaksjonell prosjektdato foretrekkes; Sanitys tidsstempel er reserven.
+  datePublished: study.date ?? study.createdAt,
+  dateModified: study.updatedAt,
+  services: study.services ?? undefined,
+});
+
+const breadcrumbLd = breadcrumbSchema(
+  [
+    { name: t('cases.title'), url: overviewUrl },
+    { name: study.company, url: pageUrl },
+  ],
+  t('nav.home'),
+);
+---
+
+<Base title={title} description={description} type="article" image={shareImage}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(articleLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <CaseDetail study={study} />
+</Base>

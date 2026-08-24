@@ -107,6 +107,12 @@ const legalLinks = [
             </li>
           ))
         }
+        <li>
+          {/* Åpner samtykkebanneret på nytt. Et samtykke må kunne trekkes
+              tilbake like enkelt som det ble gitt, og da må valget være
+              tilgjengelig fra hver side — derfor her, ikke bare i banneret. */}
+          <button type="button" data-consent-open>{t('consent.settings')}</button>
+        </li>
       </ul>
     </div>
   </div>
@@ -308,14 +314,26 @@ const legalLinks = [
     list-style: none;
   }
 
-  .site-footer__legal a {
+  /* Knappen for samtykkevalg skal se ut som lenkene ved siden av — den er en
+     knapp fordi den åpner en dialog, ikke fordi den skal se annerledes ut. */
+  .site-footer__legal a,
+  .site-footer__legal button {
     color: rgb(255 255 255 / 0.5);
+    font-family: inherit;
     font-size: 0.8125rem;
     text-decoration: none;
     transition: color 180ms ease;
   }
 
-  .site-footer__legal a:hover {
+  .site-footer__legal button {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .site-footer__legal a:hover,
+  .site-footer__legal button:hover {
     color: #fff;
   }
 </style>

@@ -1,0 +1,354 @@
+---
+import { PortableText } from 'astro-portabletext';
+import Button from './Button.astro';
+import CaseBodyImage from './CaseBodyImage.astro';
+import { BOOKING_URL } from '../data/site';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import { urlFor } from '../lib/sanity';
+import { formatDate, type BlogPost } from '../lib/posts';
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const blogHref = localizePath('/blogg', locale);
+const body = Array.isArray(post.body) && post.body.length > 0 ? post.body : null;
+// Stikkord fra studioet. Kategorien står allerede i metalinjen over, så disse
+// plasseres etter brødteksten som utfyllende emneord.
+const tags = (post.tags ?? []).map((tag) => tag?.trim()).filter(Boolean) as string[];
+---
+
+<article class="article">
+  <div class="article__inner">
+    <nav class="article__breadcrumb" aria-label={t('blog.back')}>
+      <a class="article__back" href={blogHref}>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M13 8H3M7 4L3 8l4 4" />
+        </svg>
+        {t('blog.back')}
+      </a>
+    </nav>
+
+    <header class="article__header">
+      <div class="article__meta">
+        {post.category && <span class="article__category">{post.category}</span>}
+        {
+          post.date && (
+            <time class="article__date" datetime={post.date}>
+              {formatDate(post.date, locale)}
+            </time>
+          )
+        }
+        {
+          post.readingTime && (
+            <span class="article__time">
+              {post.readingTime} {t('blog.readingTime')}
+            </span>
+          )
+        }
+      </div>
+
+      <h1 class="article__title">{post.title}</h1>
+      {post.excerpt && <p class="article__lead">{post.excerpt}</p>}
+    </header>
+
+    {
+      post.mainImage?.asset && (
+        <figure class="article__figure">
+          <img
+            src={urlFor(post.mainImage).width(1400).height(788).fit('crop').auto('format').url()}
+            alt={post.mainImage.alt ?? ''}
+            loading="eager"
+            decoding="async"
+          />
+        </figure>
+      )
+    }
+
+    {
+      body && (
+        <div class="article__body">
+          <PortableText value={body} components={{ type: { image: CaseBodyImage } }} />
+        </div>
+      )
+    }
+
+    {
+      tags.length > 0 && (
+        <ul class="article__tags">
+          {tags.map((tag) => (
+            <li class="article__tag">{tag}</li>
+          ))}
+        </ul>
+      )
+    }
+
+    <aside class="article__cta">
+      <h2 class="article__cta-title">{t('blog.ctaTitle')}</h2>
+      <p class="article__cta-body">{t('blog.ctaBody')}</p>
+      <div class="article__cta-actions">
+        <Button href={BOOKING_URL} external>{t('blog.ctaButton')}</Button>
+        <Button href={blogHref} variant="secondary">{t('blog.back')}</Button>
+      </div>
+    </aside>
+  </div>
+</article>
+
+<style>
+  .article {
+    position: relative;
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .article::before {
+    content: '';
+    position: absolute;
+    top: -18rem;
+    right: -12rem;
+    width: 40rem;
+    height: 40rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 70%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .article__inner {
+    position: relative;
+    /* Smal spalte: lang løpende tekst leses best på 60–70 tegn. */
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 2.5rem) 1.25rem 5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .article__inner {
+      padding: calc(var(--header-height) + 3rem) 2rem 6rem;
+    }
+  }
+
+  /* --- Tilbakelenke --- */
+
+  .article__breadcrumb {
+    margin-bottom: 2rem;
+  }
+
+  .article__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .article__back:hover {
+    color: var(--color-brand);
+  }
+
+  .article__back svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .article__back:hover svg {
+    transform: translateX(-3px);
+  }
+
+  /* --- Topp --- */
+
+  .article__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .article__category {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .article__date,
+  .article__time {
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+  }
+
+  .article__title {
+    margin: 1rem 0 0;
+    color: var(--color-ink);
+    font-size: clamp(2rem, 4.4vw, 2.875rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .article__lead {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.1875rem;
+    line-height: 1.7;
+  }
+
+  /* --- Hovedbilde --- */
+
+  .article__figure {
+    margin: 2.5rem 0 0;
+  }
+
+  .article__figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+  }
+
+  /* --- Brødtekst --- */
+
+  /* :global fordi markupen kommer fra PortableText og ikke får Astros
+     scope-attributt. */
+  .article__body {
+    margin-top: 2.5rem;
+  }
+
+  .article__body :global(h2) {
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--color-brand-soft);
+    color: var(--color-ink);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .article__body :global(h3) {
+    margin: 2rem 0 0.75rem;
+    color: var(--color-ink);
+    font-size: 1.1875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .article__body :global(p) {
+    margin: 0 0 1.25rem;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  .article__body :global(ul),
+  .article__body :global(ol) {
+    margin: 0 0 1.25rem;
+    padding-left: 1.25rem;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  .article__body :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .article__body :global(blockquote) {
+    margin: 1.75rem 0;
+    padding: 0 0 0 1.25rem;
+    border-left: 3px solid var(--color-brand-soft);
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .article__body :global(a) {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(17 132 205 / 0.35);
+    transition: text-decoration-color 200ms ease;
+  }
+
+  .article__body :global(a:hover) {
+    text-decoration-color: var(--color-brand);
+  }
+
+  .article__body :global(strong) {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  /* --- Stikkord --- */
+
+  .article__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .article__tag {
+    padding: 0.3125rem 0.75rem;
+    border-radius: 999px;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink-soft);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  /* --- Avsluttende CTA --- */
+
+  .article__cta {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--color-line);
+    text-align: center;
+  }
+
+  .article__cta-title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.375rem, 2.6vw, 1.75rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .article__cta-body {
+    max-width: 42ch;
+    margin: 0.875rem auto 1.75rem;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .article__cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.875rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article__back:hover svg {
+      transform: none;
+    }
+  }
+</style>

@@ -1,0 +1,100 @@
+---
+import Base from '../../../layouts/Base.astro';
+import CaseDetail from '../../../components/CaseDetail.astro';
+import {
+  getCasesWithSlug,
+  metaDescription,
+  shareImageSource,
+  refDimensions,
+  type CaseStudy,
+} from '../../../lib/cases';
+import { urlFor } from '../../../lib/sanity';
+import { breadcrumbSchema, caseArticleSchema } from '../../../data/schema';
+import { site } from '../../../data/site';
+import { LOCALES, DEFAULT_LOCALE, type Locale, isLocale, localizePath } from '../../../i18n/config';
+import { useTranslations } from '../../../i18n/utils';
+
+// Én rute per kundecase per oversatt språk. Innholdet i Sanity finnes foreløpig
+// bare på norsk (feltene heter *_no), så de oversatte sidene viser samme tekst.
+// Skulle studioet få egne språkfelt senere, er dette stedet å velge dem.
+export async function getStaticPaths() {
+  // Innholdet hentes per språk: hver oversatt rute får sin egen
+  // språkvariant i props, i stedet for én felles norsk versjon.
+  const byLocale = new Map<Locale, Awaited<ReturnType<typeof getCasesWithSlug>>>();
+  for (const locale of LOCALES) {
+    if (locale === DEFAULT_LOCALE) continue;
+    byLocale.set(locale, await getCasesWithSlug(locale));
+  }
+
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).flatMap((locale) =>
+    (byLocale.get(locale) ?? []).map((study) => ({
+      params: { locale, slug: study.slug! },
+      props: { study },
+    })),
+  );
+}
+
+interface Props {
+  study: CaseStudy;
+}
+
+const { study } = Astro.props;
+
+const { locale: param } = Astro.params;
+const locale = param && isLocale(param) ? param : DEFAULT_LOCALE;
+const t = useTranslations(locale);
+
+// Tittelen settes på sidens språk selv om brødteksten er norsk — den vises i
+// søkeresultatet og skal matche språket brukeren søkte på.
+const title =
+  study.seoTitle?.trim() ||
+  (study.sector
+    ? `${study.company} — ${t('cases.title')} (${study.sector})`
+    : `${study.company} — ${t('cases.title')}`);
+
+const description = metaDescription(study);
+
+const pageUrl = new URL(localizePath(`/kundecase/${study.slug}`, locale), site.url).href;
+const overviewUrl = new URL(localizePath('/kundecase', locale), site.url).href;
+
+const shareSource = shareImageSource(study);
+// .rect() over hele bildeflaten overstyrer hotspot-utsnittet, som ellers
+// følger med fra asset-dokumentet og kutter brede logoer til en midtstripe.
+const shareDims = refDimensions(shareSource?._ref);
+const shareImage = shareSource
+  ? (() => {
+      let b = urlFor(shareSource).width(1200).height(630).fit('fillmax').bg('ffffff');
+      if (shareDims) b = b.rect(0, 0, shareDims.width, shareDims.height);
+      return b.auto('format').url();
+    })()
+  : undefined;
+
+const articleLd = caseArticleSchema({
+  headline: title,
+  description,
+  url: pageUrl,
+  image: shareImage,
+  clientName: study.company,
+  locale,
+  datePublished: study.date ?? study.createdAt,
+  dateModified: study.updatedAt,
+  services: study.services ?? undefined,
+});
+
+const breadcrumbLd = breadcrumbSchema(
+  [
+    { name: t('cases.title'), url: overviewUrl },
+    { name: study.company, url: pageUrl },
+  ],
+  t('nav.home'),
+);
+---
+
+<Base title={title} description={description} type="article" image={shareImage}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(articleLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <CaseDetail study={study} />
+</Base>

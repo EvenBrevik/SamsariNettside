@@ -1,0 +1,74 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostDetail from '../../components/PostDetail.astro';
+import { getAllPosts, type BlogPost } from '../../lib/posts';
+import { truncate, refDimensions } from '../../lib/cases';
+import { urlFor } from '../../lib/sanity';
+import { breadcrumbSchema, caseArticleSchema } from '../../data/schema';
+import { site } from '../../data/site';
+import { DEFAULT_LOCALE } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts(DEFAULT_LOCALE);
+  return posts.map((post) => ({
+    params: { slug: post.slug! },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+const t = useTranslations(DEFAULT_LOCALE);
+
+// Redaksjonell SEO-tekst fra studioet vinner; ellers utledes den av ingressen.
+const title = post.seoTitle?.trim() || post.title;
+const description = post.seoDescription?.trim() || truncate(post.excerpt?.trim() ?? '');
+
+const pageUrl = new URL(`/blogg/${post.slug}`, site.url).href;
+const overviewUrl = new URL('/blogg', site.url).href;
+
+// Delebildet i 1200×630. Artikkelbilder er brede foto, så `crop` er riktig her
+// — i motsetning til logoene på kundecase, som ikke tåler beskjæring.
+// Eget delingsbilde vinner over forsidebildet.
+const shareRef = post.ogImage?.asset?._ref ?? post.mainImage?.asset?._ref;
+const shareDims = refDimensions(shareRef);
+const shareImage = shareRef
+  ? (() => {
+      let b = urlFor({ _ref: shareRef }).width(1200).height(630).fit('crop');
+      if (shareDims) b = b.rect(0, 0, shareDims.width, shareDims.height);
+      return b.auto('format').url();
+    })()
+  : undefined;
+
+const articleLd = caseArticleSchema({
+  headline: title,
+  description,
+  url: pageUrl,
+  image: shareImage,
+  locale: DEFAULT_LOCALE,
+  datePublished: post.date ?? post.createdAt,
+  dateModified: post.updatedAt,
+  services: post.category ? [post.category] : undefined,
+});
+
+const breadcrumbLd = breadcrumbSchema(
+  [
+    { name: t('blog.title'), url: overviewUrl },
+    { name: post.title, url: pageUrl },
+  ],
+  t('nav.home'),
+);
+---
+
+<Base title={title} description={description} type="article" image={shareImage}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(articleLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <PostDetail post={post} />
+</Base>

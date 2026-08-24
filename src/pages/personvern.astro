@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import PrivacyContent from '../components/PrivacyContent.astro';
+import { DEFAULT_LOCALE } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const t = useTranslations(DEFAULT_LOCALE);
+---
+
+<Base title={t('privacy.title')} description={t('privacy.intro')}>
+  <PrivacyContent />
+</Base>

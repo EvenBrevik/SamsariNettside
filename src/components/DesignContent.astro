@@ -1,0 +1,827 @@
+---
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import type { UIKeys } from '../i18n/ui/nb';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Logofilene ligger i /public og lastes ned som de er — nedlasting skal gi
+// originalfilen, ikke en optimalisert variant fra bildetjenesten.
+interface Logo {
+  file: string;
+  nameKey: UIKeys;
+  usageKey: UIKeys;
+  width: number;
+  height: number;
+  /** Flaten bak logoen i forhåndsvisningen. */
+  surface: 'light' | 'dark';
+}
+
+// Logo med ordmerke. Forhåndsvisningen får lys eller mørk flate ut fra hvilken
+// bakgrunn varianten faktisk er laget for — en hvit logo på hvit flate ville
+// vært usynlig i biblioteket.
+const logos: readonly Logo[] = [
+  {
+    file: '/samsari-logo-primar.png',
+    nameKey: 'design.logos.primary.name',
+    usageKey: 'design.logos.primary.usage',
+    width: 3165,
+    height: 587,
+    surface: 'light',
+  },
+  {
+    file: '/samsari-logo-hvit-tekst.png',
+    nameKey: 'design.logos.reversed.name',
+    usageKey: 'design.logos.reversed.usage',
+    width: 3164,
+    height: 587,
+    surface: 'dark',
+  },
+  {
+    file: '/samsari-logo-hvit.png',
+    nameKey: 'design.logos.white.name',
+    usageKey: 'design.logos.white.usage',
+    width: 3164,
+    height: 587,
+    surface: 'dark',
+  },
+  {
+    file: '/samsari-logo-sort.png',
+    nameKey: 'design.logos.black.name',
+    usageKey: 'design.logos.black.usage',
+    width: 3165,
+    height: 587,
+    surface: 'light',
+  },
+];
+
+// S-emblemet alene, til favicon, profilbilder og små flater.
+const marks: readonly Logo[] = [
+  {
+    file: '/samsari-emblem-bla.png',
+    nameKey: 'design.marks.blue.name',
+    usageKey: 'design.marks.blue.usage',
+    width: 1711,
+    height: 1655,
+    surface: 'light',
+  },
+  {
+    file: '/samsari-emblem-sort.png',
+    nameKey: 'design.marks.black.name',
+    usageKey: 'design.marks.black.usage',
+    width: 1711,
+    height: 1654,
+    surface: 'light',
+  },
+  {
+    file: '/samsari-emblem-hvit.png',
+    nameKey: 'design.marks.white.name',
+    usageKey: 'design.marks.white.usage',
+    width: 1711,
+    height: 1654,
+    surface: 'dark',
+  },
+];
+
+// Verdiene speiler @theme i global.css. Endres en farge der, må den endres her
+// — derfor står de samlet, med bruksområde, slik at listen er lett å se over.
+// `onDark` markerer klossene som er lyse nok til å trenge mørk tekst oppå.
+interface Swatch {
+  token: string;
+  hex: string;
+  rgb: string;
+  nameKey: UIKeys;
+  usageKey: UIKeys;
+  /** Lys nok til å trenge mørk tekst og en synlig kant. */
+  onDark?: boolean;
+}
+
+const groups: readonly { titleKey: UIKeys; colors: readonly Swatch[] }[] = [
+  {
+    titleKey: 'design.colors.brandGroup',
+    colors: [
+      { token: '--color-ink', hex: '#1E303A', rgb: '30, 48, 58', nameKey: 'design.colors.dark', usageKey: 'design.colors.darkUsage' },
+      { token: '--color-brand', hex: '#1184CD', rgb: '17, 132, 205', nameKey: 'design.colors.brand', usageKey: 'design.colors.brandUsage' },
+      { token: '--color-accent', hex: '#8958FE', rgb: '137, 88, 254', nameKey: 'design.colors.accent', usageKey: 'design.colors.accentUsage' },
+      { token: '--color-sky', hex: '#73B8E3', rgb: '115, 184, 227', nameKey: 'design.colors.sky', usageKey: 'design.colors.skyUsage', onDark: true },
+    ],
+  },
+  {
+    titleKey: 'design.colors.supportGroup',
+    colors: [
+      { token: '--color-brand-dark', hex: '#0D6BA8', rgb: '13, 107, 168', nameKey: 'design.colors.brandDark', usageKey: 'design.colors.brandDarkUsage' },
+      { token: '--color-brand-soft', hex: '#EAF4FC', rgb: '234, 244, 252', nameKey: 'design.colors.brandSoft', usageKey: 'design.colors.brandSoftUsage', onDark: true },
+      { token: '--color-accent-soft', hex: '#F1ECFF', rgb: '241, 236, 255', nameKey: 'design.colors.accentSoft', usageKey: 'design.colors.accentSoftUsage', onDark: true },
+    ],
+  },
+  {
+    titleKey: 'design.colors.inkGroup',
+    colors: [
+      { token: '--color-ink-soft', hex: '#55666F', rgb: '85, 102, 111', nameKey: 'design.colors.inkSoft', usageKey: 'design.colors.inkSoftUsage' },
+      { token: '--color-muted', hex: '#7D8C94', rgb: '125, 140, 148', nameKey: 'design.colors.muted', usageKey: 'design.colors.mutedUsage' },
+    ],
+  },
+  {
+    titleKey: 'design.colors.surfaceGroup',
+    colors: [
+      { token: '--color-surface', hex: '#FFFFFF', rgb: '255, 255, 255', nameKey: 'design.colors.surface', usageKey: 'design.colors.surfaceUsage', onDark: true },
+      { token: '--color-canvas', hex: '#F6F8F9', rgb: '246, 248, 249', nameKey: 'design.colors.canvas', usageKey: 'design.colors.canvasUsage', onDark: true },
+      { token: '--color-line', hex: '#E6EBEE', rgb: '230, 235, 238', nameKey: 'design.colors.line', usageKey: 'design.colors.lineUsage', onDark: true },
+    ],
+  },
+];
+
+const guidelines = [
+  { titleKey: 'design.usage.space.title', bodyKey: 'design.usage.space.body' },
+  { titleKey: 'design.usage.contrast.title', bodyKey: 'design.usage.contrast.body' },
+  { titleKey: 'design.usage.dont.title', bodyKey: 'design.usage.dont.body' },
+] as const;
+---
+
+<article class="design">
+  <div class="design__inner">
+    <header class="design__header">
+      <h1 class="design__title">{t('design.title')}</h1>
+      <p class="design__intro">{t('design.intro')}</p>
+    </header>
+
+    <!-- Logobibliotek -->
+    <section class="design__section">
+      <h2 class="design__heading">{t('design.logos.title')}</h2>
+      <p class="design__lead">{t('design.logos.body')}</p>
+
+      <ul class="logos">
+        {
+          logos.map((logo) => (
+            <li class="logo">
+              <div class:list={['logo__preview', `logo__preview--${logo.surface}`]}>
+                <img
+                  class="logo__img"
+                  src={logo.file}
+                  alt={t(logo.nameKey)}
+                  width={logo.width}
+                  height={logo.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              <div class="logo__meta">
+                <div class="logo__text">
+                  <span class="logo__name">{t(logo.nameKey)}</span>
+                  <span class="logo__usage">{t(logo.usageKey)}</span>
+                </div>
+
+                {/* download-attributtet ber nettleseren lagre filen i stedet for
+                    å åpne den. Fungerer fordi filen ligger på samme opphav. */}
+                <a class="logo__download" href={logo.file} download>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M8 2v8M4.5 7l3.5 3.5L11.5 7M3 13h10" />
+                  </svg>
+                  <span>{t('design.logos.download')}</span>
+                </a>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Emblem -->
+    <section class="design__section">
+      <h2 class="design__heading">{t('design.marks.title')}</h2>
+      <p class="design__lead">{t('design.marks.body')}</p>
+
+      <ul class="logos logos--marks">
+        {
+          marks.map((mark) => (
+            <li class="logo">
+              <div class:list={['logo__preview', `logo__preview--${mark.surface}`]}>
+                <img
+                  class="logo__img logo__img--mark"
+                  src={mark.file}
+                  alt={t(mark.nameKey)}
+                  width={mark.width}
+                  height={mark.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              <div class="logo__meta">
+                <div class="logo__text">
+                  <span class="logo__name">{t(mark.nameKey)}</span>
+                  <span class="logo__usage">{t(mark.usageKey)}</span>
+                </div>
+
+                <a class="logo__download" href={mark.file} download>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M8 2v8M4.5 7l3.5 3.5L11.5 7M3 13h10" />
+                  </svg>
+                  <span>{t('design.logos.download')}</span>
+                </a>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Retningslinjer -->
+    <section class="design__section">
+      <h2 class="design__heading">{t('design.usage.title')}</h2>
+
+      <ul class="rules">
+        {
+          guidelines.map((rule) => (
+            <li class="rule">
+              <h3>{t(rule.titleKey)}</h3>
+              <p>{t(rule.bodyKey)}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Farger -->
+    <section class="design__section">
+      <h2 class="design__heading">{t('design.colors.title')}</h2>
+      <p class="design__lead">{t('design.colors.body')}</p>
+
+      {
+        groups.map((group) => (
+          <div class="palette">
+            <h3 class="palette__title">{t(group.titleKey)}</h3>
+
+            <ul class="swatches">
+              {group.colors.map((color) => (
+                <li class="swatch">
+                  {/* Selve fargeflaten. Lyse farger får en ramme, ellers ville
+                      hvit-på-hvit vært usynlig. */}
+                  <div
+                    class:list={['swatch__block', color.onDark && 'swatch__block--light']}
+                    style={`background: ${color.hex}`}
+                  >
+                    <span class="swatch__token">{color.token}</span>
+                  </div>
+
+                  <div class="swatch__info">
+                    <span class="swatch__name">{t(color.nameKey)}</span>
+                    <span class="swatch__usage">{t(color.usageKey)}</span>
+
+                    <div class="swatch__values">
+                      <button class="swatch__value" type="button" data-copy={color.hex}>
+                        <span class="swatch__label">HEX</span>
+                        <span class="swatch__code">{color.hex}</span>
+                      </button>
+                      <button class="swatch__value" type="button" data-copy={`rgb(${color.rgb})`}>
+                        <span class="swatch__label">RGB</span>
+                        <span class="swatch__code">{color.rgb}</span>
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <!-- Typografi -->
+    <section class="design__section">
+      <h2 class="design__heading">{t('design.type.title')}</h2>
+      <p class="design__lead">{t('design.type.body')}</p>
+
+      <div class="type">
+        <p class="type__sample type__sample--600">{t('design.type.sample')}</p>
+        <span class="type__label">Poppins 600 · Semibold</span>
+
+        <p class="type__sample type__sample--500">{t('design.type.sample')}</p>
+        <span class="type__label">Poppins 500 · Medium</span>
+
+        <p class="type__sample type__sample--400">{t('design.type.sample')}</p>
+        <span class="type__label">Poppins 400 · Regular</span>
+      </div>
+    </section>
+  </div>
+</article>
+
+{/* Tilbakemelding ved kopiering. aria-live gjør at skjermlesere også får den. */}
+<div class="copied" data-copied role="status" aria-live="polite" hidden>
+  {t('design.colors.copied')}
+</div>
+
+<script>
+  const toast = document.querySelector<HTMLElement>('[data-copied]');
+  let timer: number | undefined;
+
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const value = button.dataset.copy;
+      if (!value) return;
+
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch {
+        // Clipboard API krever sikker kontekst og kan avvises. Faller tilbake
+        // på et midlertidig felt, slik at kopiering virker uansett.
+        const field = document.createElement('textarea');
+        field.value = value;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        try {
+          document.execCommand('copy');
+        } catch {
+          // Går heller ikke det, er verdien fortsatt synlig på skjermen.
+          return;
+        } finally {
+          field.remove();
+        }
+      }
+
+      button.classList.add('is-copied');
+      if (toast) {
+        toast.hidden = false;
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          toast.hidden = true;
+          button.classList.remove('is-copied');
+        }, 1600);
+      }
+    });
+  });
+</script>
+
+<style>
+  .design {
+    position: relative;
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .design::before {
+    content: '';
+    position: absolute;
+    top: -18rem;
+    right: -12rem;
+    width: 40rem;
+    height: 40rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 70%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .design__inner {
+    position: relative;
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 3rem) 1.25rem 5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .design__inner {
+      padding: calc(var(--header-height) + 4rem) 2rem 6rem;
+    }
+  }
+
+  /* --- Topp --- */
+
+  .design__header {
+    max-width: 42rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .design__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .design__intro {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  /* --- Seksjoner --- */
+
+  .design__section {
+    margin-top: 4rem;
+  }
+
+  .design__heading {
+    margin: 0 0 0.75rem;
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--color-brand-soft);
+    color: var(--color-ink);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  /* Toppfeltet har allerede en skillelinje. Den første seksjonen trenger ikke
+     en ekstra linje rett under den. */
+  .design__section:first-of-type .design__heading {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .design__lead {
+    max-width: 46rem;
+    margin: 0 0 2rem;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  /* --- Logobibliotek --- */
+
+  .logos {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 34rem) {
+    .logos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* Emblemene er tre og får sin egen rad på brede skjermer. */
+  @media (min-width: 48rem) {
+    .logos--marks {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .logo {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+    overflow: hidden;
+    transition:
+      border-color 220ms ease,
+      box-shadow 220ms ease;
+  }
+
+  .logo:hover {
+    border-color: transparent;
+    box-shadow: 0 1px 2px rgb(36 51 59 / 0.05), 0 16px 32px rgb(36 51 59 / 0.08);
+  }
+
+  .logo__preview {
+    display: grid;
+    place-items: center;
+    padding: 2.5rem 1.75rem;
+    min-height: 9rem;
+  }
+
+  .logo__preview--light {
+    /* Rutemønster antyder gjennomsiktig bakgrunn, slik designverktøy gjør. */
+    background:
+      linear-gradient(45deg, var(--color-canvas) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--color-canvas) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--color-canvas) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--color-canvas) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    background-color: var(--color-surface);
+  }
+
+  /* Den negative logoen er hvit og må ha mørk flate for å være synlig. */
+  .logo__preview--dark {
+    background: var(--color-ink);
+  }
+
+  .logo__img {
+    display: block;
+    width: 100%;
+    max-width: 12rem;
+    height: auto;
+  }
+
+  /* Emblemet er kvadratisk og trenger mindre bredde enn de brede logoene for
+     å oppleves like stort optisk. */
+  .logo__img--mark {
+    max-width: 5.5rem;
+  }
+
+  .logo__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex: 1;
+    padding: 1.25rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .logo__text {
+    display: grid;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .logo__name {
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .logo__usage {
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+  }
+
+  .logo__download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex: none;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease;
+  }
+
+  .logo__download:hover {
+    background: var(--color-brand-soft);
+    border-color: var(--color-brand-soft);
+  }
+
+  .logo__download svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  /* --- Retningslinjer --- */
+
+  .rules {
+    display: grid;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .rules {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .rule {
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--color-brand-soft);
+  }
+
+  .rule h3 {
+    margin: 0 0 0.5rem;
+    color: var(--color-ink);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .rule p {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  /* --- Farger --- */
+
+  .palette {
+    margin-bottom: 3rem;
+  }
+
+  .palette:last-child {
+    margin-bottom: 0;
+  }
+
+  .palette__title {
+    margin: 0 0 1.25rem;
+    color: var(--color-ink);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .swatches {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 34rem) {
+    .swatches {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 52rem) {
+    .swatches {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .swatch {
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 1.5rem 0.5rem 1.5rem;
+    overflow: hidden;
+  }
+
+  /* Klossen: fargen fyller flaten, tokennavnet ligger oppå. */
+  .swatch__block {
+    display: flex;
+    align-items: flex-end;
+    height: 7rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .swatch__token {
+    color: rgb(255 255 255 / 0.85);
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* Lyse farger: mørk tekst, og en innvendig kant slik at hvit kloss mot hvitt
+     kort fortsatt har en synlig avgrensning. */
+  .swatch__block--light {
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+
+  .swatch__block--light .swatch__token {
+    color: var(--color-ink-soft);
+  }
+
+  .swatch__info {
+    padding: 1rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .swatch__name {
+    display: block;
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .swatch__usage {
+    display: block;
+    margin-top: 0.125rem;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .swatch__values {
+    display: grid;
+    gap: 0.375rem;
+    margin-top: 0.875rem;
+  }
+
+  .swatch__value {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.4375rem 0.625rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.375rem;
+    background: var(--color-canvas);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .swatch__value:hover {
+    border-color: var(--color-brand);
+    background: var(--color-brand-soft);
+  }
+
+  .swatch__value.is-copied {
+    border-color: var(--color-brand);
+    background: var(--color-brand-soft);
+  }
+
+  .swatch__label {
+    flex: none;
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .swatch__code {
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* --- Typografi --- */
+
+  .type {
+    padding: 2rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+    background: var(--color-canvas);
+  }
+
+  .type__sample {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  .type__sample--600 {
+    font-weight: 600;
+  }
+
+  .type__sample--500 {
+    font-weight: 500;
+  }
+
+  .type__sample--400 {
+    font-weight: 400;
+  }
+
+  .type__label {
+    display: block;
+    margin: 0.375rem 0 1.75rem;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .type__label:last-child {
+    margin-bottom: 0;
+  }
+
+  /* --- Kopieringsvarsel --- */
+
+  .copied {
+    position: fixed;
+    z-index: 60;
+    left: 50%;
+    bottom: 2rem;
+    transform: translateX(-50%);
+    padding: 0.625rem 1.25rem;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgb(36 51 59 / 0.2);
+    animation: copied-in 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .copied[hidden] {
+    display: none;
+  }
+
+  @keyframes copied-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .copied {
+      animation: none;
+    }
+  }
+</style>

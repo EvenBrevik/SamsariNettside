@@ -1,29 +1,40 @@
 ---
+import { Image } from 'astro:assets';
 import Button from './Button.astro';
+import portalShot from '../assets/product-prosjektportalen.png';
+import savasShot from '../assets/product-savas.png';
+import forgeShot from '../assets/product-forge-engine.png';
 import { localeFromPath, localizePath } from '../i18n/config';
 import { useTranslations } from '../i18n/utils';
 
 const locale = localeFromPath(Astro.url.pathname);
 const t = useTranslations(locale);
 
+// Skjermbildene importeres fra src/assets (ikke public), slik at Astro kan
+// konvertere dem til WebP i flere bredder ved bygg. De er alle tatt fra toppen
+// av hver app, så beskjæringen forankres mot toppen (se CSS-en) — da beholdes
+// header og de mest gjenkjennelige elementene i utsnittet.
 const products = [
   {
     name: 'Prosjektportalen',
     bodyKey: 'products.portal.body',
     href: 'https://app.samsari.no',
     domain: 'app.samsari.no',
+    shot: portalShot,
   },
   {
     name: 'Savas',
     bodyKey: 'products.savas.body',
     href: 'https://savas.no',
     domain: 'savas.no',
+    shot: savasShot,
   },
   {
     name: 'Forge Engine',
     bodyKey: 'products.forge.body',
     href: 'https://forgeengine.no',
     domain: 'forgeengine.no',
+    shot: forgeShot,
   },
 ] as const;
 ---
@@ -52,15 +63,21 @@ const products = [
               <span class="products__media">
                 <span class="products__accent" aria-hidden="true" />
 
-                <!-- Midlertidig plassholder — bytt ut med et ekte skjermbilde når vi har ett. -->
-                <span class="products__placeholder">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <polyline points="21 15 16 10 5 21" />
-                  </svg>
-                  <span>{t('services.imagePlaceholder')}</span>
-                </span>
+                <!-- Skjermbildet er dekorativt: lenken har allerede aria-label
+                     med produktnavn og domene, så alt-teksten ville blitt
+                     gjentakelse for skjermlesere. -->
+                <Image
+                  class="products__shot"
+                  src={product.shot}
+                  alt=""
+                  width={640}
+                  widths={[360, 480, 640, 860]}
+                  sizes="(min-width: 56rem) 30vw, (min-width: 40rem) 46vw, 92vw"
+                  format="webp"
+                  quality={80}
+                  loading="lazy"
+                  decoding="async"
+                />
               </span>
 
               <span class="products__body-wrap">
@@ -252,33 +269,43 @@ const products = [
     opacity: 0.12;
   }
 
-  .products__placeholder {
+  /* :global fordi <Image> er en egen komponent — scoped CSS ville lagt på et
+     data-attributt som bildet ikke har, og regelen ville aldri truffet. */
+  .products__media :global(.products__shot) {
     position: relative;
     z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.625rem;
+    display: block;
+    width: 100%;
+    /* Felles utsnitt for alle tre, selv om originalene har ulike sideforhold —
+       det er det som gjør at kortene leses som én rad og ikke tre ulike. */
     aspect-ratio: 16 / 10;
-    background: repeating-linear-gradient(
-      -45deg,
-      var(--color-canvas),
-      var(--color-canvas) 10px,
-      var(--color-surface) 10px,
-      var(--color-surface) 20px
-    );
-    color: var(--color-muted);
+    object-fit: cover;
+    /* Skjermbildene er tatt fra toppen av hver app, så utsnittet forankres der.
+       Da beholdes header og de mest gjenkjennelige elementene. */
+    object-position: 50% 0;
+    background: var(--color-canvas);
+    border-bottom: 1px solid var(--color-line);
+    /* Litt tilbaketrukket i ro, skarpt ved hover — samme idé som gråtoningen
+       på kundelogoene, så bildene ikke overdøver teksten under. */
+    filter: saturate(0.92);
+    transition:
+      filter 260ms ease,
+      transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .products__placeholder svg {
-    width: 2rem;
-    height: 2rem;
+  .products__link:hover :global(.products__shot),
+  .products__link:focus-visible :global(.products__shot) {
+    filter: saturate(1);
+    /* Skalerer fra toppen, slik at forankringen holder seg under zoomen. */
+    transform: scale(1.03);
+    transform-origin: 50% 0;
   }
 
-  .products__placeholder span {
-    font-size: 0.8125rem;
-    font-weight: 500;
+  @media (prefers-reduced-motion: reduce) {
+    .products__link:hover :global(.products__shot),
+    .products__link:focus-visible :global(.products__shot) {
+      transform: none;
+    }
   }
 
   /* --- Tekst --- */

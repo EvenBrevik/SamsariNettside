@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import CasesOverview from '../../components/CasesOverview.astro';
+import { getAllCases } from '../../lib/cases';
+import { breadcrumbSchema, caseListSchema } from '../../data/schema';
+import { site } from '../../data/site';
+import { DEFAULT_LOCALE } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(DEFAULT_LOCALE);
+
+// Samme spørring som komponenten under. Sanity-klienten cacher innenfor ett
+// bygg, så dette koster ikke et ekstra kall.
+const cases = await getAllCases(DEFAULT_LOCALE);
+
+const overviewUrl = new URL('/kundecase', site.url).href;
+
+// Kun caser med slug har en URL å peke på. Uten filteret ville listen inneholdt
+// lenker til /kundecase/null.
+const listed = cases
+  .filter((item) => item.slug)
+  .map((item) => ({
+    name: item.company,
+    url: new URL(`/kundecase/${item.slug}`, site.url).href,
+  }));
+
+const listLd = caseListSchema(listed, t('cases.title'), t('cases.intro'));
+
+const breadcrumbLd = breadcrumbSchema(
+  [{ name: t('cases.title'), url: overviewUrl }],
+  t('nav.home'),
+);
+---
+
+<Base title={t('cases.title')} description={t('cases.intro')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(listLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <CasesOverview />
+</Base>

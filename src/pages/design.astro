@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import DesignContent from '../components/DesignContent.astro';
+import { DEFAULT_LOCALE } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const t = useTranslations(DEFAULT_LOCALE);
+---
+
+<Base title={t('design.title')} description={t('design.intro')}>
+  <DesignContent />
+</Base>

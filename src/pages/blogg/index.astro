@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogOverview from '../../components/BlogOverview.astro';
+import { getAllPosts } from '../../lib/posts';
+import { breadcrumbSchema, caseListSchema } from '../../data/schema';
+import { site } from '../../data/site';
+import { DEFAULT_LOCALE } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(DEFAULT_LOCALE);
+const posts = await getAllPosts(DEFAULT_LOCALE);
+
+const overviewUrl = new URL('/blogg', site.url).href;
+
+const listed = posts
+  .filter((post) => post.slug)
+  .map((post) => ({ name: post.title, url: new URL(`/blogg/${post.slug}`, site.url).href }));
+
+const listLd = caseListSchema(listed, t('blog.title'), t('blog.intro'));
+const breadcrumbLd = breadcrumbSchema([{ name: t('blog.title'), url: overviewUrl }], t('nav.home'));
+---
+
+<Base title={t('blog.title')} description={t('blog.intro')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(listLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <BlogOverview />
+</Base>

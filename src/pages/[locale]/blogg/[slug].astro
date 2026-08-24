@@ -1,0 +1,86 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PostDetail from '../../../components/PostDetail.astro';
+import { getAllPosts, type BlogPost } from '../../../lib/posts';
+import { truncate, refDimensions } from '../../../lib/cases';
+import { urlFor } from '../../../lib/sanity';
+import { breadcrumbSchema, caseArticleSchema } from '../../../data/schema';
+import { site } from '../../../data/site';
+import { LOCALES, DEFAULT_LOCALE, type Locale, isLocale, localizePath } from '../../../i18n/config';
+import { useTranslations } from '../../../i18n/utils';
+
+// Norsk innhold vises på den norske siden; alle andre språk får den engelske
+// oversettelsen, siden dansk og svensk ikke har egne artikler.
+export async function getStaticPaths() {
+  // Innholdet hentes per språk: hver oversatt rute får sin egen
+  // språkvariant i props, i stedet for én felles norsk versjon.
+  const byLocale = new Map<Locale, Awaited<ReturnType<typeof getAllPosts>>>();
+  for (const locale of LOCALES) {
+    if (locale === DEFAULT_LOCALE) continue;
+    byLocale.set(locale, await getAllPosts(locale));
+  }
+
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).flatMap((locale) =>
+    (byLocale.get(locale) ?? []).map((post) => ({
+      params: { locale, slug: post.slug! },
+      props: { post },
+    })),
+  );
+}
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+
+const { locale: param } = Astro.params;
+const locale = param && isLocale(param) ? param : DEFAULT_LOCALE;
+const t = useTranslations(locale);
+
+// Redaksjonell SEO-tekst fra studioet vinner; ellers utledes den av ingressen.
+const title = post.seoTitle?.trim() || post.title;
+const description = post.seoDescription?.trim() || truncate(post.excerpt?.trim() ?? '');
+
+const pageUrl = new URL(localizePath(`/blogg/${post.slug}`, locale), site.url).href;
+const overviewUrl = new URL(localizePath('/blogg', locale), site.url).href;
+
+// Eget delingsbilde vinner over forsidebildet.
+const shareRef = post.ogImage?.asset?._ref ?? post.mainImage?.asset?._ref;
+const shareDims = refDimensions(shareRef);
+const shareImage = shareRef
+  ? (() => {
+      let b = urlFor({ _ref: shareRef }).width(1200).height(630).fit('crop');
+      if (shareDims) b = b.rect(0, 0, shareDims.width, shareDims.height);
+      return b.auto('format').url();
+    })()
+  : undefined;
+
+const articleLd = caseArticleSchema({
+  headline: title,
+  description,
+  url: pageUrl,
+  image: shareImage,
+  locale,
+  datePublished: post.date ?? post.createdAt,
+  dateModified: post.updatedAt,
+  services: post.category ? [post.category] : undefined,
+});
+
+const breadcrumbLd = breadcrumbSchema(
+  [
+    { name: t('blog.title'), url: overviewUrl },
+    { name: post.title, url: pageUrl },
+  ],
+  t('nav.home'),
+);
+---
+
+<Base title={title} description={description} type="article" image={shareImage}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(articleLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <PostDetail post={post} />
+</Base>

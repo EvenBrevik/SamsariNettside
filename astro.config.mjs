@@ -56,6 +56,15 @@ export default defineConfig({
         optional: true,
       }),
 
+      // Google Analytics — måle-ID (G-XXXXXXXXXX). Setter informasjonskapsler,
+      // og lastes derfor bare etter at besøkende har samtykket til statistikk.
+      // Uten ID lastes GA ikke i det hele tatt.
+      PUBLIC_GA_MEASUREMENT_ID: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
+
       // Sanity — kilden til redaksjonelt innhold. Datasettet er offentlig lesbart,
       // så her trengs ingen token; verdiene er satt som default og kan overstyres.
       SANITY_PROJECT_ID: envField.string({

@@ -1,0 +1,324 @@
+---
+import { contact, site } from '../data/site';
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Datoen settes ved bygg. Erklæringen bør oppdateres manuelt her når innholdet
+// faktisk endres — ikke ved hvert bygg — så denne konstanten redigeres for hånd.
+const LAST_UPDATED = '2026-08-24';
+
+const updatedLabel = new Intl.DateTimeFormat(locale === 'nb' ? 'nb-NO' : locale, {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+}).format(new Date(LAST_UPDATED));
+
+const purposes = [
+  'privacy.purpose.item1',
+  'privacy.purpose.item2',
+  'privacy.purpose.item3',
+  'privacy.purpose.item4',
+] as const;
+
+const rights = [
+  'privacy.rights.item1',
+  'privacy.rights.item2',
+  'privacy.rights.item3',
+  'privacy.rights.item4',
+  'privacy.rights.item5',
+  'privacy.rights.item6',
+] as const;
+
+const processors = [
+  'privacy.sharing.cloudflare',
+  'privacy.sharing.google',
+  'privacy.sharing.resend',
+  'privacy.sharing.microsoft',
+  'privacy.sharing.sanity',
+] as const;
+---
+
+<article class="legal">
+  <div class="legal__inner">
+    <header class="legal__header">
+      <h1 class="legal__title">{t('privacy.title')}</h1>
+      <p class="legal__intro">{t('privacy.intro')}</p>
+      <p class="legal__updated">
+        {t('privacy.updated')}
+        <time datetime={LAST_UPDATED}>{updatedLabel}</time>
+      </p>
+    </header>
+
+    <div class="legal__body">
+      <section class="legal__section">
+        <h2>{t('privacy.controller.title')}</h2>
+        <p>{t('privacy.controller.body')}</p>
+
+        <address class="legal__contact">
+          <strong>{site.name} AS</strong>
+          <a href={`mailto:${contact.generalEmail}`}>{contact.generalEmail}</a>
+          <span>{contact.address.street}</span>
+          <span>{contact.address.postalCode} {contact.address.city}</span>
+          <span class="legal__org">Org.nr. {site.orgNumber}</span>
+        </address>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.collect.title')}</h2>
+        <p>{t('privacy.collect.intro')}</p>
+
+        <h3>{t('privacy.collect.contact.title')}</h3>
+        <p>{t('privacy.collect.contact.body')}</p>
+
+        <h3>{t('privacy.collect.booking.title')}</h3>
+        <p>{t('privacy.collect.booking.body')}</p>
+
+        <h3>{t('privacy.collect.analytics.title')}</h3>
+        <p>{t('privacy.collect.analytics.body')}</p>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.purpose.title')}</h2>
+        <p>{t('privacy.purpose.intro')}</p>
+        <ul>
+          {purposes.map((key) => <li>{t(key)}</li>)}
+        </ul>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.basis.title')}</h2>
+        <p>{t('privacy.basis.body')}</p>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.cookies.title')}</h2>
+        <p>{t('privacy.cookies.body')}</p>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.sharing.title')}</h2>
+        <p>{t('privacy.sharing.intro')}</p>
+        <ul>
+          {processors.map((key) => <li>{t(key)}</li>)}
+        </ul>
+        <p>{t('privacy.sharing.transfer')}</p>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.retention.title')}</h2>
+        <p>{t('privacy.retention.body')}</p>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.rights.title')}</h2>
+        <p>{t('privacy.rights.intro')}</p>
+        <ul>
+          {rights.map((key) => <li>{t(key)}</li>)}
+        </ul>
+        <p>{t('privacy.rights.response')}</p>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.security.title')}</h2>
+        <p>{t('privacy.security.body')}</p>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.complaint.title')}</h2>
+        <p>{t('privacy.complaint.body')}</p>
+      </section>
+
+      <section class="legal__section">
+        <h2>{t('privacy.changes.title')}</h2>
+        <p>{t('privacy.changes.body')}</p>
+      </section>
+    </div>
+  </div>
+</article>
+
+<style>
+  .legal {
+    position: relative;
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  /* Samme myke aksent som resten av siden, slik at den juridiske siden hører
+     hjemme i nettstedet og ikke ser ut som et vedlegg. */
+  .legal::before {
+    content: '';
+    position: absolute;
+    top: -18rem;
+    right: -12rem;
+    width: 40rem;
+    height: 40rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 70%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .legal__inner {
+    position: relative;
+    /* Smalere enn resten av siden: lange tekster leses best på 60–70 tegn. */
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 3rem) 1.25rem 5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .legal__inner {
+      padding: calc(var(--header-height) + 4rem) 2rem 6rem;
+    }
+  }
+
+  /* --- Topp --- */
+
+  .legal__header {
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .legal__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .legal__intro {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .legal__updated {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 1.75rem 0 0;
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    background: var(--color-canvas);
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  /* --- Avsnitt --- */
+
+  .legal__section {
+    margin-top: 3rem;
+  }
+
+  .legal__section h2 {
+    margin: 0 0 1rem;
+    color: var(--color-ink);
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    /* Kort strek over hver overskrift gir teksten rytme uten en tung ramme. */
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--color-brand-soft);
+  }
+
+  /* Toppfeltet har allerede én skillelinje under «Sist oppdatert». Unngå en
+     ekstra linje rett under denne før den første innholdsseksjonen. */
+  .legal__section:first-child h2 {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .legal__section h3 {
+    margin: 1.75rem 0 0.5rem;
+    color: var(--color-ink);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .legal__section p {
+    margin: 0 0 1rem;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .legal__section p:last-child {
+    margin-bottom: 0;
+  }
+
+  .legal__section ul {
+    margin: 0 0 1rem;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .legal__section li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.625rem;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  /* Egen punktmarkør i merkefargen i stedet for standard disc. */
+  .legal__section li::before {
+    content: '';
+    position: absolute;
+    left: 0.25rem;
+    top: 0.6875rem;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+    background: var(--color-brand);
+    opacity: 0.55;
+  }
+
+  .legal__section a {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(17 132 205 / 0.35);
+    transition: text-decoration-color 200ms ease;
+  }
+
+  .legal__section a:hover {
+    text-decoration-color: var(--color-brand);
+  }
+
+  /* --- Kontaktblokk --- */
+
+  .legal__contact {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+    background: var(--color-canvas);
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    font-style: normal;
+    line-height: 1.6;
+  }
+
+  .legal__contact strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .legal__org {
+    margin-top: 0.5rem;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+</style>

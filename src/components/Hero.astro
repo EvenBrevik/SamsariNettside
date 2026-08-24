@@ -48,14 +48,21 @@ const t = useTranslations(locale);
       </div>
     </div>
   </div>
+
+  <!-- Stedsangivelse nederst i heroen. Ligger utenfor __inner, så den står
+       midt i seksjonen uavhengig av tospalte-oppsettet over. -->
+  <p class="hero__locations">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+    {t('hero.locations')}
+  </p>
 </section>
 
 <style>
   .hero {
     position: relative;
-    /* Trekkes opp bak den gjennomsiktige headeren, slik at gradienten går
-       ubrutt helt til toppen av vinduet. */
-    margin-top: calc(var(--header-height) * -1);
     /* Fyller skjermen. min-height, ikke height, så innholdet får vokse forbi
        den på lave vinduer i stedet for å bli avkuttet. dvh følger mobilens
        adressefelt når det trekker seg inn. */
@@ -110,6 +117,41 @@ const t = useTranslations(locale);
          mindre skjermer i stedet for å presse begge kolonnene sammen. */
       gap: clamp(5rem, 18vw, 22rem);
       padding: calc(var(--header-height) + 2rem) 2rem 3rem;
+    }
+  }
+
+  /* --- Stedsangivelse --- */
+
+  /* Absolutt plassert i bunnen, slik at den ikke påvirker sentreringen av
+     hovedinnholdet i .hero__inner. Skjules på lave vinduer, der den ellers
+     ville kollidert med innholdet over. */
+  .hero__locations {
+    position: absolute;
+    left: 50%;
+    bottom: 1.75rem;
+    transform: translateX(-50%);
+    display: none;
+    align-items: center;
+    gap: 0.4375rem;
+    margin: 0;
+    padding: 0 1.25rem;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .hero__locations svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    color: var(--color-brand);
+    opacity: 0.75;
+  }
+
+  /* Vises først når heroen er høy nok til at bunnen faktisk er ledig. */
+  @media (min-height: 40rem) {
+    .hero__locations {
+      display: flex;
     }
   }
 

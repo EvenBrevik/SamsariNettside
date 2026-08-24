@@ -83,10 +83,9 @@ const config = { locales: LOCALES, defaultLocale: DEFAULT_LOCALE, translations, 
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Fyller det som er igjen av vinduet under den faste headeren, slik at
-       innholdet står midt i det synlige feltet i stedet for høyt oppe. */
-    min-height: calc(100vh - var(--header-height));
-    min-height: calc(100dvh - var(--header-height));
+    /* Headeren ligger over siden, så bakgrunnen fyller hele vinduet bak den. */
+    min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
     text-align: center;
   }

@@ -2,9 +2,14 @@
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
 import Clients from '../../components/Clients.astro';
+import Problems from '../../components/Problems.astro';
 import Services from '../../components/Services.astro';
+import References from '../../components/References.astro';
 import Products from '../../components/Products.astro';
+import FeaturedCase from '../../components/FeaturedCase.astro';
 import Insights from '../../components/Insights.astro';
+import Approach from '../../components/Approach.astro';
+import FinalCta from '../../components/FinalCta.astro';
 import { LOCALES, DEFAULT_LOCALE } from '../../i18n/config';
 
 // Forsiden på de oversatte språkene. Norsk ligger på rot og er ikke med her.
@@ -18,7 +23,12 @@ export function getStaticPaths() {
 <Base>
   <Hero />
   <Clients />
+  <Problems />
   <Services />
+  <References />
   <Products />
+  <FeaturedCase />
   <Insights />
+  <Approach />
+  <FinalCta />
 </Base>

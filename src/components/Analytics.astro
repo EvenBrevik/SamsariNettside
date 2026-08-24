@@ -1,0 +1,75 @@
+---
+import { PUBLIC_GA_MEASUREMENT_ID } from 'astro:env/client';
+
+// Uten måle-ID rendres ingenting — da finnes det ikke noe GA-script på siden
+// i det hele tatt, verken før eller etter samtykke.
+const measurementId = PUBLIC_GA_MEASUREMENT_ID;
+---
+
+{
+  measurementId && (
+    <script is:inline define:vars={{ measurementId }}>
+      {/* Google Analytics lastes ikke her og nå. Scriptet under lytter på
+          samtykkehendelsen fra CookieConsent.astro og injiserer gtag.js først
+          når besøkende har sagt ja til statistikk. Før det sendes ingen
+          forespørsel til Google, og ingen informasjonskapsler settes. */}
+      (function () {
+        var loaded = false;
+
+        function loadGtag() {
+          if (loaded) return;
+          loaded = true;
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            window.dataLayer.push(arguments);
+          }
+          // Gjøres tilgjengelig globalt, slik at egne hendelser kan sendes
+          // senere uten å måtte laste noe på nytt.
+          window.gtag = gtag;
+
+          gtag('js', new Date());
+          // anonymize_ip er standard i GA4, men settes eksplisitt her slik at
+          // det er synlig i koden hva vi faktisk ber om.
+          gtag('config', measurementId, { anonymize_ip: true });
+
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(measurementId);
+          document.head.appendChild(s);
+        }
+
+        function handle(consent) {
+          if (consent && consent.analytics) loadGtag();
+          // Trekkes samtykket tilbake, fjernes lagringen GA har satt, og siden
+          // lastes på nytt. Et script kan ikke «avlastes» fra en levende side,
+          // så omlasting er den ærlige måten å stanse sporingen på.
+          else if (loaded) {
+            clearGaStorage();
+            window.location.reload();
+          }
+        }
+
+        function clearGaStorage() {
+          try {
+            // GA setter _ga og _ga_<container> på toppdomenet.
+            var parts = window.location.hostname.split('.');
+            var domain = parts.length > 1 ? '.' + parts.slice(-2).join('.') : window.location.hostname;
+            document.cookie.split(';').forEach(function (entry) {
+              var name = entry.split('=')[0].trim();
+              if (name.indexOf('_ga') !== 0) return;
+              document.cookie = name + '=; Max-Age=0; path=/';
+              document.cookie = name + '=; Max-Age=0; path=/; domain=' + domain;
+            });
+          } catch (e) {
+            /* Feiler sletting, er omlastingen under fortsatt riktig handling. */
+          }
+        }
+
+        window.addEventListener('samsari:consent', function (event) {
+          handle(event.detail);
+        });
+      })();
+    </script>
+  )
+}

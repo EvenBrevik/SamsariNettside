@@ -1,0 +1,997 @@
+---
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import portalShot from '../assets/product-prosjektportalen.png';
+import savasShot from '../assets/product-savas.png';
+import forgeShot from '../assets/product-forge-engine.png';
+import { BOOKING_URL } from '../data/site';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import type { UIKeys } from '../i18n/ui/nb';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+interface Product {
+  key: string;
+  nameKey: UIKeys;
+  taglineKey: UIKeys;
+  bodyKey: UIKeys;
+  /** Innledning til «passer for»-listen. Savas har ingen. */
+  suitsIntroKey?: UIKeys;
+  suits?: UIKeys[];
+  featuresKey: UIKeys;
+  shot: ImageMetadata;
+  /** Intern produktside. Savas har ingen egen underside ennå. */
+  readMoreHref?: string;
+  visitHref: string;
+  visitKey: UIKeys;
+  /** Aksentfargen brukes på ett produkt, ikke alle — se kommentaren i CSS. */
+  accent?: boolean;
+}
+
+const products: readonly Product[] = [
+  {
+    key: 'portal',
+    nameKey: 'pr.portal.name',
+    taglineKey: 'pr.portal.tagline',
+    bodyKey: 'pr.portal.body',
+    suitsIntroKey: 'pr.portal.suitsIntro',
+    suits: ['pr.portal.s1', 'pr.portal.s2', 'pr.portal.s3', 'pr.portal.s4'],
+    featuresKey: 'pr.portal.features',
+    shot: portalShot,
+    readMoreHref: localizePath('/produkter/prosjektportal', locale),
+    visitHref: 'https://app.samsari.no',
+    visitKey: 'pr.portal.cta',
+  },
+  {
+    key: 'forge',
+    nameKey: 'pr.forge.name',
+    taglineKey: 'pr.forge.tagline',
+    bodyKey: 'pr.forge.body',
+    suitsIntroKey: 'pr.forge.suitsIntro',
+    suits: ['pr.forge.s1', 'pr.forge.s2', 'pr.forge.s3'],
+    featuresKey: 'pr.forge.features',
+    shot: forgeShot,
+    readMoreHref: localizePath('/produkter/forge-engine', locale),
+    visitHref: 'https://forgeengine.no',
+    visitKey: 'pr.forge.cta',
+    accent: true,
+  },
+  {
+    key: 'savas',
+    nameKey: 'pr.savas.name',
+    taglineKey: 'pr.savas.tagline',
+    bodyKey: 'pr.savas.body',
+    featuresKey: 'pr.savas.features',
+    shot: savasShot,
+    visitHref: 'https://savas.no',
+    visitKey: 'pr.savas.cta',
+  },
+];
+
+// Funksjonslistene er skrevet som «A · B · C» i ordboken. De splittes her, slik
+// at hver funksjon kan bli sin egen chip i stedet for én lang tekstlinje.
+function splitFeatures(value: string): string[] {
+  return value
+    .split('·')
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+const statuses = [
+  { nameKey: 'pr.portal.name' as UIKeys, active: true },
+  { nameKey: 'pr.forge.name' as UIKeys, active: true },
+  { nameKey: 'pr.savas.name' as UIKeys, active: true },
+];
+
+const servicesHref = localizePath('/tjenester', locale);
+---
+
+<article class="pr">
+  <!-- 1. Hero -->
+  <section class="pr-hero">
+    <div class="pr-hero__inner">
+      <div class="pr-hero__copy">
+        <h1 class="pr-hero__title">{t('pr.title')}</h1>
+        <p class="pr-hero__intro">{t('pr.intro')}</p>
+      </div>
+
+      {/* Bred, sentrert bildeflate under teksten — bevisst en annen rytme enn
+          forsiden og tjenestesiden, som begge har tekst og bilde side om side.
+          Produktnavnene ligger som faner over flaten, slik at den leses som en
+          produktflate og ikke som et vilkårlig foto. */}
+      <div class="pr-hero__stage">
+        <span class="pr-hero__glow" aria-hidden="true"></span>
+
+        <div class="pr-hero__window">
+          <div class="pr-hero__tabs" aria-hidden="true">
+            <span class="pr-hero__dots"><i></i><i></i><i></i></span>
+            {products.map((product, index) => (
+              <span class:list={['pr-hero__tab', index === 0 && 'is-active']}>
+                {t(product.nameKey)}
+              </span>
+            ))}
+          </div>
+
+          <!-- Midlertidig plassholder — bytt ut med et ekte bilde. -->
+          <div class="pr-hero__placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+            <span>{t('pr.imageAlt')}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Produktene -->
+  {
+    products.map((product, index) => (
+      <section
+        class:list={['product', product.accent && 'product--accent']}
+        data-reveal
+        id={product.key}
+      >
+        <div class="pr-wrap">
+          {/* Annenhver seksjon speilvendes, slik at siden får rytme i stedet
+              for tre identiske rader under hverandre. */}
+          <div class:list={['product__grid', index % 2 === 1 && 'product__grid--flip']}>
+            <div class="product__copy">
+              <span class="product__name">{t(product.nameKey)}</span>
+              <h2 class="product__tagline">{t(product.taglineKey)}</h2>
+              <p class="product__body">{t(product.bodyKey)}</p>
+
+              {product.suits && product.suitsIntroKey && (
+                <div class="product__suits">
+                  <p class="product__suits-intro">{t(product.suitsIntroKey)}</p>
+                  <ul class="product__suits-list">
+                    {product.suits.map((item) => (
+                      <li>{t(item)}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div class="product__features">
+                <p class="product__label">{t('pr.features')}</p>
+                <ul class="product__chips">
+                  {splitFeatures(t(product.featuresKey)).map((feature) => (
+                    <li class="product__chip">{feature}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div class="product__actions">
+                {product.readMoreHref && (
+                  <Button href={product.readMoreHref}>{t('pr.readMore')}</Button>
+                )}
+                <Button
+                  href={product.visitHref}
+                  external
+                  variant={product.readMoreHref ? 'secondary' : 'primary'}
+                >
+                  {t(product.visitKey)}
+                </Button>
+              </div>
+            </div>
+
+            <div class="product__media">
+              <span class="product__accent" aria-hidden="true" />
+              <div class="product__frame">
+                <Image
+                  class="product__shot"
+                  src={product.shot}
+                  alt=""
+                  width={900}
+                  widths={[480, 700, 900, 1200]}
+                  sizes="(min-width: 60rem) 48vw, 92vw"
+                  format="webp"
+                  quality={82}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <!-- 3. Produkt eller skreddersøm -->
+  <section class="pr-choice" data-reveal>
+    <div class="pr-wrap">
+      <h2 class="pr-head__title pr-head__title--center">{t('pr.choice.title')}</h2>
+
+      <div class="choice">
+        <div class="choice__card">
+          <span class="choice__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+          </span>
+          <h3>{t('pr.choice.productTitle')}</h3>
+          <p>{t('pr.choice.productBody')}</p>
+        </div>
+
+        <div class="choice__card choice__card--custom">
+          <span class="choice__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+              <line x1="13.5" y1="4" x2="10.5" y2="20" />
+            </svg>
+          </span>
+          <h3>{t('pr.choice.customTitle')}</h3>
+          <p>{t('pr.choice.customBody')}</p>
+        </div>
+      </div>
+
+      <div class="pr-choice__cta">
+        <Button href={servicesHref} variant="secondary">{t('pr.choice.cta')}</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Produktfilosofi + 5. status -->
+  <section class="pr-why" data-reveal>
+    <div class="pr-wrap">
+      <div class="pr-why__grid">
+        <div class="pr-why__copy">
+          <h2 class="pr-head__title">{t('pr.why.title')}</h2>
+          <p class="pr-why__body">{t('pr.why.body')}</p>
+        </div>
+
+        <div class="pr-why__status">
+          <p class="product__label">{t('pr.status.title')}</p>
+          <ul class="status">
+            {
+              statuses.map((item) => (
+                <li class="status__item">
+                  <span class="status__name">{t(item.nameKey)}</span>
+                  <span class="status__badge">
+                    <span class="status__dot" aria-hidden="true" />
+                    {t(item.active ? 'pr.status.active' : 'pr.status.building')}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Avsluttende CTA -->
+  <section class="pr-final" data-reveal>
+    <div class="pr-wrap">
+      <div class="pr-final__panel">
+        <h2 class="pr-final__title">{t('pr.final.title')}</h2>
+        <p class="pr-final__body">{t('pr.final.body')}</p>
+        <div class="pr-final__action">
+          <Button href={BOOKING_URL} external>{t('pr.final.cta')}</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<script>
+  // Samme inntoning-på-scroll som tjenestesiden.
+  const sections = document.querySelectorAll<HTMLElement>('[data-reveal]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+    for (const section of sections) section.classList.add('is-visible');
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+    );
+
+    for (const section of sections) observer.observe(section);
+  }
+</script>
+
+<style>
+  /* --- Felles --- */
+
+  .pr-wrap {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .pr-wrap {
+      padding: 0 2rem;
+    }
+  }
+
+  .pr > section {
+    padding: 5rem 0;
+  }
+
+  @media (min-width: 48rem) {
+    .pr > section {
+      padding: 7rem 0;
+    }
+  }
+
+  .pr-head__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .pr-head__title--center {
+    max-width: 24ch;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  /* --- Inntoning --- */
+
+  [data-reveal] .product__copy,
+  [data-reveal] .product__media,
+  [data-reveal] .pr-head__title,
+  [data-reveal] .choice__card,
+  [data-reveal] .pr-choice__cta,
+  [data-reveal] .pr-why__copy,
+  [data-reveal] .pr-why__status,
+  [data-reveal] .pr-final__panel {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 640ms ease,
+      transform 640ms ease;
+  }
+
+  [data-reveal].is-visible .product__copy,
+  [data-reveal].is-visible .product__media,
+  [data-reveal].is-visible .pr-head__title,
+  [data-reveal].is-visible .choice__card,
+  [data-reveal].is-visible .pr-choice__cta,
+  [data-reveal].is-visible .pr-why__copy,
+  [data-reveal].is-visible .pr-why__status,
+  [data-reveal].is-visible .pr-final__panel {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  [data-reveal].is-visible .product__media,
+  [data-reveal].is-visible .choice__card:nth-child(2),
+  [data-reveal].is-visible .pr-why__status {
+    transition-delay: 140ms;
+  }
+
+  [data-reveal].is-visible .pr-choice__cta {
+    transition-delay: 260ms;
+  }
+
+  /* --- 1. Hero --- */
+
+  /* Fyller skjermen som forsidens hero, men med et annet oppsett: tekst over,
+     bred bildeflate under, alt sentrert. */
+  .pr-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--color-surface);
+    overflow: hidden;
+    padding: calc(var(--header-height) + 2rem) 0 2.5rem !important;
+  }
+
+  /* To fargeskjær, ett i hver merkefarge, gir toppen dybde. */
+  .pr-hero::before,
+  .pr-hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .pr-hero::before {
+    top: -22rem;
+    right: -16rem;
+    width: 50rem;
+    height: 50rem;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 68%);
+    opacity: 0.9;
+  }
+
+  .pr-hero::after {
+    bottom: -26rem;
+    left: -18rem;
+    width: 46rem;
+    height: 46rem;
+    background: radial-gradient(circle, var(--color-accent-soft) 0%, transparent 70%);
+    opacity: 0.8;
+  }
+
+  .pr-hero__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .pr-hero__inner {
+      padding: 0 2rem;
+    }
+  }
+
+  .pr-hero__copy {
+    max-width: 44rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .pr-hero__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .pr-hero__intro {
+    max-width: 52ch;
+    margin: 1.75rem auto 0;
+    color: var(--color-ink-soft);
+    font-size: clamp(1.0625rem, 1.6vw, 1.1875rem);
+    line-height: 1.75;
+  }
+
+  /* --- Bildeflaten --- */
+
+  .pr-hero__stage {
+    position: relative;
+    width: 100%;
+    max-width: 60rem;
+    margin: 3rem auto 0;
+  }
+
+  @media (min-width: 48rem) {
+    .pr-hero__stage {
+      margin-top: 4rem;
+    }
+  }
+
+  /* Et bredt, mykt skjær under flaten som løfter den fra bakgrunnen. */
+  .pr-hero__glow {
+    position: absolute;
+    z-index: 0;
+    left: 8%;
+    right: 8%;
+    bottom: -1.5rem;
+    height: 60%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgb(17 132 205 / 0.18) 0%, transparent 70%);
+    filter: blur(28px);
+    pointer-events: none;
+  }
+
+  /* Vindusrammen: faner øverst, flate under. Gir produktfølelse uten å låse
+     seg til ett bestemt produkt. */
+  .pr-hero__window {
+    position: relative;
+    z-index: 1;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem 2.5rem 0.75rem 2.5rem;
+    background: var(--color-surface);
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 28px 64px rgb(30 48 58 / 0.16);
+    overflow: hidden;
+  }
+
+  .pr-hero__tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-canvas);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .pr-hero__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pr-hero__dots {
+    display: inline-flex;
+    gap: 0.3125rem;
+    flex: none;
+    margin-right: 0.5rem;
+  }
+
+  .pr-hero__dots i {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-line);
+  }
+
+  .pr-hero__tab {
+    flex: none;
+    padding: 0.3125rem 0.75rem;
+    border-radius: 999px;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .pr-hero__tab.is-active {
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+  }
+
+  .pr-hero__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    aspect-ratio: 16 / 9;
+    /* Taket hindrer at flaten blir uforholdsmessig høy på høye vinduer. */
+    max-height: 52vh;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--color-canvas),
+      var(--color-canvas) 10px,
+      var(--color-surface) 10px,
+      var(--color-surface) 20px
+    );
+    color: var(--color-muted);
+  }
+
+  .pr-hero__placeholder svg {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .pr-hero__placeholder span {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* --- 2. Produktene --- */
+
+  /* Vekslende duk gir hvert produkt sin egen flate å stå på. */
+  .product:nth-of-type(odd) {
+    background: var(--color-canvas);
+  }
+
+  .product:nth-of-type(even) {
+    background: var(--color-surface);
+  }
+
+  .product__grid {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 60rem) {
+    .product__grid {
+      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr);
+      gap: clamp(3rem, 7vw, 5.5rem);
+    }
+
+    /* Speilvending: bildet til venstre, teksten til høyre. */
+    .product__grid--flip .product__copy {
+      order: 2;
+    }
+
+    .product__grid--flip .product__media {
+      order: 1;
+    }
+  }
+
+  .product__name {
+    display: inline-block;
+    padding: 0.3125rem 0.875rem;
+    border-radius: 999px;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  /* Forge Engine får aksentfargen — ett av tre produkter, nok til å gi siden
+     variasjon uten at lilla blir en andre merkefarge. */
+  .product--accent .product__name {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-deep);
+  }
+
+  .product__tagline {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink);
+    font-size: clamp(1.625rem, 3.2vw, 2.25rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .product__body {
+    max-width: 46ch;
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  /* --- Passer for --- */
+
+  .product__suits {
+    margin-top: 2rem;
+  }
+
+  .product__suits-intro {
+    margin: 0 0 0.75rem;
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .product__suits-list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .product__suits-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .product__suits-list li::before {
+    content: '';
+    position: absolute;
+    left: 0.3125rem;
+    top: 0.625rem;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+    background: var(--color-brand);
+    opacity: 0.5;
+  }
+
+  .product--accent .product__suits-list li::before {
+    background: var(--color-accent);
+  }
+
+  /* --- Funksjoner --- */
+
+  .product__label {
+    margin: 0 0 0.75rem;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .product__features {
+    margin-top: 2rem;
+  }
+
+  .product__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .product__chip {
+    padding: 0.3125rem 0.75rem;
+    border-radius: 999px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink-soft);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .product:nth-of-type(even) .product__chip {
+    background: var(--color-canvas);
+  }
+
+  .product__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+    margin-top: 2.5rem;
+  }
+
+  /* --- Skjermbilde --- */
+
+  .product__media {
+    position: relative;
+  }
+
+  .product__accent {
+    position: absolute;
+    z-index: 0;
+    right: -1.5rem;
+    top: -1.5rem;
+    width: 58%;
+    height: 55%;
+    border-radius: 5rem 0.5rem 5rem 0.5rem;
+    background: var(--color-brand);
+    opacity: 0.1;
+  }
+
+  .product--accent .product__accent {
+    background: var(--color-accent);
+  }
+
+  .product__grid--flip .product__accent {
+    right: auto;
+    left: -1.5rem;
+    border-radius: 0.5rem 5rem 0.5rem 5rem;
+  }
+
+  .product__frame {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: 0.5rem 3rem 0.5rem 3rem;
+    border: 1px solid var(--color-line);
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 24px 56px rgb(30 48 58 / 0.14);
+  }
+
+  /* :global fordi <Image> er en egen komponent og ikke får scope-attributtet. */
+  .product__frame :global(.product__shot) {
+    display: block;
+    width: 100%;
+    /* Felles utsnitt, forankret mot toppen: skjermbildene er tatt fra toppen
+       av hver app, der header og hovedinnhold er. */
+    aspect-ratio: 16 / 10.5;
+    object-fit: cover;
+    object-position: 50% 0;
+    background: var(--color-canvas);
+  }
+
+  /* --- 3. Produkt eller skreddersøm --- */
+
+  .pr-choice {
+    background: var(--color-canvas);
+  }
+
+  .choice {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .choice {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.75rem;
+    }
+  }
+
+  .choice__card {
+    padding: 2.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    transition:
+      border-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .choice__card:hover {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 20px 44px rgb(30 48 58 / 0.1);
+  }
+
+  .choice__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.75rem;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+  }
+
+  .choice__card--custom .choice__icon {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-deep);
+  }
+
+  .choice__icon svg {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .choice__card h3 {
+    margin: 0 0 0.5rem;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .choice__card p {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .pr-choice__cta {
+    margin-top: 2.5rem;
+    text-align: center;
+  }
+
+  /* --- 4. Filosofi + 5. status --- */
+
+  .pr-why {
+    background: var(--color-surface);
+  }
+
+  .pr-why__grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 56rem) {
+    .pr-why__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+      gap: clamp(3rem, 7vw, 5rem);
+      align-items: start;
+    }
+  }
+
+  .pr-why__body {
+    max-width: 52ch;
+    margin: 1.5rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  .status {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .status__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.125rem 1.25rem;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 1.5rem 0.5rem 1.5rem;
+  }
+
+  .status__name {
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .status__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    flex: none;
+    color: var(--color-ink-soft);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .status__dot {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 50%;
+    background: #22a06b;
+  }
+
+  /* --- 6. Avsluttende CTA --- */
+
+  .pr-final {
+    background: var(--color-surface);
+    padding-top: 0 !important;
+  }
+
+  .pr-final__panel {
+    position: relative;
+    padding: 3.5rem 1.75rem;
+    border-radius: 1rem 5rem 1rem 5rem;
+    background: linear-gradient(135deg, var(--color-brand) 0%, #4a3fd4 62%, var(--color-accent) 100%);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  @media (min-width: 48rem) {
+    .pr-final__panel {
+      padding: 4.5rem 3.5rem;
+    }
+  }
+
+  .pr-final__title {
+    max-width: 22ch;
+    margin: 0 auto;
+    color: #fff;
+    font-size: clamp(1.625rem, 3.4vw, 2.375rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .pr-final__body {
+    max-width: 52ch;
+    margin: 1.25rem auto 0;
+    color: rgb(255 255 255 / 0.85);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .pr-final__action {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.25rem;
+  }
+
+  .pr-final__action :global(.btn--primary) {
+    background: #fff;
+    color: var(--color-brand);
+    box-shadow: 0 2px 6px rgb(9 46 74 / 0.18), 0 14px 30px rgb(9 46 74 / 0.22);
+  }
+
+  .pr-final__action :global(.btn--primary:hover) {
+    background: var(--color-brand-soft);
+    color: var(--color-brand-dark);
+  }
+
+  .pr-final__action :global(.btn:focus-visible) {
+    outline-color: #fff;
+  }
+</style>

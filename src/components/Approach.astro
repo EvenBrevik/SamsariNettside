@@ -1,0 +1,303 @@
+---
+import { Image } from 'astro:assets';
+import teamPhoto from '../assets/team-oliver-even.png';
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Seksjonen kombinerer to ting som hører sammen: hvem dere møter hos Samsari,
+// og hvordan arbeidet faktisk foregår. Rekkefølgen er bevisst — først hvem,
+// så hvordan.
+const steps = [
+  { titleKey: 'approach.step1.title', bodyKey: 'approach.step1.body' },
+  { titleKey: 'approach.step2.title', bodyKey: 'approach.step2.body' },
+  { titleKey: 'approach.step3.title', bodyKey: 'approach.step3.body' },
+  { titleKey: 'approach.step4.title', bodyKey: 'approach.step4.body' },
+] as const;
+---
+
+<section class="approach" data-approach>
+  <div class="approach__inner">
+    <!-- Del 1: hvorfor Samsari — tekst ved siden av et bilde av teamet. -->
+    <div class="approach__intro">
+      <div class="approach__copy">
+        <h2 class="approach__title">{t('approach.why.title')}</h2>
+        <p class="approach__body">{t('approach.why.body')}</p>
+      </div>
+
+      <div class="approach__media">
+        <span class="approach__accent" aria-hidden="true"></span>
+
+        <!-- Originalen er 1,4 MB PNG. Via <Image> konverteres den til WebP i
+             flere bredder, slik at nettleseren henter den minste som holder. -->
+        <Image
+          class="approach__photo"
+          src={teamPhoto}
+          alt={t('approach.imageAlt')}
+          width={720}
+          widths={[400, 560, 720, 960]}
+          sizes="(min-width: 56rem) 38vw, (min-width: 40rem) 80vw, 92vw"
+          format="webp"
+          quality={80}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+
+    <!-- Del 2: de fire stegene. -->
+    <div class="approach__process">
+      <h3 class="approach__process-title">{t('approach.process.title')}</h3>
+
+      <ol class="approach__steps">
+        {
+          steps.map((step, index) => (
+            <li class="approach__step" style={`--i: ${index}`}>
+              <span class="approach__number">{index + 1}</span>
+              <h4 class="approach__step-title">{t(step.titleKey)}</h4>
+              <p class="approach__text">{t(step.bodyKey)}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Samme inntoning-på-scroll som de andre forsideseksjonene.
+  const section = document.querySelector<HTMLElement>('[data-approach]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section) {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      section.classList.add('is-visible');
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              section.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.12 },
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  .approach {
+    background: var(--color-canvas);
+  }
+
+  .approach__inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 5rem 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .approach__inner {
+      padding: 6rem 2rem;
+    }
+  }
+
+  /* --- Del 1: hvorfor Samsari --- */
+
+  .approach__intro {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 56rem) {
+    .approach__intro {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+      gap: clamp(3rem, 7vw, 5rem);
+    }
+  }
+
+  .approach__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease,
+      transform 700ms ease;
+  }
+
+  .approach.is-visible .approach__title {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .approach__body {
+    max-width: 52ch;
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 80ms,
+      transform 700ms ease 80ms;
+  }
+
+  .approach.is-visible .approach__body {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* --- Bildeplassholder --- */
+
+  .approach__media {
+    position: relative;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 700ms ease 140ms,
+      transform 700ms ease 140ms;
+  }
+
+  .approach.is-visible .approach__media {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Samme aksentflate-idé som i heroen, speilvendt. */
+  .approach__accent {
+    position: absolute;
+    z-index: 0;
+    right: -1.25rem;
+    top: -1.25rem;
+    width: 55%;
+    height: 52%;
+    border-radius: 5rem 0.5rem 5rem 0.5rem;
+    background: var(--color-brand);
+    opacity: 0.1;
+  }
+
+  /* :global fordi <Image> er en egen komponent — scoped CSS ville lagt på et
+     data-attributt som bildet ikke har, og regelen ville aldri truffet. */
+  .approach__media :global(.approach__photo) {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3.2;
+    object-fit: cover;
+    /* Ansiktene sitter i øvre halvdel av bildet — utsnittet forankres derfor
+       mot toppen, ellers kuttes hodene når flaten er lavere enn originalen. */
+    object-position: 50% 12%;
+    /* Samme asymmetriske hjørne som plassholderen hadde, og som resten av
+       siden bruker. */
+    border-radius: 0.5rem 4rem 0.5rem 4rem;
+    background: var(--color-canvas);
+  }
+
+  /* --- Del 2: stegene --- */
+
+  .approach__process {
+    margin-top: 4.5rem;
+  }
+
+  @media (min-width: 56rem) {
+    .approach__process {
+      margin-top: 5.5rem;
+    }
+  }
+
+  .approach__process-title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.375rem, 2.6vw, 1.875rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 180ms,
+      transform 700ms ease 180ms;
+  }
+
+  .approach.is-visible .approach__process-title {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .approach__steps {
+    display: grid;
+    gap: 2.25rem;
+    margin: 3rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .approach__steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2.75rem 2.5rem;
+    }
+  }
+
+  @media (min-width: 68rem) {
+    .approach__steps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 2rem;
+    }
+  }
+
+  .approach__step {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 600ms ease calc(260ms + var(--i) * 110ms),
+      transform 600ms ease calc(260ms + var(--i) * 110ms);
+  }
+
+  .approach.is-visible .approach__step {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .approach__number {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .approach__step-title {
+    margin: 0 0 0.5rem;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .approach__text {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+</style>

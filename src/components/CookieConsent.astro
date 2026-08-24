@@ -1,0 +1,500 @@
+---
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const privacyHref = localizePath('/personvern', locale);
+
+// Kategoriene speiler dem personvernerklæringen beskriver. «necessary» er
+// alltid på og kan ikke slås av — den dekker bare det som kreves for at
+// nettstedet skal fungere, inkludert lagringen av selve samtykket.
+const categories = [
+  {
+    id: 'analytics',
+    titleKey: 'consent.analytics.title',
+    bodyKey: 'consent.analytics.body',
+  },
+  {
+    id: 'marketing',
+    titleKey: 'consent.marketing.title',
+    bodyKey: 'consent.marketing.body',
+  },
+] as const;
+---
+
+{/* hidden til scriptet har lest lagret valg — ellers ville banneret blinket
+    til syne for alle som allerede har svart. */}
+<div class="consent" data-consent hidden>
+  <div
+    class="consent__box"
+    role="dialog"
+    aria-modal="false"
+    aria-labelledby="consent-title"
+    aria-describedby="consent-body"
+  >
+    <!-- Enkel visning -->
+    <div class="consent__view" data-view="simple">
+      <h2 class="consent__title" id="consent-title">{t('consent.title')}</h2>
+      <p class="consent__body" id="consent-body">{t('consent.body')}</p>
+
+      <a class="consent__link" href={privacyHref}>{t('consent.readMore')}</a>
+
+      <div class="consent__actions">
+        <button class="consent__btn consent__btn--primary" type="button" data-action="accept-all">
+          {t('consent.acceptAll')}
+        </button>
+        <button class="consent__btn" type="button" data-action="necessary-only">
+          {t('consent.necessaryOnly')}
+        </button>
+        <button class="consent__btn consent__btn--quiet" type="button" data-action="customize">
+          {t('consent.customize')}
+        </button>
+      </div>
+    </div>
+
+    <!-- Detaljert visning -->
+    <div class="consent__view" data-view="detailed" hidden>
+      <h2 class="consent__title">{t('consent.customize')}</h2>
+
+      <ul class="consent__list">
+        <li class="consent__item">
+          <div class="consent__item-head">
+            <span class="consent__item-title">{t('consent.necessary.title')}</span>
+            <span class="consent__always">{t('consent.necessary.always')}</span>
+          </div>
+          <p class="consent__item-body">{t('consent.necessary.body')}</p>
+        </li>
+
+        {
+          categories.map((cat) => (
+            <li class="consent__item">
+              <div class="consent__item-head">
+                <label class="consent__switch" for={`consent-${cat.id}`}>
+                  <span class="consent__item-title">{t(cat.titleKey)}</span>
+                  <input type="checkbox" id={`consent-${cat.id}`} data-category={cat.id} />
+                  <span class="consent__track" aria-hidden="true">
+                    <span class="consent__thumb" />
+                  </span>
+                </label>
+              </div>
+              <p class="consent__item-body">{t(cat.bodyKey)}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="consent__actions">
+        <button class="consent__btn consent__btn--primary" type="button" data-action="save">
+          {t('consent.save')}
+        </button>
+        <button class="consent__btn consent__btn--quiet" type="button" data-action="back">
+          {t('consent.back')}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Samtykket lagres i localStorage, ikke i en informasjonskapsel: det er ikke
+  // nødvendig å sende valget til serveren, og en nøkkel som aldri forlater
+  // nettleseren er det minst inngripende alternativet.
+  const STORAGE_KEY = 'samsari:consent';
+  // Versjonen gjør at vi kan spørre på nytt hvis kategoriene endrer seg.
+  const VERSION = 1;
+
+  type Consent = {
+    version: number;
+    analytics: boolean;
+    marketing: boolean;
+    date: string;
+  };
+
+  const rootEl = document.querySelector<HTMLElement>('[data-consent]');
+  if (rootEl) {
+    // Lokal binding, slik at TypeScript beholder innsnevringen inne i
+    // funksjonene under — closures over en ytre `let`/`const` med union-type
+    // ville ellers gitt «possibly null».
+    const root = rootEl;
+    const simple = root.querySelector<HTMLElement>('[data-view="simple"]')!;
+    const detailed = root.querySelector<HTMLElement>('[data-view="detailed"]')!;
+    const toggles = root.querySelectorAll<HTMLInputElement>('input[data-category]');
+
+    function read(): Consent | null {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw) as Consent;
+        // Ugyldig eller utdatert lagring behandles som «ikke svart».
+        if (!parsed || parsed.version !== VERSION) return null;
+        return parsed;
+      } catch {
+        // Private vinduer og blokkert lagring kaster her. Da spør vi hver gang
+        // heller enn å anta samtykke.
+        return null;
+      }
+    }
+
+    function write(analytics: boolean, marketing: boolean) {
+      const value: Consent = {
+        version: VERSION,
+        analytics,
+        marketing,
+        date: new Date().toISOString(),
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+      } catch {
+        // Kan vi ikke lagre, gjelder valget for denne økten. Bedre enn å feile.
+      }
+      apply(value);
+    }
+
+    // Her lastes verktøyene som krever samtykke. Så lenge Google Analytics ikke
+    // er lagt inn, sendes bare hendelsen — når GA kommer, lyttes det på den.
+    function apply(consent: Consent) {
+      window.dispatchEvent(new CustomEvent('samsari:consent', { detail: consent }));
+    }
+
+    function hide() {
+      root.hidden = true;
+    }
+
+    function show() {
+      root.hidden = false;
+      // Flytter fokus inn i dialogen, slik at den som bruker tastatur havner
+      // der handlingen er i stedet for å måtte tabbe gjennom hele siden.
+      root.querySelector<HTMLButtonElement>('[data-action="accept-all"]')?.focus();
+    }
+
+    function openDetailed() {
+      simple.hidden = true;
+      detailed.hidden = false;
+      detailed.querySelector<HTMLInputElement>('input[data-category]')?.focus();
+    }
+
+    function openSimple() {
+      detailed.hidden = true;
+      simple.hidden = false;
+      simple.querySelector<HTMLButtonElement>('[data-action="accept-all"]')?.focus();
+    }
+
+    root.addEventListener('click', (event) => {
+      const target = (event.target as HTMLElement).closest<HTMLElement>('[data-action]');
+      if (!target) return;
+
+      switch (target.dataset.action) {
+        case 'accept-all':
+          write(true, true);
+          hide();
+          break;
+        case 'necessary-only':
+          write(false, false);
+          hide();
+          break;
+        case 'customize':
+          openDetailed();
+          break;
+        case 'back':
+          openSimple();
+          break;
+        case 'save': {
+          const state: Record<string, boolean> = {};
+          toggles.forEach((input) => {
+            state[input.dataset.category!] = input.checked;
+          });
+          write(Boolean(state.analytics), Boolean(state.marketing));
+          hide();
+          break;
+        }
+      }
+    });
+
+    // Escape lukker ikke banneret: det ville vært et valg uten å ha valgt noe,
+    // og et samtykke må være aktivt. Men fra den detaljerte visningen går
+    // Escape tilbake til den enkle.
+    root.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !detailed.hidden) {
+        event.stopPropagation();
+        openSimple();
+      }
+    });
+
+    // Lenker fra footeren eller personvernsiden kan åpne banneret på nytt,
+    // slik at et valg kan trekkes tilbake — et krav når samtykke er grunnlaget.
+    document.querySelectorAll('[data-consent-open]').forEach((el) => {
+      el.addEventListener('click', (event) => {
+        event.preventDefault();
+        const saved = read();
+        toggles.forEach((input) => {
+          input.checked = Boolean(saved?.[input.dataset.category as 'analytics' | 'marketing']);
+        });
+        show();
+        openDetailed();
+      });
+    });
+
+    const existing = read();
+    if (existing) {
+      // Allerede svart: banneret vises ikke, men verktøyene må aktiveres på
+      // nytt for denne sidevisningen.
+      apply(existing);
+    } else {
+      show();
+    }
+  }
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    z-index: 60;
+    inset: auto 0 0 0;
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    pointer-events: none;
+  }
+
+  @media (min-width: 40rem) {
+    /* Forankres nede til venstre på større skjermer — mindre påtrengende enn
+       midt på, og kolliderer ikke med innhold i høyre spalte. */
+    .consent {
+      inset: auto auto 1.5rem 1.5rem;
+      padding: 0;
+    }
+  }
+
+  .consent[hidden] {
+    display: none;
+  }
+
+  .consent__box {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 26rem;
+    padding: 1.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    /* Samme asymmetriske hjørnespråk som kortene ellers på siden. */
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+    box-shadow: 0 2px 8px rgb(36 51 59 / 0.08), 0 24px 56px rgb(36 51 59 / 0.16);
+    animation: consent-in 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes consent-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .consent__box {
+      animation: none;
+    }
+  }
+
+  /* --- Topp --- */
+
+  .consent__title {
+    margin: 0 0 0.625rem;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .consent__body {
+    margin: 0 0 1rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .consent__link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    color: var(--color-brand);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(17 132 205 / 0.35);
+    transition: text-decoration-color 200ms ease;
+  }
+
+  .consent__link:hover {
+    text-decoration-color: var(--color-brand);
+  }
+
+  /* --- Knapper --- */
+
+  .consent__actions {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .consent__btn {
+    /* Alle valgene er like lett tilgjengelige. «Godta alle» er visuelt primær,
+       men «Kun nødvendige» ligger rett under i samme størrelse — et samtykke
+       er ikke fritt hvis avslag er gjemt bort. */
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .consent__btn:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  .consent__btn--primary {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: #fff;
+  }
+
+  .consent__btn--primary:hover {
+    background: var(--color-brand-dark);
+    border-color: var(--color-brand-dark);
+    color: #fff;
+  }
+
+  .consent__btn--quiet {
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+  }
+
+  .consent__btn--quiet:hover {
+    background: var(--color-canvas);
+    color: var(--color-brand);
+  }
+
+  /* --- Detaljert visning --- */
+
+  .consent__list {
+    display: grid;
+    gap: 1rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .consent__item {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .consent__item:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .consent__item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .consent__item-title {
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .consent__always {
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .consent__item-body {
+    margin: 0.375rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  /* --- Bryter --- */
+
+  .consent__switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  /* Selve avkryssingsboksen skjules visuelt, men beholder tastaturfokus og
+     leses av skjermlesere — sporet under er bare en presentasjon av den. */
+  .consent__switch input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .consent__track {
+    flex: none;
+    display: block;
+    width: 2.5rem;
+    height: 1.375rem;
+    padding: 0.1875rem;
+    border-radius: 999px;
+    background: var(--color-line);
+    transition: background-color 200ms ease;
+  }
+
+  .consent__thumb {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: 0 1px 3px rgb(36 51 59 / 0.24);
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .consent__switch input:checked + .consent__track {
+    background: var(--color-brand);
+  }
+
+  .consent__switch input:checked + .consent__track .consent__thumb {
+    transform: translateX(1.125rem);
+  }
+
+  .consent__switch input:focus-visible + .consent__track {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .consent__thumb {
+      transition: none;
+    }
+  }
+</style>

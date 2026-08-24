@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import DesignContent from '../../components/DesignContent.astro';
+import { LOCALES, DEFAULT_LOCALE, isLocale } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+
+// Designsiden på de oversatte språkene. Norsk ligger på rot og er ikke med.
+export function getStaticPaths() {
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map((locale) => ({
+    params: { locale },
+  }));
+}
+
+// Ruten er statisk generert fra listen over, så params.locale er alltid en
+// gyldig språkkode. isLocale-sjekken tilfredsstiller typen uten å anta det.
+const { locale: param } = Astro.params;
+const locale = param && isLocale(param) ? param : DEFAULT_LOCALE;
+const t = useTranslations(locale);
+---
+
+<Base title={t('design.title')} description={t('design.intro')}>
+  <DesignContent />
+</Base>

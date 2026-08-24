@@ -1,0 +1,405 @@
+---
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// De to sitatene er svært ulike i lengde — det ene er tre setninger, det andre
+// én. I stedet for å tvinge dem inn i like kort får de hver sin vekt: Jørns står
+// som hovedsitatet i stor skrift, Kristians som et kort, slagkraftig utsagn.
+// Logoen følger med hver referanse, så leseren kjenner igjen virksomheten uten
+// å måtte lese stillingstittelen.
+const references = [
+  {
+    variant: 'lead',
+    quoteKey: 'references.jorn.quote',
+    nameKey: 'references.jorn.name',
+    roleKey: 'references.jorn.role',
+    companyKey: 'references.jorn.company',
+    portrait: { src: '/Jorn.jpg', width: 200, height: 200 },
+    logo: { src: '/mmbanklogo.png', width: 1129, height: 160 },
+  },
+  {
+    variant: 'compact',
+    quoteKey: 'references.kristian.quote',
+    nameKey: 'references.kristian.name',
+    roleKey: 'references.kristian.role',
+    companyKey: 'references.kristian.company',
+    portrait: { src: '/Kristian_.png', width: 500, height: 500 },
+    logo: { src: '/Flematec.png', width: 560, height: 77 },
+  },
+] as const;
+---
+
+<section class="refs" data-refs>
+  <div class="refs__inner">
+    <div class="refs__intro">
+      <h2 class="refs__title">{t('references.title')}</h2>
+      <p class="refs__body">{t('references.body')}</p>
+    </div>
+
+    <div class="refs__grid">
+      {
+        references.map((ref, index) => (
+          <figure class={`refs__card refs__card--${ref.variant}`} style={`--i: ${index}`}>
+            {/* Anførselstegnet er dekorativt — sitatet bæres av <blockquote>. */}
+            <span class="refs__mark" aria-hidden="true">
+              <svg viewBox="0 0 32 24" fill="currentColor">
+                <path d="M13 24V13.2C13 5.9 17.5 1.2 25.3 0l1.3 3.6c-4.3 1.1-6.5 3.6-6.7 7.4H25V24H13zM0 24V13.2C0 5.9 4.5 1.2 12.3 0l1.3 3.6c-4.3 1.1-6.5 3.6-6.7 7.4H12V24H0z" />
+              </svg>
+            </span>
+
+            <blockquote class="refs__quote">
+              <p>{t(ref.quoteKey)}</p>
+            </blockquote>
+
+            <figcaption class="refs__person">
+              <img
+                class="refs__portrait"
+                src={ref.portrait.src}
+                alt={t(ref.nameKey)}
+                width={ref.portrait.width}
+                height={ref.portrait.height}
+                loading="lazy"
+                decoding="async"
+              />
+
+              <span class="refs__identity">
+                <span class="refs__name">{t(ref.nameKey)}</span>
+                <span class="refs__role">
+                  {t(ref.roleKey)}
+                  <span class="refs__at"> @ </span>
+                  {t(ref.companyKey)}
+                </span>
+              </span>
+
+              {/* Logoen er ren gjentakelse av firmanavnet over, derfor tom alt. */}
+              <img
+                class="refs__logo"
+                src={ref.logo.src}
+                alt=""
+                width={ref.logo.width}
+                height={ref.logo.height}
+                loading="lazy"
+                decoding="async"
+              />
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  // Samme inntoning-på-scroll som de andre forsideseksjonene.
+  const section = document.querySelector<HTMLElement>('[data-refs]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section) {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      section.classList.add('is-visible');
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              section.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.15 },
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  /* Tjenesteseksjonen over ligger på canvas, produktene under på canvas —
+     denne står i hvitt mellom dem og får dermed sin egen luft uten en eneste
+     ekstra ramme. */
+  .refs {
+    background: var(--color-surface);
+  }
+
+  .refs__inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 5rem 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .refs__inner {
+      padding: 6rem 2rem;
+    }
+  }
+
+  /* --- Intro --- */
+
+  .refs__intro {
+    max-width: 40rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .refs__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease,
+      transform 700ms ease;
+  }
+
+  .refs.is-visible .refs__title {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .refs__body {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 80ms,
+      transform 700ms ease 80ms;
+  }
+
+  .refs.is-visible .refs__body {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* --- Grid --- */
+
+  .refs__grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+  }
+
+  @media (min-width: 56rem) {
+    /* Det lange sitatet får mest plass, det korte står smalere ved siden av.
+       Ulik vekt gjør at de leses som to ulike stemmer, ikke som to like kort. */
+    .refs__grid {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: 1.75rem;
+      align-items: stretch;
+    }
+  }
+
+  /* --- Kort --- */
+
+  .refs__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 2.25rem 1.75rem 1.75rem;
+    border: 1px solid var(--color-line);
+    /* Samme asymmetriske hjørnespråk som resten av siden. */
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 600ms ease calc(200ms + var(--i) * 120ms),
+      transform 600ms ease calc(200ms + var(--i) * 120ms),
+      border-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .refs.is-visible .refs__card {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .refs__card:hover {
+    border-color: transparent;
+    box-shadow: 0 1px 2px rgb(36 51 59 / 0.05), 0 18px 40px rgb(36 51 59 / 0.09);
+  }
+
+  @media (min-width: 40rem) {
+    .refs__card {
+      padding: 2.75rem 2.25rem 2rem;
+    }
+  }
+
+  /* Det korte sitatet får merkefargen som flate. Det gjør at den ene setningen
+     — som ellers ville sett tynn ut ved siden av tre — bærer sin egen halvdel. */
+  .refs__card--compact {
+    background: var(--color-brand);
+    border-color: transparent;
+  }
+
+  /* Et lyst skjær nede til venstre bryter opp den flate fargen, samme grep som
+     brukes i den avsluttende CTA-en. */
+  .refs__card--compact::after {
+    content: '';
+    position: absolute;
+    left: -6rem;
+    bottom: -10rem;
+    width: 22rem;
+    height: 22rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 255 255 / 0.16) 0%, transparent 68%);
+    pointer-events: none;
+  }
+
+  /* --- Anførselstegn --- */
+
+  .refs__mark {
+    display: block;
+    margin-bottom: 1.25rem;
+    color: var(--color-brand);
+    opacity: 0.22;
+  }
+
+  .refs__mark svg {
+    width: 2rem;
+    height: 1.5rem;
+  }
+
+  .refs__card--compact .refs__mark {
+    color: #fff;
+    opacity: 0.45;
+  }
+
+  /* --- Sitatet --- */
+
+  .refs__quote {
+    position: relative;
+    margin: 0;
+    flex: 1;
+  }
+
+  .refs__quote p {
+    margin: 0;
+    color: var(--color-ink);
+    /* Litt større enn brødteksten ellers — sitatet er seksjonens hovedstemme. */
+    font-size: clamp(1.0625rem, 1.7vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: -0.01em;
+  }
+
+  /* Den ene setningen tåler — og fortjener — mer vekt. */
+  .refs__card--compact .refs__quote p {
+    color: #fff;
+    font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.02em;
+  }
+
+  /* --- Personen --- */
+
+  .refs__person {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .refs__card--compact .refs__person {
+    border-top-color: rgb(255 255 255 / 0.25);
+  }
+
+  .refs__portrait {
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    object-fit: cover;
+    /* Ansiktene sitter i øvre halvdel av begge portrettene, så beskjæringen
+       forankres oppover — ellers kuttes hakene i den runde rammen. */
+    object-position: 50% 20%;
+    background: var(--color-canvas);
+  }
+
+  .refs__card--compact .refs__portrait {
+    /* Portrettet ligger mot blå flate og trenger en kant for å løsne fra den. */
+    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.35);
+  }
+
+  .refs__identity {
+    display: grid;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .refs__name {
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .refs__role {
+    color: var(--color-ink-soft);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+
+  .refs__at {
+    color: var(--color-muted);
+  }
+
+  .refs__card--compact .refs__name {
+    color: #fff;
+  }
+
+  .refs__card--compact .refs__role,
+  .refs__card--compact .refs__at {
+    color: rgb(255 255 255 / 0.75);
+  }
+
+  /* --- Firmalogo --- */
+
+  .refs__logo {
+    /* Skyves helt til høyre, adskilt fra navn og tittel. */
+    margin-left: auto;
+    width: auto;
+    max-width: 7rem;
+    height: 1.375rem;
+    object-fit: contain;
+    object-position: right center;
+    /* Gråtonet som i kundelogo-raden, så logoene ikke konkurrerer med teksten. */
+    filter: grayscale(1) opacity(0.5);
+    transition: filter 240ms ease;
+  }
+
+  .refs__card:hover .refs__logo {
+    filter: grayscale(0) opacity(1);
+  }
+
+  /* Flematec-logoen er mørk og ville forsvunnet mot den blå flaten — den snus
+     til hvit i stedet for å gråtones. */
+  .refs__card--compact .refs__logo {
+    filter: brightness(0) invert(1) opacity(0.8);
+  }
+
+  .refs__card--compact:hover .refs__logo {
+    filter: brightness(0) invert(1) opacity(1);
+  }
+
+  /* Logoen er sekundær informasjon; på de smaleste skjermene tar navnet all
+     plassen den trenger i stedet for å presses sammen. */
+  @media (max-width: 26rem) {
+    .refs__logo {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,47 @@
+---
+import Base from '../../../layouts/Base.astro';
+import CasesOverview from '../../../components/CasesOverview.astro';
+import { getAllCases } from '../../../lib/cases';
+import { breadcrumbSchema, caseListSchema } from '../../../data/schema';
+import { site } from '../../../data/site';
+import { LOCALES, DEFAULT_LOCALE, isLocale, localizePath } from '../../../i18n/config';
+import { useTranslations } from '../../../i18n/utils';
+
+// Kundecase-oversikten på de oversatte språkene. Norsk ligger på rot.
+export function getStaticPaths() {
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale: param } = Astro.params;
+const locale = param && isLocale(param) ? param : DEFAULT_LOCALE;
+const t = useTranslations(locale);
+
+const cases = await getAllCases(locale);
+
+const overviewUrl = new URL(localizePath('/kundecase', locale), site.url).href;
+
+const listed = cases
+  .filter((item) => item.slug)
+  .map((item) => ({
+    name: item.company,
+    url: new URL(localizePath(`/kundecase/${item.slug}`, locale), site.url).href,
+  }));
+
+const listLd = caseListSchema(listed, t('cases.title'), t('cases.intro'));
+
+const breadcrumbLd = breadcrumbSchema(
+  [{ name: t('cases.title'), url: overviewUrl }],
+  t('nav.home'),
+);
+---
+
+<Base title={t('cases.title')} description={t('cases.intro')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(listLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <CasesOverview />
+</Base>

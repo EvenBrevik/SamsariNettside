@@ -1,0 +1,533 @@
+---
+import Button from './Button.astro';
+import { BOOKING_URL } from '../data/site';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import { urlFor } from '../lib/sanity';
+import { PortableText } from 'astro-portabletext';
+import CaseBodyImage from './CaseBodyImage.astro';
+import { toParagraphs, cleanMetrics, logoSource, type CaseStudy } from '../lib/cases';
+
+interface Props {
+  study: CaseStudy;
+}
+
+const { study } = Astro.props;
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const overviewHref = localizePath('/kundecase', locale);
+
+// Nøkkeltallene tåler flere enn tre her — undersiden har plass, i motsetning
+// til forsidepanelet.
+const metrics = cleanMetrics(study.metrics, 6);
+
+const sections = [
+  { labelKey: 'cases.problem', paragraphs: toParagraphs(study.problem) },
+  { labelKey: 'cases.solution', paragraphs: toParagraphs(study.solution) },
+  { labelKey: 'cases.result', paragraphs: toParagraphs(study.result) },
+] as const;
+
+const logo = logoSource(study);
+const intro = study.intro?.trim();
+const services = (study.services ?? []).map((s) => s?.trim()).filter(Boolean) as string[];
+const quote = study.testimonial?.quote?.trim();
+
+// «Ekstra innhold» er Portable Text. Bilder i strømmen rendres av
+// CaseBodyImage; resten faller til bibliotekets standardoppsett.
+const extraContent = Array.isArray(study.content) && study.content.length > 0 ? study.content : null;
+---
+
+<article class="detail">
+  <div class="detail__inner">
+    {/* Brødsmulesti. <nav> med aria-label gjør den navigerbar for skjermlesere,
+        og speiler BreadcrumbList-en i JSON-LD på sidene som bruker denne. */}
+    <nav class="detail__breadcrumb" aria-label={t('cases.back')}>
+      <a class="detail__back" href={overviewHref}>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M13 8H3M7 4L3 8l4 4" />
+        </svg>
+        {t('cases.back')}
+      </a>
+    </nav>
+
+    <header class="detail__header">
+      {study.sector && <span class="detail__sector">{study.sector}</span>}
+      <h1 class="detail__title">{study.company}</h1>
+
+      {intro && <p class="detail__intro">{intro}</p>}
+
+      {
+        logo && (
+          <div class="detail__brand">
+            <img
+              class="detail__logo"
+              src={urlFor(logo).width(480).fit('max').auto('format').url()}
+              alt={logo.alt ?? study.company}
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+        )
+      }
+
+      {
+        services.length > 0 && (
+          <ul class="detail__services">
+            {services.map((service) => (
+              <li class="detail__service">{service}</li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    {
+      metrics.length > 0 && (
+        <section class="detail__metrics" aria-label={t('cases.metrics')}>
+          <h2 class="detail__metrics-title">{t('cases.metrics')}</h2>
+          <ul class="detail__metrics-list">
+            {metrics.map((metric) => (
+              <li class="detail__metric">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="3 8.5 6.5 12 13 4.5" />
+                </svg>
+                {metric}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <div class="detail__body">
+      {
+        sections.map(
+          (section) =>
+            section.paragraphs.length > 0 && (
+              <section class="detail__section">
+                <h2>{t(section.labelKey)}</h2>
+                {section.paragraphs.map((paragraph) => (
+                  <p>{paragraph}</p>
+                ))}
+              </section>
+            ),
+        )
+      }
+    </div>
+
+    {
+      extraContent && (
+        <div class="detail__extra">
+          <PortableText value={extraContent} components={{ type: { image: CaseBodyImage } }} />
+        </div>
+      )
+    }
+
+    {
+      /* Kundens egne ord veier tyngst etter at leseren har sett hva vi gjorde. */
+      quote && (
+        <figure class="detail__quote">
+          <blockquote>
+            <p>{quote}</p>
+          </blockquote>
+          {(study.testimonial?.name || study.testimonial?.role) && (
+            <figcaption>
+              {study.testimonial?.name && (
+                <span class="detail__quote-name">{study.testimonial.name}</span>
+              )}
+              {study.testimonial?.role && (
+                <span class="detail__quote-role">{study.testimonial.role}</span>
+              )}
+            </figcaption>
+          )}
+        </figure>
+      )
+    }
+
+    <aside class="detail__cta">
+      <h2 class="detail__cta-title">{t('cases.ctaTitle')}</h2>
+      <p class="detail__cta-body">{t('cases.ctaBody')}</p>
+      <div class="detail__cta-actions">
+        <Button href={BOOKING_URL} external>{t('cases.ctaButton')}</Button>
+        <Button href={overviewHref} variant="secondary">{t('cases.nextTitle')}</Button>
+      </div>
+    </aside>
+  </div>
+</article>
+
+<style>
+  .detail {
+    position: relative;
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .detail::before {
+    content: '';
+    position: absolute;
+    top: -18rem;
+    right: -12rem;
+    width: 40rem;
+    height: 40rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 70%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .detail__inner {
+    position: relative;
+    /* Smalere enn oversikten: dette er lang løpende tekst. */
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 2.5rem) 1.25rem 5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .detail__inner {
+      padding: calc(var(--header-height) + 3rem) 2rem 6rem;
+    }
+  }
+
+  /* --- Tilbakelenke --- */
+
+  .detail__breadcrumb {
+    margin-bottom: 2rem;
+  }
+
+  .detail__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .detail__back:hover {
+    color: var(--color-brand);
+  }
+
+  .detail__back svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .detail__back:hover svg {
+    transform: translateX(-3px);
+  }
+
+  /* --- Topp --- */
+
+  .detail__header {
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .detail__sector {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .detail__title {
+    margin: 1rem 0 0;
+    color: var(--color-ink);
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+  }
+
+  .detail__intro {
+    max-width: 54ch;
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+
+  .detail__brand {
+    margin-top: 2rem;
+  }
+
+  /* --- Tjenester --- */
+
+  .detail__services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .detail__service {
+    padding: 0.3125rem 0.75rem;
+    border-radius: 999px;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  /* --- Ekstra innhold (Portable Text) --- */
+
+  /* :global fordi markupen kommer fra PortableText-komponenten og ikke får
+     scope-attributtet Astro ellers legger på. */
+  .detail__extra {
+    margin-top: 3rem;
+  }
+
+  .detail__extra :global(h2) {
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--color-brand-soft);
+    color: var(--color-ink);
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .detail__extra :global(h3) {
+    margin: 2rem 0 0.75rem;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .detail__extra :global(p) {
+    margin: 0 0 1rem;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  .detail__extra :global(ul),
+  .detail__extra :global(ol) {
+    margin: 0 0 1.25rem;
+    padding-left: 1.25rem;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  .detail__extra :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .detail__extra :global(blockquote) {
+    margin: 1.75rem 0;
+    padding: 0 0 0 1.25rem;
+    border-left: 3px solid var(--color-brand-soft);
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .detail__extra :global(a) {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(17 132 205 / 0.35);
+    transition: text-decoration-color 200ms ease;
+  }
+
+  .detail__extra :global(a:hover) {
+    text-decoration-color: var(--color-brand);
+  }
+
+  .detail__extra :global(strong) {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  /* --- Kundesitat --- */
+
+  .detail__quote {
+    margin: 3.5rem 0 0;
+    padding: 2rem;
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-line);
+  }
+
+  .detail__quote blockquote {
+    margin: 0;
+  }
+
+  .detail__quote p {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.125rem, 2.2vw, 1.375rem);
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: -0.015em;
+  }
+
+  .detail__quote figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .detail__quote-name {
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .detail__quote-role {
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+  }
+
+  .detail__logo {
+    display: block;
+    width: auto;
+    max-width: 14rem;
+    height: 2.5rem;
+    object-fit: contain;
+    object-position: left center;
+  }
+
+  /* --- Nøkkeltall --- */
+
+  .detail__metrics {
+    margin-top: 2.5rem;
+    padding: 1.75rem;
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-line);
+  }
+
+  .detail__metrics-title {
+    margin: 0 0 1rem;
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .detail__metrics-list {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 34rem) {
+    .detail__metrics-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .detail__metric {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .detail__metric svg {
+    flex: none;
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-top: 0.3125rem;
+    color: var(--color-brand);
+  }
+
+  /* --- Brødtekst --- */
+
+  .detail__section {
+    margin-top: 3rem;
+  }
+
+  .detail__section h2 {
+    margin: 0 0 1rem;
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--color-brand-soft);
+    color: var(--color-ink);
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* Headeren har allerede én skillelinje under tjenestemerkene. Unngå en
+     ekstra linje over den første tekstseksjonen. */
+  .detail__section:first-child h2 {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .detail__section p {
+    margin: 0 0 1rem;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  .detail__section p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* --- Avsluttende CTA --- */
+
+  .detail__cta {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--color-line);
+    text-align: center;
+  }
+
+  .detail__cta-title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.375rem, 2.6vw, 1.75rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .detail__cta-body {
+    max-width: 42ch;
+    margin: 0.875rem auto 1.75rem;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .detail__cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.875rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail__back:hover svg {
+      transform: none;
+    }
+  }
+</style>

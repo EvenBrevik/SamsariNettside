@@ -1,0 +1,681 @@
+---
+import Button from './Button.astro';
+import { BOOKING_URL } from '../data/site';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import { urlFor } from '../lib/sanity';
+import { getAllPosts, categoriesOf, formatDate, searchIndex } from '../lib/posts';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const posts = await getAllPosts(locale);
+const categories = categoriesOf(posts);
+---
+
+<article class="blog">
+  <div class="blog__inner">
+    <header class="blog__header">
+      <h1 class="blog__title">{t('blog.title')}</h1>
+      <p class="blog__intro">{t('blog.intro')}</p>
+    </header>
+
+    {
+      posts.length === 0 ? (
+        <p class="blog__empty">{t('blog.empty')}</p>
+      ) : (
+        <div class="blog__browse" data-blog>
+          {/* Verktøylinje: fritekstsøk og emnefilter. Begge er progressive —
+              uten JavaScript vises alle artiklene, og filtrene gjør ingenting
+              i stedet for å skjule innhold. */}
+          <div class="tools">
+            <div class="search">
+              <label class="visually-hidden" for="blog-search">
+                {t('blog.searchLabel')}
+              </label>
+              <svg class="search__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+                <circle cx="9" cy="9" r="6" />
+                <path d="M13.5 13.5 17 17" />
+              </svg>
+              <input
+                id="blog-search"
+                class="search__input"
+                type="search"
+                autocomplete="off"
+                placeholder={t('blog.searchPlaceholder')}
+                data-search
+              />
+              <button class="search__clear" type="button" data-clear hidden aria-label={t('blog.searchClear')}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+                  <path d="M4 4l8 8M12 4l-8 8" />
+                </svg>
+              </button>
+            </div>
+
+            {categories.length > 0 && (
+              <div class="filters" role="group" aria-label={t('blog.filterLabel')}>
+                <button class="chip is-active" type="button" data-category="" aria-pressed="true">
+                  {t('blog.all')}
+                </button>
+                {categories.map((category) => (
+                  <button class="chip" type="button" data-category={category} aria-pressed="false">
+                    {category}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Teller som oppdateres av filteret. aria-live gjør at skjermlesere
+              får vite hvor mange treff som ble igjen. */}
+          <p class="blog__count" data-count aria-live="polite" />
+
+          <ul class="posts" data-list>
+            {posts.map((post) => (
+              <li
+                class="post"
+                data-post
+                data-category={post.category ?? ''}
+                data-index={searchIndex(post)}
+              >
+                <a class="post__link" href={localizePath(`/blogg/${post.slug}`, locale)}>
+                  <span class="post__media">
+                    {post.mainImage?.asset ? (
+                      <img
+                        src={urlFor(post.mainImage).width(720).height(405).fit('crop').auto('format').url()}
+                        alt={post.mainImage.alt ?? ''}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <span class="post__placeholder" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                          <line x1="16" y1="13" x2="8" y2="13" />
+                          <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                      </span>
+                    )}
+                  </span>
+
+                  <span class="post__body">
+                    <span class="post__meta">
+                      {post.category && <span class="post__category">{post.category}</span>}
+                      {post.readingTime && (
+                        <span class="post__time">
+                          {post.readingTime} {t('blog.readingTime')}
+                        </span>
+                      )}
+                    </span>
+
+                    <span class="post__title">{post.title}</span>
+                    {post.excerpt && <span class="post__excerpt">{post.excerpt}</span>}
+
+                    <span class="post__footer">
+                      {post.date && (
+                        <time class="post__date" datetime={post.date}>
+                          {formatDate(post.date, locale)}
+                        </time>
+                      )}
+                      <span class="post__more">
+                        {t('blog.readMore')}
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M3 8h10M9 4l4 4-4 4" />
+                        </svg>
+                      </span>
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <div class="blog__none" data-none hidden>
+            <p class="blog__none-title">{t('blog.noResults')}</p>
+            <p class="blog__none-hint">{t('blog.noResultsHint')}</p>
+            <button class="blog__reset" type="button" data-reset>
+              {t('blog.reset')}
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    <aside class="blog__cta">
+      <h2 class="blog__cta-title">{t('blog.ctaTitle')}</h2>
+      <p class="blog__cta-body">{t('blog.ctaBody')}</p>
+      <Button href={BOOKING_URL} external>{t('blog.ctaButton')}</Button>
+    </aside>
+  </div>
+</article>
+
+<script define:vars={{ one: t('blog.countOne'), many: t('blog.countMany') }}>
+  const root = document.querySelector('[data-blog]');
+
+  if (root) {
+    const input = root.querySelector('[data-search]');
+    const clearBtn = root.querySelector('[data-clear]');
+    // Kun knappene i filterraden. Et bredere søk ville plukket opp
+    // [data-category] fra samtykkebanneret, som ligger i samme dokument.
+    const chips = [...root.querySelectorAll('.filters [data-category]')];
+    const items = [...root.querySelectorAll('[data-post]')];
+    const none = root.querySelector('[data-none]');
+    const count = root.querySelector('[data-count]');
+    const resetBtn = root.querySelector('[data-reset]');
+
+    let category = '';
+    let term = '';
+
+    function apply() {
+      let visible = 0;
+
+      for (const item of items) {
+        const matchesCategory = !category || item.dataset.category === category;
+        // Alle ordene må finnes, men i vilkårlig rekkefølge — «power apps»
+        // treffer også en tittel som skriver «Apps i Power Platform».
+        const words = term.split(/\s+/).filter(Boolean);
+        const haystack = item.dataset.index || '';
+        const matchesTerm = words.every((word) => haystack.includes(word));
+
+        const show = matchesCategory && matchesTerm;
+        item.hidden = !show;
+        if (show) visible += 1;
+      }
+
+      if (none) none.hidden = visible !== 0;
+
+      if (count) {
+        // Teller vises bare når noe faktisk er filtrert — ellers er den støy.
+        const filtering = Boolean(category || term);
+        count.textContent = filtering
+          ? `${visible} ${visible === 1 ? one : many}`
+          : '';
+      }
+
+      if (clearBtn) clearBtn.hidden = !term;
+    }
+
+    input?.addEventListener('input', () => {
+      term = input.value.trim().toLowerCase();
+      apply();
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      if (!input) return;
+      input.value = '';
+      term = '';
+      apply();
+      input.focus();
+    });
+
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        category = chip.dataset.category || '';
+        for (const other of chips) {
+          const active = other === chip;
+          other.classList.toggle('is-active', active);
+          other.setAttribute('aria-pressed', String(active));
+        }
+        apply();
+      });
+    }
+
+    resetBtn?.addEventListener('click', () => {
+      category = '';
+      term = '';
+      if (input) input.value = '';
+      for (const chip of chips) {
+        const active = !chip.dataset.category;
+        chip.classList.toggle('is-active', active);
+        chip.setAttribute('aria-pressed', String(active));
+      }
+      apply();
+      input?.focus();
+    });
+  }
+</script>
+
+<style>
+  .blog {
+    position: relative;
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .blog::before {
+    content: '';
+    position: absolute;
+    top: -18rem;
+    right: -12rem;
+    width: 40rem;
+    height: 40rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 70%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .blog__inner {
+    position: relative;
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 3rem) 1.25rem 5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .blog__inner {
+      padding: calc(var(--header-height) + 4rem) 2rem 6rem;
+    }
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* --- Topp --- */
+
+  .blog__header {
+    max-width: 42rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .blog__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .blog__intro {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .blog__empty {
+    margin: 3rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  /* --- Verktøylinje --- */
+
+  .tools {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+
+  .search {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search__icon {
+    position: absolute;
+    left: 1rem;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--color-muted);
+    pointer-events: none;
+  }
+
+  .search__input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0 2.75rem 0 2.875rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    transition:
+      border-color 200ms ease,
+      background-color 200ms ease;
+  }
+
+  .search__input::placeholder {
+    color: var(--color-muted);
+  }
+
+  .search__input:focus {
+    outline: none;
+    border-color: var(--color-brand);
+    background: var(--color-surface);
+  }
+
+  /* Nettleserens eget kryss i type="search" ville stått ved siden av vårt. */
+  .search__input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .search__clear {
+    position: absolute;
+    right: 0.75rem;
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-line);
+    color: var(--color-ink-soft);
+    cursor: pointer;
+    transition: background-color 180ms ease;
+  }
+
+  .search__clear:hover {
+    background: var(--color-muted);
+    color: var(--color-surface);
+  }
+
+  .search__clear[hidden] {
+    display: none;
+  }
+
+  .search__clear svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  /* --- Emnefilter --- */
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .chip {
+    padding: 0.4375rem 0.9375rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-ink-soft);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
+  }
+
+  .chip:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  .chip.is-active {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: #fff;
+  }
+
+  .blog__count {
+    margin: 1.25rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    min-height: 1.25rem;
+  }
+
+  /* --- Artikkelliste --- */
+
+  .posts {
+    display: grid;
+    gap: 1.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .posts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .posts {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .post[hidden] {
+    display: none;
+  }
+
+  .post__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid var(--color-line);
+    border-radius: 2.5rem 0.5rem 2.5rem 0.5rem;
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      transform 220ms ease;
+  }
+
+  .post__link:hover,
+  .post__link:focus-visible {
+    border-color: transparent;
+    box-shadow: 0 1px 2px rgb(30 48 58 / 0.05), 0 20px 40px rgb(30 48 58 / 0.1);
+    transform: translateY(-3px);
+  }
+
+  .post__media {
+    display: block;
+    aspect-ratio: 16 / 9;
+    background: var(--color-canvas);
+    overflow: hidden;
+  }
+
+  .post__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .post__placeholder {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    color: var(--color-muted);
+  }
+
+  .post__placeholder svg {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .post__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.5rem;
+  }
+
+  .post__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .post__category {
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .post__time {
+    color: var(--color-muted);
+    font-size: 0.75rem;
+  }
+
+  .post__title {
+    display: block;
+    margin-top: 0.875rem;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+
+  .post__excerpt {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 0.5rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .post__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1.25rem;
+  }
+
+  .post__date {
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+  }
+
+  .post__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--color-brand);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .post__more svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .post__link:hover .post__more svg,
+  .post__link:focus-visible .post__more svg {
+    transform: translateX(3px);
+  }
+
+  /* --- Ingen treff --- */
+
+  .blog__none {
+    margin-top: 2rem;
+    padding: 2.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    background: var(--color-canvas);
+    text-align: center;
+  }
+
+  .blog__none[hidden] {
+    display: none;
+  }
+
+  .blog__none-title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  .blog__none-hint {
+    margin: 0.5rem 0 1.5rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .blog__reset {
+    min-height: 2.5rem;
+    padding: 0 1.25rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .blog__reset:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  /* --- Avsluttende CTA --- */
+
+  .blog__cta {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--color-line);
+    text-align: center;
+  }
+
+  .blog__cta-title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.375rem, 2.6vw, 1.75rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .blog__cta-body {
+    max-width: 42ch;
+    margin: 0.875rem auto 1.75rem;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .post__link:hover {
+      transform: none;
+    }
+
+    .post__link:hover .post__more svg {
+      transform: none;
+    }
+  }
+</style>

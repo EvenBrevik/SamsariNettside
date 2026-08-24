@@ -1,0 +1,354 @@
+---
+import Button from './Button.astro';
+import { localeFromPath, localizePath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import { urlFor } from '../lib/sanity';
+import { getFeaturedCase, cleanMetrics, leadText, truncate, logoSource } from '../lib/cases';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const allCasesHref = localizePath('/kundecase', locale);
+
+// Hvilken case som fremheves styres nå fra studioet: den som er merket
+// «Fremhevet kundecase», ellers den første i rekkefølgen. Ingen firmanavn
+// hardkodet her lenger.
+const featured = await getFeaturedCase(locale);
+
+const caseHref = featured?.slug
+  ? localizePath(`/kundecase/${featured.slug}`, locale)
+  : allCasesHref;
+
+// Overskriften er firmanavnet. Casen har ingen egen kort tittel for forsiden,
+// og en oppdiktet én ville sagt noe artikkelen ikke sier.
+const heading = featured?.company ?? t('featuredCase.title');
+
+// Ingressen: redaksjonell om den finnes, ellers utledet av innholdet. Kuttes,
+// slik at et langt avsnitt i Sanity ikke gjør panelet uforholdsmessig høyt.
+const lead = featured ? truncate(leadText(featured), 190) : t('featuredCase.body');
+
+// Tjenestene er det mest presise stikkordet når de finnes; ellers nøkkeltallene.
+const services = (featured?.services ?? []).map((s) => s?.trim()).filter(Boolean) as string[];
+const sanityTags = services.length > 0 ? services.slice(0, 3) : cleanMetrics(featured?.metrics);
+
+// Faller tilbake på de oversatte stikkordene om Sanity er utilgjengelig, slik
+// at seksjonen aldri står tom.
+const tags: string[] =
+  sanityTags.length > 0
+    ? sanityTags
+    : [t('featuredCase.tag1'), t('featuredCase.tag2'), t('featuredCase.tag3')];
+
+// Logoen hentes nå fra Sanity, med den statiske filen som siste utvei.
+const logo = featured ? logoSource(featured) : null;
+const logoUrl = logo ? urlFor(logo).width(480).fit('max').auto('format').url() : '/mmbanklogo.png';
+const logoAlt = logo?.alt ?? featured?.company ?? t('featuredCase.logoAlt');
+---
+
+<section class="fcase" data-fcase>
+  <div class="fcase__inner">
+    <article class="fcase__panel">
+      <!-- Uten skjermbilde av løsningen må logoen bære flaten visuelt. Den står
+           derfor som eget anker til venstre, ikke som en liten byline. -->
+      <div class="fcase__brand">
+        <img class="fcase__logo" src={logoUrl} alt={logoAlt} loading="lazy" decoding="async" />
+      </div>
+
+      <div class="fcase__content">
+        <span class="fcase__eyebrow">{t('featuredCase.eyebrow')}</span>
+
+        <h2 class="fcase__title">
+          <!-- Lenken dekker hele panelet via ::after, men ligger på overskriften
+               slik at lenketeksten er meningsbærende for skjermlesere. -->
+          <a class="fcase__link" href={caseHref}>{heading}</a>
+        </h2>
+
+        <p class="fcase__body">{lead}</p>
+
+        <ul class="fcase__tags">
+          {
+            tags.map((tag) => (
+              <li class="fcase__tag">{tag}</li>
+            ))
+          }
+        </ul>
+
+        <span class="fcase__cta">
+          {t('featuredCase.cta')}
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" />
+          </svg>
+        </span>
+      </div>
+    </article>
+
+    {
+      /* Uten slug peker panelet allerede til oversikten — da ville denne
+         knappen vært en andre lenke til samme sted. */
+      caseHref !== allCasesHref && (
+        <div class="fcase__more">
+          <Button href={allCasesHref} variant="secondary">
+            {t('featuredCase.all')}
+          </Button>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  // Samme inntoning-på-scroll som de andre forsideseksjonene.
+  const section = document.querySelector<HTMLElement>('[data-fcase]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section) {
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+      section.classList.add('is-visible');
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              section.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.2 },
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  /* Produktene over ligger på canvas — denne står i hvitt, slik at det ene
+     panelet får luft rundt seg og leses som ett utvalgt element. */
+  .fcase {
+    background: var(--color-surface);
+  }
+
+  .fcase__inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 5rem 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .fcase__inner {
+      padding: 6rem 2rem;
+    }
+  }
+
+  /* --- Panelet --- */
+
+  .fcase__panel {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    padding: 2.25rem 1.75rem;
+    border: 1px solid var(--color-line);
+    /* Samme asymmetriske hjørnespråk som resten av siden. */
+    border-radius: 0.5rem 3rem 0.5rem 3rem;
+    background: var(--color-surface);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 700ms ease,
+      transform 700ms ease,
+      border-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .fcase.is-visible .fcase__panel {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .fcase__panel:hover,
+  .fcase__panel:focus-within {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgb(36 51 59 / 0.06), 0 22px 48px rgb(36 51 59 / 0.11);
+  }
+
+  @media (min-width: 40rem) {
+    .fcase__panel {
+      padding: 3rem 2.5rem;
+    }
+  }
+
+  @media (min-width: 56rem) {
+    /* Logoen får sin egen faste spalte til venstre, teksten resten. */
+    .fcase__panel {
+      grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
+      gap: clamp(2.5rem, 5vw, 4rem);
+      align-items: center;
+      padding: 3.5rem 3rem;
+    }
+  }
+
+  /* Et svakt fargeskjær øverst til høyre gir panelet dybde uten et bilde —
+     samme grep som i heroen, men mye mer tilbaketrukket. */
+  .fcase__panel::before {
+    content: '';
+    position: absolute;
+    top: -14rem;
+    right: -10rem;
+    width: 30rem;
+    height: 30rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 70%);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
+  /* --- Logoen --- */
+
+  .fcase__brand {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  @media (min-width: 56rem) {
+    .fcase__brand {
+      justify-content: center;
+      /* Skillelinjen markerer logoen som eget felt, ikke som en byline over
+         teksten. Bare på brede skjermer — under stables de. */
+      padding-right: clamp(2.5rem, 5vw, 4rem);
+      border-right: 1px solid var(--color-line);
+    }
+  }
+
+  .fcase__logo {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: 2.25rem;
+    object-fit: contain;
+    object-position: left center;
+  }
+
+  @media (min-width: 56rem) {
+    .fcase__logo {
+      height: 2.75rem;
+      object-position: center;
+    }
+  }
+
+  /* --- Innhold --- */
+
+  .fcase__content {
+    position: relative;
+  }
+
+  /* Aksentfargen markerer at dette er det utvalgte. Bare etiketten — resten av
+     panelet holder seg blått, ellers ville seksjonen skiftet merkefarge. */
+  .fcase__eyebrow {
+    display: block;
+    color: var(--color-accent-deep);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .fcase__title {
+    margin: 0.75rem 0 0;
+    color: var(--color-ink);
+    font-size: clamp(1.375rem, 2.6vw, 1.875rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+  }
+
+  .fcase__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Hele panelet blir klikkbart, men bare overskriften er den faktiske lenken —
+     det holder lenketeksten meningsbærende og markeringen av tekst mulig. */
+  .fcase__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Dekker hele panelet, ikke bare innholdsspalten. */
+    margin: -100rem;
+  }
+
+  .fcase__body {
+    max-width: 58ch;
+    margin: 1rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  /* --- Stikkord --- */
+
+  .fcase__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fcase__tag {
+    padding: 0.3125rem 0.75rem;
+    border-radius: 999px;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  /* --- Lenketekst --- */
+
+  .fcase__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 1.75rem;
+    color: var(--color-brand);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .fcase__cta svg {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .fcase__panel:hover .fcase__cta svg,
+  .fcase__panel:focus-within .fcase__cta svg {
+    transform: translateX(3px);
+  }
+
+  /* --- Se flere --- */
+
+  .fcase__more {
+    margin-top: 2.5rem;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms ease 220ms,
+      transform 700ms ease 220ms;
+  }
+
+  .fcase.is-visible .fcase__more {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fcase__panel:hover .fcase__cta svg {
+      transform: none;
+    }
+  }
+</style>

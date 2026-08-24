@@ -1,0 +1,1299 @@
+---
+import Button from './Button.astro';
+import { BOOKING_URL } from '../data/site';
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import type { UIKeys } from '../i18n/ui/nb';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Seksjon 2: organisert etter kundens situasjon, ikke etter teknologi.
+// Ikonene er rå markup fordi frontmatter ikke støtter JSX-fragmenter.
+interface Need {
+  key: string;
+  titleKey: UIKeys;
+  bodyKey: UIKeys;
+  items: UIKeys[];
+  icon: string;
+  /** Kun AI-kortet bruker aksentfargen, i tråd med resten av siden. */
+  accent?: boolean;
+}
+
+const needs: readonly Need[] = [
+  {
+    key: 'manual',
+    titleKey: 'sv.needs.manual.title',
+    bodyKey: 'sv.needs.manual.body',
+    items: [
+      'sv.needs.manual.i1',
+      'sv.needs.manual.i2',
+      'sv.needs.manual.i3',
+      'sv.needs.manual.i4',
+      'sv.needs.manual.i5',
+    ],
+    icon: `
+      <path d="M21 12a9 9 0 1 1-3.5-7.1" />
+      <polyline points="21 3 21 9 15 9" />
+    `,
+  },
+  {
+    key: 'scattered',
+    titleKey: 'sv.needs.scattered.title',
+    bodyKey: 'sv.needs.scattered.body',
+    items: [
+      'sv.needs.scattered.i1',
+      'sv.needs.scattered.i2',
+      'sv.needs.scattered.i3',
+      'sv.needs.scattered.i4',
+      'sv.needs.scattered.i5',
+    ],
+    icon: `
+      <polygon points="12 3 21 8 12 13 3 8" />
+      <polyline points="3 13 12 18 21 13" />
+      <polyline points="3 17.5 12 22.5 21 17.5" />
+    `,
+  },
+  {
+    key: 'ai',
+    titleKey: 'sv.needs.ai.title',
+    bodyKey: 'sv.needs.ai.body',
+    accent: true,
+    items: [
+      'sv.needs.ai.i1',
+      'sv.needs.ai.i2',
+      'sv.needs.ai.i3',
+      'sv.needs.ai.i4',
+      'sv.needs.ai.i5',
+      'sv.needs.ai.i6',
+    ],
+    icon: `
+      <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+      <rect x="9" y="9" width="6" height="6" />
+      <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+    `,
+  },
+  {
+    key: 'custom',
+    titleKey: 'sv.needs.custom.title',
+    bodyKey: 'sv.needs.custom.body',
+    items: [
+      'sv.needs.custom.i1',
+      'sv.needs.custom.i2',
+      'sv.needs.custom.i3',
+      'sv.needs.custom.i4',
+      'sv.needs.custom.i5',
+      'sv.needs.custom.i6',
+    ],
+    icon: `
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
+      <line x1="13.5" y1="4" x2="10.5" y2="20" />
+    `,
+  },
+];
+
+// Seksjon 3
+const deliverables = Array.from({ length: 8 }, (_, i) => ({
+  titleKey: `sv.deliver.d${i + 1}.title` as UIKeys,
+  bodyKey: `sv.deliver.d${i + 1}.body` as UIKeys,
+}));
+
+// Seksjon 4
+const examples = Array.from({ length: 5 }, (_, i) => ({
+  quoteKey: `sv.examples.e${i + 1}.quote` as UIKeys,
+  answerKey: `sv.examples.e${i + 1}.answer` as UIKeys,
+}));
+
+// Seksjon 5
+const directions = Array.from({ length: 3 }, (_, i) => ({
+  titleKey: `sv.approach.a${i + 1}.title` as UIKeys,
+  bodyKey: `sv.approach.a${i + 1}.body` as UIKeys,
+}));
+
+// Seksjon 6
+const engagements = Array.from({ length: 4 }, (_, i) => ({
+  titleKey: `sv.engage.e${i + 1}.title` as UIKeys,
+  bodyKey: `sv.engage.e${i + 1}.body` as UIKeys,
+}));
+
+// Seksjon 7 — teknologinavn er egennavn og oversettes ikke.
+const technologies = [
+  'Microsoft 365',
+  'Power Apps',
+  'Power Automate',
+  'Dataverse',
+  'SharePoint',
+  'Teams',
+  'Azure',
+  'React',
+  'Supabase',
+  'Claude',
+  'OpenAI',
+];
+
+// Seksjon 8
+const fits = Array.from({ length: 6 }, (_, i) => `sv.fit.f${i + 1}` as UIKeys);
+
+// Seksjon 9
+const faqs = Array.from({ length: 7 }, (_, i) => ({
+  questionKey: `sv.faq.q${i + 1}` as UIKeys,
+  answerKey: `sv.faq.a${i + 1}` as UIKeys,
+}));
+---
+
+<article class="sv">
+  <!-- 1. Hero -->
+  <section class="sv-hero">
+    <div class="sv-hero__inner">
+      <div class="sv-hero__copy">
+        <h1 class="sv-hero__title">{t('sv.title')}</h1>
+        <p class="sv-hero__intro">{t('sv.intro')}</p>
+        <Button href={BOOKING_URL} external>{t('sv.cta')}</Button>
+      </div>
+
+      <div class="sv-hero__media">
+        <span class="sv-hero__accent" aria-hidden="true"></span>
+        <!-- Midlertidig plassholder — bytt ut med et ekte bilde. -->
+        <div class="sv-hero__placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          <span>{t('sv.heroImageAlt')}</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="sv-hero__disciplines">{t('sv.disciplines')}</p>
+  </section>
+
+  <!-- 2. Hva trenger dere hjelp med -->
+  <section class="sv-needs" data-reveal>
+    <div class="sv-wrap">
+      <header class="sv-head">
+        <h2 class="sv-head__title">{t('sv.needs.title')}</h2>
+        <p class="sv-head__body">{t('sv.needs.body')}</p>
+      </header>
+
+      <ul class="needs">
+        {
+          needs.map((need) => (
+            <li class:list={['need', need.accent && 'need--accent']}>
+              <span class="need__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={need.icon} />
+              </span>
+
+              <div class="need__body">
+                <h3 class="need__title">{t(need.titleKey)}</h3>
+                <p class="need__text">{t(need.bodyKey)}</p>
+
+                <p class="need__label">{t('sv.needs.deliveries')}</p>
+                <ul class="need__items">
+                  {need.items.map((item) => (
+                    <li>{t(item)}</li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3. Dette kan vi levere -->
+  <section class="sv-deliver" data-reveal>
+    <div class="sv-wrap">
+      <header class="sv-head sv-head--center">
+        <h2 class="sv-head__title">{t('sv.deliver.title')}</h2>
+        <p class="sv-head__body">{t('sv.deliver.body')}</p>
+      </header>
+
+      <ul class="deliver">
+        {
+          deliverables.map((item, index) => (
+            <li class="deliver__item">
+              <span class="deliver__num" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <h3>{t(item.titleKey)}</h3>
+              <p>{t(item.bodyKey)}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. Eksempler -->
+  <section class="sv-examples" data-reveal>
+    <div class="sv-wrap">
+      <header class="sv-head">
+        <h2 class="sv-head__title">{t('sv.examples.title')}</h2>
+        <p class="sv-head__body">{t('sv.examples.body')}</p>
+      </header>
+
+      <ul class="examples">
+        {
+          examples.map((example) => (
+            <li class="example">
+              <blockquote class="example__quote">
+                <p>{t(example.quoteKey)}</p>
+              </blockquote>
+
+              <div class="example__answer">
+                <span class="example__label">{t('sv.examples.answer')}</span>
+                <p>{t(example.answerKey)}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5. Ny teknologi er ikke alltid svaret -->
+  <section class="sv-approach" data-reveal>
+    <div class="sv-wrap">
+      <div class="sv-approach__grid">
+        <div class="sv-approach__copy">
+          <h2 class="sv-head__title">{t('sv.approach.title')}</h2>
+          <p class="sv-approach__text">{t('sv.approach.body1')}</p>
+          <p class="sv-approach__text">{t('sv.approach.body2')}</p>
+          <p class="sv-approach__lead">{t('sv.approach.body3')}</p>
+        </div>
+
+        <ol class="directions">
+          {
+            directions.map((direction, index) => (
+              <li class="direction">
+                <span class="direction__step" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <div>
+                  <h3>{t(direction.titleKey)}</h3>
+                  <p>{t(direction.bodyKey)}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Slik kan vi samarbeide -->
+  <section class="sv-engage" data-reveal>
+    <div class="sv-wrap">
+      <header class="sv-head sv-head--center">
+        <h2 class="sv-head__title">{t('sv.engage.title')}</h2>
+        <p class="sv-head__body">{t('sv.engage.body')}</p>
+      </header>
+
+      <ul class="engage">
+        {
+          engagements.map((item) => (
+            <li class="engage__item">
+              <h3>{t(item.titleKey)}</h3>
+              <p>{t(item.bodyKey)}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 7. Teknologi -->
+  <section class="sv-tech" data-reveal>
+    <div class="sv-wrap">
+      <header class="sv-head sv-head--center">
+        <h2 class="sv-head__title">{t('sv.tech.title')}</h2>
+        <p class="sv-head__body">{t('sv.tech.body')}</p>
+      </header>
+
+      <ul class="tech">
+        {
+          technologies.map((tech) => (
+            <li class="tech__item">{tech}</li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8. Når passer Samsari -->
+  <section class="sv-fit" data-reveal>
+    <div class="sv-wrap">
+      <div class="sv-fit__grid">
+        <h2 class="sv-head__title">{t('sv.fit.title')}</h2>
+
+        <ul class="fit">
+          {
+            fits.map((key) => (
+              <li class="fit__item">
+                <span class="fit__check" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 8.5 6.5 12 13 4.5" />
+                  </svg>
+                </span>
+                {t(key)}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. FAQ -->
+  <section class="sv-faq" data-reveal>
+    <div class="sv-wrap sv-wrap--narrow">
+      <header class="sv-head">
+        <h2 class="sv-head__title">{t('sv.faq.title')}</h2>
+      </header>
+
+      <div class="faq">
+        {
+          faqs.map((faq) => (
+            <details class="faq__item">
+              <summary class="faq__q">
+                <span>{t(faq.questionKey)}</span>
+                <svg class="faq__chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M4 6l4 4 4-4" />
+                </svg>
+              </summary>
+              <p class="faq__a">{t(faq.answerKey)}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Avsluttende CTA -->
+  <section class="sv-final" data-reveal>
+    <div class="sv-wrap">
+      <div class="sv-final__panel">
+        <h2 class="sv-final__title">{t('sv.final.title')}</h2>
+        <p class="sv-final__body">{t('sv.final.body')}</p>
+        <div class="sv-final__action">
+          <Button href={BOOKING_URL} external>{t('sv.final.cta')}</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<script>
+  // Samme inntoning-på-scroll som forsiden. Én observer for alle seksjonene i
+  // stedet for én per komponent — siden er lang, og hver seksjon skal tone inn
+  // først når den faktisk kommer i sikte.
+  const sections = document.querySelectorAll<HTMLElement>('[data-reveal]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+    // Uten bevegelse, eller uten støtte: alt står ferdig synlig med én gang.
+    for (const section of sections) section.classList.add('is-visible');
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      // Lav terskel: seksjonene her er høye, og 15 % ville krevd at man
+      // scrollet langt inn i dem før de tonet fram.
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+    );
+
+    for (const section of sections) observer.observe(section);
+  }
+</script>
+
+<style>
+  /* --- Felles --- */
+
+  .sv-wrap {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .sv-wrap {
+      padding: 0 2rem;
+    }
+  }
+
+  .sv-wrap--narrow {
+    max-width: 48rem;
+  }
+
+  /* Rikelig luft mellom seksjonene — siden er lang, og pusterommet er det som
+     gjør den lesbar. */
+  .sv > section {
+    padding: 5rem 0;
+  }
+
+  @media (min-width: 48rem) {
+    .sv > section {
+      padding: 7rem 0;
+    }
+  }
+
+  /* --- Inntoning på scroll --- */
+
+  /* Seksjonene starter forskjøvet og tones inn når de kommer i sikte. Uten
+     JavaScript, eller med prefers-reduced-motion, står de synlige med én gang
+     — scriptet setter .is-visible i begge tilfeller. */
+  [data-reveal] .sv-head,
+  [data-reveal] .needs > *,
+  [data-reveal] .deliver > *,
+  [data-reveal] .examples > *,
+  [data-reveal] .sv-approach__copy,
+  [data-reveal] .directions > *,
+  [data-reveal] .engage > *,
+  [data-reveal] .tech > *,
+  [data-reveal] .sv-fit__grid > *,
+  [data-reveal] .faq__item,
+  [data-reveal] .sv-final__panel {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 620ms ease,
+      transform 620ms ease;
+  }
+
+  [data-reveal].is-visible .sv-head,
+  [data-reveal].is-visible .needs > *,
+  [data-reveal].is-visible .deliver > *,
+  [data-reveal].is-visible .examples > *,
+  [data-reveal].is-visible .sv-approach__copy,
+  [data-reveal].is-visible .directions > *,
+  [data-reveal].is-visible .engage > *,
+  [data-reveal].is-visible .tech > *,
+  [data-reveal].is-visible .sv-fit__grid > *,
+  [data-reveal].is-visible .faq__item,
+  [data-reveal].is-visible .sv-final__panel {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Elementene i en liste vandrer inn etter hverandre i stedet for å dukke opp
+     som én flate. nth-child i stedet for en inline --i, siden antallet er kjent
+     og markupen holdes ren. */
+  [data-reveal].is-visible .needs > *:nth-child(1),
+  [data-reveal].is-visible .deliver > *:nth-child(1),
+  [data-reveal].is-visible .examples > *:nth-child(1),
+  [data-reveal].is-visible .directions > *:nth-child(1),
+  [data-reveal].is-visible .engage > *:nth-child(1),
+  [data-reveal].is-visible .faq__item:nth-child(1) {
+    transition-delay: 90ms;
+  }
+
+  [data-reveal].is-visible .needs > *:nth-child(2),
+  [data-reveal].is-visible .deliver > *:nth-child(2),
+  [data-reveal].is-visible .examples > *:nth-child(2),
+  [data-reveal].is-visible .directions > *:nth-child(2),
+  [data-reveal].is-visible .engage > *:nth-child(2),
+  [data-reveal].is-visible .faq__item:nth-child(2) {
+    transition-delay: 160ms;
+  }
+
+  [data-reveal].is-visible .needs > *:nth-child(3),
+  [data-reveal].is-visible .deliver > *:nth-child(3),
+  [data-reveal].is-visible .examples > *:nth-child(3),
+  [data-reveal].is-visible .directions > *:nth-child(3),
+  [data-reveal].is-visible .engage > *:nth-child(3),
+  [data-reveal].is-visible .faq__item:nth-child(3) {
+    transition-delay: 230ms;
+  }
+
+  [data-reveal].is-visible .needs > *:nth-child(n + 4),
+  [data-reveal].is-visible .deliver > *:nth-child(n + 4),
+  [data-reveal].is-visible .examples > *:nth-child(n + 4),
+  [data-reveal].is-visible .engage > *:nth-child(n + 4),
+  [data-reveal].is-visible .faq__item:nth-child(n + 4) {
+    transition-delay: 300ms;
+  }
+
+  /* Teknologi-chipsene er mange og små — en kortere kaskade kler dem bedre. */
+  [data-reveal].is-visible .tech > *:nth-child(n + 2) {
+    transition-delay: 60ms;
+  }
+
+  [data-reveal].is-visible .tech > *:nth-child(n + 5) {
+    transition-delay: 120ms;
+  }
+
+  [data-reveal].is-visible .tech > *:nth-child(n + 8) {
+    transition-delay: 180ms;
+  }
+
+  .sv-head {
+    max-width: 46rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .sv-head--center {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .sv-head__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .sv-head__body {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .sv-head--center .sv-head__body {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 52ch;
+  }
+
+  /* --- 1. Hero --- */
+
+  /* Fyller skjermen, som heroen på forsiden. Innholdet sentreres vertikalt, og
+     fagområdelinjen forankres i bunnen. min-height (ikke height) lar innholdet
+     vokse forbi skjermen på lave vinduer i stedet for å bli avkuttet. */
+  .sv-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--color-surface);
+    overflow: hidden;
+    padding: calc(var(--header-height) + 2rem) 0 2rem !important;
+  }
+
+  @media (min-width: 48rem) {
+    .sv-hero {
+      padding: calc(var(--header-height) + 2.5rem) 0 2.5rem !important;
+    }
+  }
+
+  .sv-hero::before {
+    content: '';
+    position: absolute;
+    top: -16rem;
+    right: -12rem;
+    width: 46rem;
+    height: 46rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 68%);
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  .sv-hero__inner {
+    position: relative;
+    /* Tar den ledige høyden, slik at blokken står optisk midt i skjermen med
+       fagområdelinjen forankret under. */
+    flex: 1;
+    display: grid;
+    gap: 3rem;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .sv-hero__inner {
+      padding: 0 2rem;
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .sv-hero__inner {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.85fr);
+      gap: clamp(3rem, 7vw, 5rem);
+    }
+  }
+
+  .sv-hero__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(2.125rem, 4.6vw, 3.375rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+
+  .sv-hero__intro {
+    max-width: 46ch;
+    margin: 1.75rem 0 2.5rem;
+    color: var(--color-ink-soft);
+    font-size: clamp(1rem, 1.5vw, 1.1875rem);
+    line-height: 1.75;
+  }
+
+  .sv-hero__media {
+    position: relative;
+  }
+
+  .sv-hero__accent {
+    position: absolute;
+    z-index: 0;
+    right: -1.25rem;
+    top: -1.25rem;
+    width: 55%;
+    height: 52%;
+    border-radius: 5rem 0.5rem 5rem 0.5rem;
+    background: var(--color-brand);
+    opacity: 0.1;
+  }
+
+  .sv-hero__placeholder {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    aspect-ratio: 4 / 3.2;
+    /* Taket hindrer at flaten blir uforholdsmessig høy nå som heroen fyller
+       skjermen — på høye vinduer ville forholdet alene gitt en veldig stor boks. */
+    max-height: 60vh;
+    border-radius: 0.5rem 4rem 0.5rem 4rem;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--color-canvas),
+      var(--color-canvas) 10px,
+      var(--color-surface) 10px,
+      var(--color-surface) 20px
+    );
+    border: 1px solid var(--color-line);
+    color: var(--color-muted);
+  }
+
+  .sv-hero__placeholder svg {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .sv-hero__placeholder span {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* Fagområdene under heroen. */
+  .sv-hero__disciplines {
+    position: relative;
+    flex: none;
+    width: 100%;
+    max-width: 72rem;
+    margin: 2.5rem auto 0;
+    padding: 0 1.25rem;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+
+  @media (min-width: 40rem) {
+    .sv-hero__disciplines {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* --- 2. Behov --- */
+
+  .sv-needs {
+    background: var(--color-canvas);
+  }
+
+  .needs {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 56rem) {
+    .needs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.75rem;
+    }
+  }
+
+  .need {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    transition:
+      border-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .need:hover {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 20px 44px rgb(30 48 58 / 0.1);
+  }
+
+  @media (min-width: 40rem) {
+    .need {
+      padding: 2.5rem;
+    }
+  }
+
+  .need__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+  }
+
+  /* AI-kortet får aksentfargen, som ellers på siden. */
+  .need--accent .need__icon {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-deep);
+  }
+
+  .need__icon svg {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .need__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  .need__text {
+    margin: 0.75rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .need__label {
+    margin: 1.75rem 0 0.875rem;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .need__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .need__items li {
+    padding: 0.3125rem 0.75rem;
+    border-radius: 999px;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink-soft);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  /* --- 3. Leveranser --- */
+
+  .sv-deliver {
+    background: var(--color-surface);
+  }
+
+  .deliver {
+    display: grid;
+    gap: 2.5rem 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .deliver {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .deliver {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .deliver__item {
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--color-brand-soft);
+  }
+
+  .deliver__num {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+
+  .deliver__item h3 {
+    margin: 0 0 0.5rem;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .deliver__item p {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  /* --- 4. Eksempler --- */
+
+  .sv-examples {
+    background: var(--color-canvas);
+  }
+
+  .examples {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .example {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+  }
+
+  @media (min-width: 48rem) {
+    .example {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 2.5rem;
+      align-items: center;
+      padding: 2rem 2.5rem;
+    }
+  }
+
+  .example__quote {
+    margin: 0;
+  }
+
+  .example__quote p {
+    position: relative;
+    margin: 0;
+    padding-left: 1.25rem;
+    border-left: 3px solid var(--color-brand-soft);
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.55;
+  }
+
+  .example__label {
+    display: block;
+    margin-bottom: 0.375rem;
+    color: var(--color-brand);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .example__answer p {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  /* --- 5. Tilnærming --- */
+
+  .sv-approach {
+    background: var(--color-surface);
+  }
+
+  .sv-approach__grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 56rem) {
+    .sv-approach__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+      gap: clamp(3rem, 7vw, 5rem);
+      align-items: start;
+    }
+  }
+
+  .sv-approach__text {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .sv-approach__lead {
+    margin: 1.75rem 0 0;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .directions {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .direction {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 1.5rem 0.5rem 1.5rem;
+  }
+
+  .direction__step {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .direction h3 {
+    margin: 0 0 0.25rem;
+    color: var(--color-ink);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .direction p {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  /* --- 6. Samarbeidsformer --- */
+
+  .sv-engage {
+    background: var(--color-canvas);
+  }
+
+  .engage {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .engage {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .engage {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .engage__item {
+    padding: 1.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+  }
+
+  .engage__item h3 {
+    margin: 0 0 0.5rem;
+    color: var(--color-ink);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .engage__item p {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  /* --- 7. Teknologi --- */
+
+  .sv-tech {
+    background: var(--color-surface);
+  }
+
+  .tech {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tech__item {
+    padding: 0.5rem 1.125rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition:
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .tech__item:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  /* --- 8. Når passer vi --- */
+
+  .sv-fit {
+    background: var(--color-canvas);
+  }
+
+  .sv-fit__grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 56rem) {
+    .sv-fit__grid {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+      gap: clamp(3rem, 7vw, 5rem);
+      align-items: start;
+    }
+  }
+
+  .fit {
+    display: grid;
+    gap: 0.875rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fit__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1.125rem 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 1.5rem 0.5rem 1.5rem;
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .fit__check {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+  }
+
+  .fit__check svg {
+    width: 0.8125rem;
+    height: 0.8125rem;
+  }
+
+  /* --- 9. FAQ --- */
+
+  .sv-faq {
+    background: var(--color-surface);
+  }
+
+  .faq {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .faq__item {
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 1.5rem 0.5rem 1.5rem;
+    background: var(--color-surface);
+    transition: border-color 200ms ease;
+  }
+
+  .faq__item[open] {
+    border-color: var(--color-brand-soft);
+    background: var(--color-canvas);
+  }
+
+  .faq__q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    color: var(--color-ink);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+
+  .faq__chevron {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-brand);
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .faq__item[open] .faq__chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq__a {
+    margin: 0;
+    padding: 0 1.5rem 1.5rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.75;
+  }
+
+  /* --- 10. Avsluttende CTA --- */
+
+  .sv-final {
+    background: var(--color-surface);
+    /* CTA-panelet bærer sin egen luft; seksjonen trenger bare bunnmargin. */
+    padding-top: 0 !important;
+  }
+
+  .sv-final__panel {
+    position: relative;
+    padding: 3.5rem 1.75rem;
+    border-radius: 1rem 5rem 1rem 5rem;
+    background: linear-gradient(135deg, var(--color-brand) 0%, #4a3fd4 62%, var(--color-accent) 100%);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  @media (min-width: 48rem) {
+    .sv-final__panel {
+      padding: 4.5rem 3.5rem;
+    }
+  }
+
+  .sv-final__title {
+    margin: 0;
+    max-width: 22ch;
+    margin-inline: auto;
+    color: #fff;
+    font-size: clamp(1.625rem, 3.4vw, 2.375rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .sv-final__body {
+    max-width: 52ch;
+    margin: 1.25rem auto 0;
+    color: rgb(255 255 255 / 0.85);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .sv-final__action {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.25rem;
+  }
+
+  /* Knappen snus mot den fargede flaten, som i forsidens CTA. */
+  .sv-final__action :global(.btn--primary) {
+    background: #fff;
+    color: var(--color-brand);
+    box-shadow: 0 2px 6px rgb(9 46 74 / 0.18), 0 14px 30px rgb(9 46 74 / 0.22);
+  }
+
+  .sv-final__action :global(.btn--primary:hover) {
+    background: var(--color-brand-soft);
+    color: var(--color-brand-dark);
+  }
+
+  .sv-final__action :global(.btn:focus-visible) {
+    outline-color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq__chevron {
+      transition: none;
+    }
+  }
+</style>

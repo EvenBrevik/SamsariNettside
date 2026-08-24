@@ -2,6 +2,8 @@
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import CookieConsent from '../components/CookieConsent.astro';
+import Analytics from '../components/Analytics.astro';
 import { PUBLIC_CF_ANALYTICS_TOKEN } from 'astro:env/client';
 import { organizationSchema } from '../data/schema';
 import { LOCALE_META, localeFromPath } from '../i18n/config';
@@ -30,7 +32,7 @@ const t = useTranslations(locale);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/png" sizes="32x32" href="/Favicon_blue_32x32.png" />
     <link rel="apple-touch-icon" href="/Favicon_blue_32x32.png" />
-    <meta name="theme-color" content="#1183ce" />
+    <meta name="theme-color" content="#1184cd" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <Seo
       title={title}
@@ -54,8 +56,19 @@ const t = useTranslations(locale);
 
     <Footer />
 
+    {/* Analytics må stå FØR CookieConsent: den registrerer lytteren på
+        «samsari:consent», og banneret sender hendelsen med én gang det finner
+        et lagret valg. Bytter man om, går den første hendelsen tapt og GA
+        lastes ikke før neste valg. */}
+    <Analytics />
+    <CookieConsent />
+
     {
-      /* Cookieløs besøksstatistikk. Uten token lastes ingen sporing i det hele tatt. */
+      /* Cookieløs besøksstatistikk. Uten token lastes ingen sporing i det hele tatt.
+         Cloudflare Insights setter ingen informasjonskapsler og krever derfor
+         ikke samtykke.
+
+         Google Analytics ligger i Analytics.astro over, bak samtykke. */
       PUBLIC_CF_ANALYTICS_TOKEN && (
         <script
           is:inline

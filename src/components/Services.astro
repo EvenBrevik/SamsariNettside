@@ -1,17 +1,30 @@
 ---
+import { Image } from 'astro:assets';
 import Button from './Button.astro';
+import servicesImage from '../assets/services-spisskompetanse.jpg';
 import { localeFromPath, localizePath } from '../i18n/config';
 import { useTranslations } from '../i18n/utils';
+import type { UIKeys } from '../i18n/ui/nb';
 
 const locale = localeFromPath(Astro.url.pathname);
 const t = useTranslations(locale);
 
 // SVG-innholdet er rå markup (ikke JSX) fordi frontmatter-blokken ikke støtter
 // JSX-fragmenter — det gjør derimot malen under, via set:html.
-const pillars = [
+interface Pillar {
+  titleKey: UIKeys;
+  bodyKey: UIKeys;
+  icon: string;
+  /** Markerer kortet med aksentfargen. Kun AI-kortet bruker den. */
+  accent?: boolean;
+}
+
+const pillars: readonly Pillar[] = [
   {
     titleKey: 'services.ai.title',
     bodyKey: 'services.ai.body',
+    // Lilla markerer AI gjennom hele siden — se .services__card--accent under.
+    accent: true,
     icon: `
       <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
       <rect x="9" y="9" width="6" height="6" />
@@ -46,7 +59,7 @@ const pillars = [
       <rect x="3" y="14" width="7" height="7" />
     `,
   },
-] as const;
+];
 ---
 
 <section class="services" data-services>
@@ -63,22 +76,28 @@ const pillars = [
       <div class="services__media">
         <span class="services__accent" aria-hidden="true"></span>
 
-        <!-- Midlertidig plassholder — bytt ut med et ekte bilde når vi har ett. -->
-        <div class="services__placeholder">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <polyline points="21 15 16 10 5 21" />
-          </svg>
-          <span>{t('services.imagePlaceholder')}</span>
-        </div>
+        <!-- Originalen er 4417 px bred og 3 MB. Via <Image> konverteres den til
+             WebP i flere bredder, slik at nettleseren henter den minste som
+             holder for spalten. -->
+        <Image
+          class="services__photo"
+          src={servicesImage}
+          alt={t('services.imageAlt')}
+          width={840}
+          widths={[420, 620, 840, 1120]}
+          sizes="(min-width: 56rem) 42vw, (min-width: 40rem) 80vw, 92vw"
+          format="webp"
+          quality={80}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     </div>
 
     <ul class="services__grid">
       {
         pillars.map((pillar, index) => (
-          <li class="services__card" style={`--i: ${index}`}>
+          <li class:list={['services__card', pillar.accent && 'services__card--accent']} style={`--i: ${index}`}>
             <span class="services__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={pillar.icon} />
             </span>
@@ -118,8 +137,10 @@ const pillars = [
 </script>
 
 <style>
+  /* Grå duk mellom de hvite nabo-seksjonene (problemer over, referanser under),
+     slik at tjenestene løfter seg ut som sitt eget felt. */
   .services {
-    background: var(--color-surface);
+    background: var(--color-canvas);
   }
 
   .services__inner {
@@ -229,37 +250,21 @@ const pillars = [
     opacity: 0.1;
   }
 
-  .services__placeholder {
+  /* :global fordi <Image> er en egen komponent — scoped CSS ville lagt på et
+     data-attributt som bildet ikke har, og regelen ville aldri truffet. */
+  .services__media :global(.services__photo) {
     position: relative;
     z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
+    display: block;
+    width: 100%;
     aspect-ratio: 4 / 3.4;
+    object-fit: cover;
+    /* Ansiktet og skissene sitter i øvre del av bildet, så utsnittet forankres
+       litt over midten. */
+    object-position: 50% 32%;
+    /* Samme asymmetriske hjørne som plassholderen hadde. */
     border-radius: 0.5rem 4rem 0.5rem 4rem;
-    /* Diagonalt stripemønster gjør det umulig å forveksle flaten med et ferdig
-       bilde — tydelig plassholder til et ekte foto er på plass. */
-    background: repeating-linear-gradient(
-      -45deg,
-      var(--color-canvas),
-      var(--color-canvas) 10px,
-      var(--color-surface) 10px,
-      var(--color-surface) 20px
-    );
-    border: 1px solid var(--color-line);
-    color: var(--color-muted);
-  }
-
-  .services__placeholder svg {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-
-  .services__placeholder span {
-    font-size: 0.875rem;
-    font-weight: 500;
+    background: var(--color-canvas);
   }
 
   /* --- Kortgrid --- */
@@ -287,6 +292,9 @@ const pillars = [
 
   .services__card {
     padding: 1.75rem;
+    /* Hvit flate mot den grå duken — uten den ville kortene blitt grå på grå
+       og bare rammen skilt dem fra bakgrunnen. */
+    background: var(--color-surface);
     border: 1px solid var(--color-line);
     border-radius: 0.5rem 2rem 0.5rem 2rem;
     opacity: 0;
@@ -319,6 +327,17 @@ const pillars = [
     border-radius: 0.75rem;
     background: var(--color-brand-soft);
     color: var(--color-brand);
+  }
+
+  /* AI-kortet får aksentfargen. Kun ett av fire kort — nok til å peke ut hva
+     som er kjernen i tilbudet, uten at fargen blir en andre merkefarge. */
+  .services__card--accent .services__icon {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-deep);
+  }
+
+  .services__card--accent:hover {
+    box-shadow: 0 1px 2px rgb(91 43 217 / 0.06), 0 16px 32px rgb(91 43 217 / 0.12);
   }
 
   .services__icon svg {

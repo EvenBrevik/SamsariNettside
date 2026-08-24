@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProductsContent from '../../components/ProductsContent.astro';
+import { breadcrumbSchema, servicesSchema } from '../../data/schema';
+import { site } from '../../data/site';
+import { LOCALES, DEFAULT_LOCALE, isLocale, localizePath } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import type { UIKeys } from '../../i18n/ui/nb';
+
+export function getStaticPaths() {
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale: param } = Astro.params;
+const locale = param && isLocale(param) ? param : DEFAULT_LOCALE;
+const t = useTranslations(locale);
+
+const pageUrl = new URL(localizePath('/produkter', locale), site.url).href;
+
+const productsLd = servicesSchema({
+  name: t('nav.products'),
+  description: t('pr.seoDescription'),
+  url: pageUrl,
+  locale,
+  offers: (['portal', 'forge', 'savas'] as const).map((key) => ({
+    name: t(`pr.${key}.name` as UIKeys),
+    description: t(`pr.${key}.body` as UIKeys),
+  })),
+});
+
+const breadcrumbLd = breadcrumbSchema([{ name: t('nav.products'), url: pageUrl }], t('nav.home'));
+---
+
+<Base title={t('pr.seoTitle')} description={t('pr.seoDescription')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(productsLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <ProductsContent />
+</Base>
