@@ -27,3 +27,18 @@
 
 # Dotenv and similar local-only files
 *.local
+
+node_modules/
+dist/
+.vite/
+.astro/
+.claude/
+*.log
+*.tsbuildinfo
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
