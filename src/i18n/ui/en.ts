@@ -176,6 +176,8 @@ export const en: Record<UIKeys, string> = {
   'privacy.title': 'Privacy policy',
   'privacy.intro':
     'This policy explains what personal data Samsari collects when you use our website or get in touch, what we use it for, and what rights you have.',
+  'privacy.seoDescription':
+    'How Samsari handles personal data: what we collect, what we use it for, which cookies we use and the rights you have over your own information.',
   'privacy.updated': 'Last updated',
 
   'privacy.controller.title': 'Data controller',
@@ -299,7 +301,10 @@ export const en: Record<UIKeys, string> = {
     'Samsari helps with everything from smaller automations and AI solutions to complete internal systems and customer portals. We can improve what you already have, or build something new when the need calls for it.',
   'sv.cta': 'Tell us what you want to improve',
   'sv.disciplines': 'Advisory · Development · Integrations · Automation · Maintenance',
-  'sv.heroImageAlt': 'Photo from our work coming soon',
+  'sv.heroImageAlt': 'Abstract image of a person in motion',
+
+  'sv.approachImageAlt': 'An office where outdated technology is still in use',
+  'sv.fitImageAlt': 'An adult king penguin standing among a crowd of chicks',
 
   'sv.needs.title': 'What do you need help with?',
   'sv.needs.body':
@@ -450,11 +455,9 @@ export const en: Record<UIKeys, string> = {
   'pr.title': 'Software built for specific needs',
   'pr.intro':
     'We build our own products for work processes and industries where we see that existing solutions do not cover the need well enough.',
-  'pr.imageAlt': 'Screenshot coming soon',
 
   'pr.suits': 'Suited for',
   'pr.features': 'Key features',
-  'pr.readMore': 'Read more',
   'pr.status.active': 'Active product',
   'pr.status.building': 'In development',
 
@@ -509,6 +512,167 @@ export const en: Record<UIKeys, string> = {
     'We are happy to show how the solution works and assess whether it fits your needs.',
   'pr.final.cta': 'Book a demo',
 
+  // ---- About ----
+  'ab.seoTitle': 'About us: the team behind Samsari',
+  'ab.seoDescription':
+    'Samsari is a Norwegian technology company in Kristiansund and Stavanger. Meet the people building software, automation and AI solutions.',
+  'ab.title': 'We build Samsari together',
+  'ab.intro':
+    'Samsari is a Norwegian technology company with roots in Kristiansund and a presence in Stavanger. We build software, automation and AI solutions closely with the people who will actually use them.',
+  'ab.facts': 'Kristiansund · Stavanger · Founded 2025',
+  'ab.heroImageAlt': 'Many people raising a building together, with the Samsari emblem on the gable',
+  'ab.heroDisclaimer': 'AI-generated illustration',
+
+  'ab.story.title': 'It did not start with a business plan',
+  'ab.story.p1':
+    'Samsari was started by Oliver Lysø and Even Brevik after several years of IT education, apprenticeship and hands-on development work. The trade certificate and the experience from working life gave us a foundation we still build on today: understand the problem first, then build the technology.',
+  'ab.story.p2':
+    'What began as building solutions and automation has since grown into client projects, our own products and a team with ambitions to build technology that genuinely creates value.',
+  'ab.story.img1': 'Oliver and Even during their apprenticeship',
+  'ab.story.img2': 'Oliver and Even as mentors at GreenTechSee 2025',
+  'ab.story.img3': 'Oliver and Even at work on Samsari',
+  'ab.story.cap1': 'Apprenticeship',
+  'ab.story.cap2': 'Mentors at GreenTechSee 2025',
+  'ab.story.cap3': 'Still building',
+  'ab.story.link1': 'Read the article at Sparebank 1 Nordmøre',
+
+  'ab.places.title': 'From Nordmøre to Rogaland',
+  'ab.places.distance': '640 km',
+  'ab.places.kristiansund.name': 'Kristiansund',
+  'ab.places.kristiansund.body':
+    'Much of our story started here. School, apprenticeship and experience from businesses in Nordmøre shaped how Samsari came to be.',
+  'ab.places.kristiansund.imageAlt': 'Photo from Kristiansund coming soon',
+  'ab.places.stavanger.name': 'Stavanger',
+  'ab.places.stavanger.body':
+    'In the Stavanger region we work closely with a varied business community across industry, technology, energy and finance.',
+  'ab.places.stavanger.imageAlt': 'Photo from the Stavanger region coming soon',
+
+  'ab.values.title': 'How we want to work',
+  'ab.values.v1.title': 'We get the job done',
+  'ab.values.v1.body':
+    'A good idea is worth little if it never reaches use. We like short paths from problem to solution and prioritise progress over unnecessary complexity.',
+  'ab.values.v1.imageAlt': 'A solution taking shape on screen',
+  'ab.values.v2.title': 'We build for the people who will use it',
+  'ab.values.v2.body':
+    'A system can be technically impressive and still fail. That is why we put great weight on simplicity, user experience and adoption.',
+  'ab.values.v2.imageAlt': 'Development in progress',
+  'ab.values.v3.title': 'We do not build something just because we can',
+  'ab.values.v3.body':
+    'Sometimes Power Automate is enough. Other times a whole new system is needed. We choose the solution that fits the problem, not the technology we happen to want to use.',
+  'ab.values.v3.imageAlt': 'Sketching solution directions on a whiteboard',
+  'ab.values.v4.title': 'We keep learning',
+  'ab.values.v4.body':
+    'AI and software move fast. We test new technologies, build our own products and bring what we learn back into client work.',
+  'ab.values.v4.imageAlt': 'Working on product development',
+
+  'ab.team.title': 'The people behind Samsari',
+  'ab.team.linkedin': 'View LinkedIn',
+  'ab.team.oliver.name': 'Oliver Lysø',
+  'ab.team.oliver.role': 'Managing Director & Co-founder',
+  'ab.team.oliver.body':
+    'Works on solution design, development and business development, and often follows projects all the way from the first problem statement to the finished solution.',
+  'ab.team.oliver.skills': 'AI · Power Platform · Systems development · Business',
+  'ab.team.oliver.imageAlt': 'Portrait of Oliver Lysø coming soon',
+  'ab.team.even.name': 'Even Brevik',
+  'ab.team.even.role': 'Co-founder & developer',
+  'ab.team.even.body':
+    'Works on development, technical architecture and product development across Samsari client projects and our own solutions.',
+  'ab.team.even.skills': 'Development · Architecture · Integrations · Products',
+  'ab.team.even.imageAlt': 'Portrait of Even Brevik coming soon',
+  'ab.team.adrian.name': 'Adrian Rurkowski',
+  'ab.team.adrian.role': 'Product Owner, Forge Engine & Business Developer',
+  'ab.team.adrian.body':
+    'Adrian works on Forge Engine, client relationships and business development, with a particular focus on manufacturing and the laser cutting industry.',
+  'ab.team.adrian.skills': 'Forge Engine · Sales · Client relations · Business development',
+  'ab.team.adrian.imageAlt': 'Portrait of Adrian Rurkowski coming soon',
+
+  'ab.moment.title': 'You work directly with us',
+  'ab.moment.body':
+    'At Samsari the distance is short between the person who understands the problem and the person who builds the solution. You meet the developers and product people directly, without extra layers of project management in between.',
+  'ab.moment.imageAlt': 'A handshake after a meeting',
+
+  'ab.numbers.founded': 'Founded',
+  'ab.numbers.people': 'in the team',
+  'ab.numbers.places': 'locations',
+  'ab.numbers.products': 'own products',
+
+  'ab.final.title': 'We are still a small team. We like it that way.',
+  'ab.final.body':
+    'It lets us move quickly, know the projects well and work closely with the people we build for.',
+  'ab.final.cta': 'Book a chat',
+  'ab.final.imageAlt': 'The small team at Samsari',
+
+  // ---- Contact ----
+  'ct.seoTitle': 'Contact us: book a meeting or reach out directly',
+  'ct.seoDescription':
+    'Book a no-obligation chat, send an email or call us directly. You do not need to know which solution you need before getting in touch.',
+  'ct.eyebrow': 'Contact us',
+  'ct.title': 'Let us have a chat',
+  'ct.intro':
+    'Do you have a project, an idea or something in the working day that should have worked better? Book a meeting or reach out to us directly. You do not need to know exactly which solution you need before getting in touch.',
+  'ct.cta': 'Book a meeting',
+  'ct.ctaNote': 'No obligation · Microsoft Teams · Pick your own time',
+  'ct.heroImageAlt': 'Central Stavanger seen from Breiavatnet',
+
+  'ct.methods.title': 'Choose what suits you',
+  'ct.methods.book.title': 'Book a meeting',
+  'ct.methods.book.lead': 'Find a time that works',
+  'ct.methods.book.body':
+    'Book a no-obligation chat directly in our calendar. Feel free to say briefly what you would like to discuss, so we can prepare.',
+  'ct.methods.book.cta': 'Book a meeting',
+  'ct.methods.email.title': 'Send us an email',
+  'ct.methods.email.body':
+    'Not sure who to contact? Send us an email at our general address and we will make sure it reaches the right person.',
+  'ct.methods.email.cta': 'Send email',
+  'ct.methods.phone.title': 'Call us',
+  'ct.methods.phone.body': 'Would you rather have a quick chat? Call us directly.',
+  'ct.methods.phone.cta': 'Call us',
+
+  'ct.team.title': 'Contact us directly',
+  'ct.team.body':
+    'You do not need to go through a switchboard or a sales department. Reach out directly to whichever of us best fits what you want to talk about.',
+  'ct.team.emailCta': 'Send email',
+  'ct.team.phoneCta': 'Call',
+  'ct.team.even.role': 'CTO & Co-founder',
+  'ct.team.oliver.body':
+    'Get in touch with Oliver about new projects, partnerships, AI, automation, or if you are unsure where to start.',
+  'ct.team.even.body':
+    'Even can be contacted about technical questions, systems development, integrations and existing client projects.',
+  'ct.team.adrian.body':
+    'Contact Adrian about Forge Engine, demos, manufacturing and the laser cutting industry, partnerships or other product questions.',
+
+  'ct.unsure.title': 'Not sure who you need?',
+  'ct.unsure.body':
+    'That is perfectly fine. Send an email to hei@samsari.no and we will take it from there internally.',
+
+  'ct.places.title': 'Where to find us',
+  'ct.places.stavanger.name': 'Stavanger',
+  'ct.places.stavanger.body':
+    'We have a presence in the Stavanger region and are happy to meet clients in Stavanger, Sandnes, Sola, Forus and the surrounding areas.',
+  'ct.places.stavanger.note': 'Would you rather meet at your place? We are happy to visit.',
+  'ct.places.stavanger.imageAlt': 'Photo from the Stavanger region coming soon',
+  'ct.places.kristiansund.name': 'Kristiansund',
+  'ct.places.kristiansund.body':
+    'Samsari has roots in Kristiansund and works with businesses across Nordmøre and the surrounding areas. We do not have a visitor office in Kristiansund, but are happy to come to you for meetings and project work in the region.',
+  'ct.places.kristiansund.postal': 'Postal address',
+  'ct.places.kristiansund.imageAlt': 'Photo from Kristiansund coming soon',
+
+  'ct.final.title': 'Shall we look at it together?',
+  'ct.final.body':
+    'It does not have to be a finished project. If you have a challenge, an idea or a process you are considering improving, we are happy to have a no-obligation chat.',
+  'ct.final.cta': 'Book a meeting',
+  'ct.final.or': 'or',
+  'ct.final.note': 'You meet the people who will actually work on the solution.',
+
+  'cases.seoTitle': 'Case studies: solutions we have delivered',
+  'cases.seoDescription':
+    'See what we built for Maritime & Merchant Bank and Flematec — the challenge they had, what we developed and what it led to in practice.',
+  'blog.seoTitle': 'Insights: guides on AI and Microsoft 365',
+  'blog.seoDescription':
+    'Thoughts, guides and lessons from our work with AI, Microsoft 365 and custom development. Search and filter by the topics relevant to you.',
+  'design.seoTitle': 'Design: logos, colours and guidelines',
+  'design.seoDescription':
+    'Download the Samsari logo in every variant, see the colour palette with hex and RGB values, and find the guidelines for using the brand.',
   'design.title': 'Design',
   'design.intro':
     'Logos, colours and guidelines for how Samsari should look. Download what you need, and use it as intended.',

@@ -1,5 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import Button from './Button.astro';
+import servicesHero from '../assets/services-hero.jpg';
+import servicesRetroTech from '../assets/services-retrotech.jpg';
+import servicesUnik from '../assets/services-unik.jpg';
 import { BOOKING_URL } from '../data/site';
 import { localeFromPath } from '../i18n/config';
 import { useTranslations } from '../i18n/utils';
@@ -154,15 +158,19 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
 
       <div class="sv-hero__media">
         <span class="sv-hero__accent" aria-hidden="true"></span>
-        <!-- Midlertidig plassholder — bytt ut med et ekte bilde. -->
-        <div class="sv-hero__placeholder">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <polyline points="21 15 16 10 5 21" />
-          </svg>
-          <span>{t('sv.heroImageAlt')}</span>
-        </div>
+        <Image
+          class="sv-hero__photo"
+          src={servicesHero}
+          alt={t('sv.heroImageAlt')}
+          width={820}
+          widths={[420, 620, 820, 1100]}
+          sizes="(min-width: 60rem) 44vw, 92vw"
+          format="webp"
+          quality={82}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
       </div>
     </div>
 
@@ -265,6 +273,22 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
           <p class="sv-approach__lead">{t('sv.approach.body3')}</p>
         </div>
 
+        <div class="sv-approach__media">
+          <span class="sv-approach__accent" aria-hidden="true"></span>
+          <Image
+            class="sv-approach__photo"
+            src={servicesRetroTech}
+            alt={t('sv.approachImageAlt')}
+            width={820}
+            widths={[420, 620, 820, 1100]}
+            sizes="(min-width: 56rem) 46vw, 92vw"
+            format="webp"
+            quality={80}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
         <ol class="directions">
           {
             directions.map((direction, index) => (
@@ -327,7 +351,24 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
   <section class="sv-fit" data-reveal>
     <div class="sv-wrap">
       <div class="sv-fit__grid">
-        <h2 class="sv-head__title">{t('sv.fit.title')}</h2>
+        <div class="sv-fit__intro">
+          <h2 class="sv-head__title">{t('sv.fit.title')}</h2>
+
+          <div class="sv-fit__media">
+            <Image
+              class="sv-fit__photo"
+              src={servicesUnik}
+              alt={t('sv.fitImageAlt')}
+              width={760}
+              widths={[400, 560, 760, 1000]}
+              sizes="(min-width: 56rem) 40vw, 92vw"
+              format="webp"
+              quality={80}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
 
         <ul class="fit">
           {
@@ -460,6 +501,7 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
   [data-reveal] .engage > *,
   [data-reveal] .tech > *,
   [data-reveal] .sv-fit__grid > *,
+  [data-reveal] .sv-fit__media,
   [data-reveal] .faq__item,
   [data-reveal] .sv-final__panel {
     opacity: 0;
@@ -478,6 +520,7 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
   [data-reveal].is-visible .engage > *,
   [data-reveal].is-visible .tech > *,
   [data-reveal].is-visible .sv-fit__grid > *,
+  [data-reveal].is-visible .sv-fit__media,
   [data-reveal].is-visible .faq__item,
   [data-reveal].is-visible .sv-final__panel {
     opacity: 1;
@@ -641,6 +684,19 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
     line-height: 1.08;
   }
 
+  .sv-hero__copy > * {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: sv-hero-in 760ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .sv-hero__copy > *:nth-child(2) { animation-delay: 110ms; }
+  .sv-hero__copy > *:nth-child(3) { animation-delay: 220ms; }
+
+  @keyframes sv-hero-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   .sv-hero__intro {
     max-width: 46ch;
     margin: 1.75rem 0 2.5rem;
@@ -651,6 +707,13 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
 
   .sv-hero__media {
     position: relative;
+    opacity: 0;
+    transform: scale(1.03);
+    animation: sv-hero-visual 1100ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes sv-hero-visual {
+    to { opacity: 1; transform: scale(1); }
   }
 
   .sv-hero__accent {
@@ -665,39 +728,22 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
     opacity: 0.1;
   }
 
-  .sv-hero__placeholder {
+  /* :global fordi <Image> er en egen komponent og ikke får scope-attributtet.
+     Originalen er stående, så flaten får et høyere format enn de andre
+     bildene på siden — ellers ville motivet blitt hardt beskåret. */
+  .sv-hero__media :global(.sv-hero__photo) {
+    display: block;
     position: relative;
     z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    aspect-ratio: 4 / 3.2;
-    /* Taket hindrer at flaten blir uforholdsmessig høy nå som heroen fyller
-       skjermen — på høye vinduer ville forholdet alene gitt en veldig stor boks. */
-    max-height: 60vh;
+    width: 100%;
+    aspect-ratio: 4 / 4.2;
+    max-height: 62vh;
+    object-fit: cover;
     border-radius: 0.5rem 4rem 0.5rem 4rem;
-    background: repeating-linear-gradient(
-      -45deg,
-      var(--color-canvas),
-      var(--color-canvas) 10px,
-      var(--color-surface) 10px,
-      var(--color-surface) 20px
-    );
-    border: 1px solid var(--color-line);
-    color: var(--color-muted);
+    background: var(--color-canvas);
   }
 
-  .sv-hero__placeholder svg {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
 
-  .sv-hero__placeholder span {
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
 
   /* Fagområdene under heroen. */
   .sv-hero__disciplines {
@@ -839,7 +885,7 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
 
   .deliver {
     display: grid;
-    gap: 2.5rem 2rem;
+    gap: 1.25rem;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -857,9 +903,24 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
     }
   }
 
+  /* Kortene får en egen flate, uten dekorlinje langs toppen. */
   .deliver__item {
-    padding-top: 1.5rem;
-    border-top: 2px solid var(--color-brand-soft);
+    position: relative;
+    padding: 1.75rem 1.5rem 1.5rem;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 1.5rem 0.5rem 1.5rem;
+    overflow: hidden;
+    transition:
+      border-color 240ms ease,
+      box-shadow 240ms ease,
+      transform 240ms ease;
+  }
+
+  .deliver__item:hover {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 16px 36px rgb(30 48 58 / 0.1);
+    transform: translateY(-3px);
   }
 
   .deliver__num {
@@ -870,6 +931,10 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.04em;
+  }
+
+  .deliver__item:nth-child(even) .deliver__num {
+    color: var(--color-accent-deep);
   }
 
   .deliver__item h3 {
@@ -890,8 +955,49 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
 
   /* --- 4. Eksempler --- */
 
+  /* Mørk flate midt på siden. Bryter den mekaniske hvit/grå-vekslingen, og gir
+     kundesitatene den tyngden de fortjener. */
   .sv-examples {
-    background: var(--color-canvas);
+    position: relative;
+    background: var(--color-ink);
+    overflow: hidden;
+  }
+
+  /* Et lilla og et blått skjær i hjørnene gir dybde uten å legge på elementer. */
+  .sv-examples::before,
+  .sv-examples::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .sv-examples::before {
+    top: -20rem;
+    right: -14rem;
+    width: 46rem;
+    height: 46rem;
+    background: radial-gradient(circle, rgb(137 88 254 / 0.22) 0%, transparent 68%);
+  }
+
+  .sv-examples::after {
+    bottom: -22rem;
+    left: -16rem;
+    width: 42rem;
+    height: 42rem;
+    background: radial-gradient(circle, rgb(17 132 205 / 0.22) 0%, transparent 70%);
+  }
+
+  .sv-examples .sv-wrap {
+    position: relative;
+  }
+
+  .sv-examples .sv-head__title {
+    color: #fff;
+  }
+
+  .sv-examples .sv-head__body {
+    color: rgb(255 255 255 / 0.7);
   }
 
   .examples {
@@ -906,9 +1012,19 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
     display: grid;
     gap: 1.25rem;
     padding: 1.75rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-line);
+    /* Halvgjennomsiktig hvit på den mørke flaten: kortene løfter seg fram uten
+       å bli harde bokser. */
+    background: rgb(255 255 255 / 0.06);
+    border: 1px solid rgb(255 255 255 / 0.12);
     border-radius: 0.5rem 2rem 0.5rem 2rem;
+    transition:
+      background-color 240ms ease,
+      border-color 240ms ease;
+  }
+
+  .example:hover {
+    background: rgb(255 255 255 / 0.09);
+    border-color: rgb(255 255 255 / 0.2);
   }
 
   @media (min-width: 48rem) {
@@ -928,8 +1044,8 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
     position: relative;
     margin: 0;
     padding-left: 1.25rem;
-    border-left: 3px solid var(--color-brand-soft);
-    color: var(--color-ink);
+    border-left: 3px solid var(--color-accent);
+    color: #fff;
     font-size: 1.0625rem;
     font-weight: 500;
     font-style: italic;
@@ -939,7 +1055,7 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
   .example__label {
     display: block;
     margin-bottom: 0.375rem;
-    color: var(--color-brand);
+    color: var(--color-sky);
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -948,7 +1064,7 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
 
   .example__answer p {
     margin: 0;
-    color: var(--color-ink-soft);
+    color: rgb(255 255 255 / 0.78);
     font-size: 1rem;
     line-height: 1.7;
   }
@@ -971,6 +1087,38 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
       align-items: start;
     }
   }
+
+  /* Bildet ligger under teksten i venstre spalte, slik at de tre retningene
+     til høyre får stå udelt. */
+  .sv-approach__media {
+    position: relative;
+    margin-top: 2.5rem;
+  }
+
+  .sv-approach__accent {
+    position: absolute;
+    z-index: 0;
+    left: -1.25rem;
+    bottom: -1.25rem;
+    width: 55%;
+    height: 50%;
+    border-radius: 0.5rem 4rem 0.5rem 4rem;
+    background: var(--color-accent);
+    opacity: 0.12;
+  }
+
+  .sv-approach__media :global(.sv-approach__photo) {
+    display: block;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    background: var(--color-canvas);
+  }
+
+
 
   .sv-approach__text {
     margin: 1.25rem 0 0;
@@ -1084,7 +1232,27 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
   /* --- 7. Teknologi --- */
 
   .sv-tech {
+    position: relative;
     background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  /* Et bredt, svakt skjær bak chipsene gjør at raden ikke flyter i tomrom. */
+  .sv-tech::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60rem;
+    height: 30rem;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse, var(--color-brand-soft) 0%, transparent 65%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .sv-tech .sv-wrap {
+    position: relative;
   }
 
   .tech {
@@ -1098,21 +1266,39 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
   }
 
   .tech__item {
-    padding: 0.5rem 1.125rem;
+    padding: 0.5625rem 1.25rem;
     border: 1px solid var(--color-line);
     border-radius: 999px;
-    background: var(--color-canvas);
+    background: var(--color-surface);
     color: var(--color-ink);
     font-size: 0.9375rem;
     font-weight: 500;
+    box-shadow: 0 1px 2px rgb(30 48 58 / 0.04);
     transition:
       border-color 200ms ease,
-      color 200ms ease;
+      color 200ms ease,
+      box-shadow 200ms ease,
+      transform 200ms ease;
   }
 
   .tech__item:hover {
     border-color: var(--color-brand);
     color: var(--color-brand);
+    box-shadow: 0 2px 6px rgb(17 132 205 / 0.12), 0 8px 20px rgb(17 132 205 / 0.1);
+    transform: translateY(-2px);
+  }
+
+  /* Annenhver chip får lilla ved hover, så raden ikke blir ensfarget. */
+  .tech__item:nth-child(even):hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent-deep);
+    box-shadow: 0 2px 6px rgb(137 88 254 / 0.14), 0 8px 20px rgb(137 88 254 / 0.12);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tech__item:hover {
+      transform: none;
+    }
   }
 
   /* --- 8. Når passer vi --- */
@@ -1133,6 +1319,21 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
       align-items: start;
     }
   }
+
+  .sv-fit__media {
+    margin-top: 2.5rem;
+  }
+
+  .sv-fit__media :global(.sv-fit__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 3rem 0.5rem 3rem 0.5rem;
+    background: var(--color-surface);
+  }
+
+
 
   .fit {
     display: grid;
@@ -1292,6 +1493,13 @@ const faqs = Array.from({ length: 7 }, (_, i) => ({
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .sv-hero__copy > *,
+    .sv-hero__media {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+
     .faq__chevron {
       transition: none;
     }

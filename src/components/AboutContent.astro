@@ -1,0 +1,1539 @@
+---
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import portraitOliver from '../assets/portrait-oliver.png';
+import portraitEven from '../assets/portrait-even.png';
+import portraitAdrian from '../assets/portrait-adrian.jpg';
+import placeStavanger from '../assets/place-stavanger.jpg';
+import placeKristiansund from '../assets/place-kristiansund.jpg';
+import storyLaeretid from '../assets/story-laeretid.jpg';
+import storyGreenTechSee from '../assets/story-greentechsee.jpg';
+import storyIdag from '../assets/story-idag.jpg';
+import valueStartSolution from '../assets/value-start-solution.jpg';
+import valueWorkInProgress from '../assets/value-work-in-progress.jpg';
+import valueWhiteboard from '../assets/value-whiteboard.jpg';
+import valueProductDev from '../assets/value-product-dev.jpg';
+import momentHandshake from '../assets/moment-handshake.png';
+import aboutHero from '../assets/about-hero.png';
+import aboutFinal from '../assets/about-final.png';
+import { BOOKING_URL, people } from '../data/site';
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import type { UIKeys } from '../i18n/ui/nb';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// 2. Historien — tre bilder i scrapbook-oppsett. Det første lenker til
+// Sparebank 1 Nordmøres artikkel om at lærlingene startet egen bedrift.
+const storyShots = [
+  {
+    image: storyLaeretid,
+    altKey: 'ab.story.img1' as UIKeys,
+    capKey: 'ab.story.cap1' as UIKeys,
+    linkKey: 'ab.story.link1' as UIKeys,
+    href: 'https://www.sparebank1.no/nb/nordmore/om-oss/nyheter/laerlinger-starter-egen-bedrift.html',
+  },
+  {
+    image: storyGreenTechSee,
+    altKey: 'ab.story.img2' as UIKeys,
+    capKey: 'ab.story.cap2' as UIKeys,
+  },
+  {
+    image: storyIdag,
+    altKey: 'ab.story.img3' as UIKeys,
+    capKey: 'ab.story.cap3' as UIKeys,
+  },
+];
+
+// 3. Stedene.
+const places = [
+  {
+    key: 'kristiansund',
+    nameKey: 'ab.places.kristiansund.name' as UIKeys,
+    bodyKey: 'ab.places.kristiansund.body' as UIKeys,
+    altKey: 'ab.places.kristiansund.imageAlt' as UIKeys,
+    image: placeKristiansund,
+  },
+  {
+    key: 'stavanger',
+    nameKey: 'ab.places.stavanger.name' as UIKeys,
+    bodyKey: 'ab.places.stavanger.body' as UIKeys,
+    altKey: 'ab.places.stavanger.imageAlt' as UIKeys,
+    image: placeStavanger,
+  },
+];
+
+// 4. Verdiene — vertikalt, med stort nummer i bakgrunnen.
+const valueImages = [
+  valueStartSolution,
+  valueWorkInProgress,
+  valueWhiteboard,
+  valueProductDev,
+];
+
+const values = Array.from({ length: 4 }, (_, i) => ({
+  num: String(i + 1).padStart(2, '0'),
+  titleKey: `ab.values.v${i + 1}.title` as UIKeys,
+  bodyKey: `ab.values.v${i + 1}.body` as UIKeys,
+  altKey: `ab.values.v${i + 1}.imageAlt` as UIKeys,
+  image: valueImages[i],
+}));
+
+// 5. Teamet. LinkedIn-lenkene peker foreløpig til selskapssiden — bytt til
+// personlige profiler når vi har dem.
+const portraits: Record<string, ImageMetadata> = {
+  oliver: portraitOliver,
+  even: portraitEven,
+  adrian: portraitAdrian,
+};
+
+const team = people.map((person) => ({
+  ...person,
+  nameKey: `ab.team.${person.key}.name` as UIKeys,
+  roleKey: (person.key === 'even' ? 'ct.team.even.role' : `ab.team.${person.key}.role`) as UIKeys,
+  bodyKey: `ab.team.${person.key}.body` as UIKeys,
+  locationKey: (person.key === 'oliver' ? 'ct.places.stavanger.name' : 'ct.places.kristiansund.name') as UIKeys,
+  portrait: portraits[person.key],
+}));
+
+// 7. Tallene. `count` styrer om tallet skal telles opp — årstall vises statisk,
+// og små tall trenger det ikke.
+const numbers = [
+  { value: '2025', labelKey: 'ab.numbers.founded' as UIKeys, count: false },
+  { value: '3', labelKey: 'ab.numbers.people' as UIKeys, count: false },
+  { value: '2', labelKey: 'ab.numbers.places' as UIKeys, count: false },
+  { value: '3', labelKey: 'ab.numbers.products' as UIKeys, count: false },
+];
+
+// Ferdighetslistene er skrevet som «A · B · C» og splittes til chips.
+---
+
+<article class="ab">
+  <!-- 1. Hero -->
+  <section class="ab-hero">
+    <div class="ab-hero__inner">
+      <div class="ab-hero__copy">
+        <h1 class="ab-hero__title">{t('ab.title')}</h1>
+        <p class="ab-hero__intro">{t('ab.intro')}</p>
+        <p class="ab-hero__facts">{t('ab.facts')}</p>
+      </div>
+
+      <figure class="ab-hero__figure">
+        <div class="ab-hero__media">
+          <Image
+            class="ab-hero__photo"
+            src={aboutHero}
+            alt={t('ab.heroImageAlt')}
+            width={1100}
+            widths={[560, 800, 1100, 1440]}
+            sizes="(min-width: 60rem) 52vw, 92vw"
+            format="webp"
+            quality={82}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+        <figcaption class="ab-hero__disclaimer">{t('ab.heroDisclaimer')}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2. Historien -->
+  <section class="ab-story" data-reveal>
+    <div class="ab-wrap">
+      <div class="story">
+        <div class="story__copy">
+          <h2 class="ab-head">{t('ab.story.title')}</h2>
+          <p class="story__text">{t('ab.story.p1')}</p>
+          <p class="story__text">{t('ab.story.p2')}</p>
+        </div>
+
+        {/* Scrapbook: tre bilder i ulik størrelse og forskjøvet plassering, slik
+            at seksjonen leses som dokumentasjon fra reisen og ikke som et
+            symmetrisk galleri. */}
+        <div class="story__shots">
+          {
+            storyShots.map((shot, index) => (
+              <figure class:list={['shot', `shot--${index + 1}`]}>
+                <div class="shot__media">
+                  <Image
+                    class="shot__photo"
+                    src={shot.image}
+                    alt={t(shot.altKey)}
+                    width={900}
+                    widths={[420, 640, 900, 1200]}
+                    sizes="(min-width: 40rem) 46vw, 92vw"
+                    format="webp"
+                    quality={82}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+
+                <figcaption>
+                  <span class="shot__caption">{t(shot.capKey)}</span>
+
+                  {index === 2 && <span class="shot__disclaimer">{t('ab.heroDisclaimer')}</span>}
+
+                  {shot.href && shot.linkKey && (
+                    <a class="shot__link" href={shot.href} target="_blank" rel="noreferrer">
+                      {t(shot.linkKey)}
+                    </a>
+                  )}
+                </figcaption>
+              </figure>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Kristiansund ↔ Stavanger -->
+  <section class="ab-places" data-reveal>
+    <div class="ab-wrap">
+      <h2 class="ab-head ab-head--center">{t('ab.places.title')}</h2>
+
+      <div class="places">
+        {
+          places.map((place) => (
+            <div class="place">
+              <div class="place__media">
+                <Image
+                  class="place__photo"
+                  src={place.image}
+                  alt={t(place.nameKey)}
+                  width={900}
+                  widths={[480, 700, 900, 1200]}
+                  sizes="(min-width: 48rem) 46vw, 92vw"
+                  format="webp"
+                  quality={82}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <h3 class="place__name">{t(place.nameKey)}</h3>
+              <p class="place__body">{t(place.bodyKey)}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      {/* Linjen mellom stedene tegnes opp når seksjonen kommer i sikte. */}
+      <div class="route" aria-hidden="true">
+        <span class="route__dot" />
+        <svg class="route__line" viewBox="0 0 400 2" preserveAspectRatio="none">
+          <line x1="0" y1="1" x2="400" y2="1" stroke="currentColor" stroke-width="2" />
+        </svg>
+        <span class="route__label">{t('ab.places.distance')}</span>
+        <svg class="route__line" viewBox="0 0 400 2" preserveAspectRatio="none">
+          <line x1="0" y1="1" x2="400" y2="1" stroke="currentColor" stroke-width="2" />
+        </svg>
+        <span class="route__dot" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Verdiene -->
+  <section class="ab-values" data-reveal>
+    <div class="ab-wrap">
+      <h2 class="ab-head">{t('ab.values.title')}</h2>
+
+      <ol class="values">
+        {
+          values.map((value) => (
+            <li class="value">
+              <span class="value__num" aria-hidden="true">
+                {value.num}
+              </span>
+
+              <div class="value__copy">
+                <h3 class="value__title">{t(value.titleKey)}</h3>
+                <p class="value__body">{t(value.bodyKey)}</p>
+              </div>
+
+              <div class="value__media">
+                <Image
+                  class="value__photo"
+                  src={value.image}
+                  alt={t(value.altKey)}
+                  width={720}
+                  widths={[400, 560, 720, 960]}
+                  sizes="(min-width: 56rem) 30vw, 92vw"
+                  format="webp"
+                  quality={80}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 5. Teamet -->
+  <section class="ab-team" data-reveal>
+    <div class="ab-wrap">
+      <h2 class="ab-head ab-head--center">{t('ab.team.title')}</h2>
+
+      <ul class="persons">
+        {
+          team.map((person) => (
+            <li class="person">
+              <div class="person__media">
+                <Image class="person__photo" src={person.portrait} alt={t(person.nameKey)} width={640} widths={[360, 480, 640, 860]} sizes="(min-width: 48rem) 30vw, 92vw" format="webp" quality={82} loading="lazy" decoding="async" />
+              </div>
+
+              <div class="person__body">
+                <h3 class="person__name">{t(person.nameKey)}</h3>
+                <p class="person__role">{t(person.roleKey)}</p>
+                <p class="person__location">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                    <circle cx="12" cy="10" r="2.5" />
+                  </svg>
+                  {t(person.locationKey)}
+                </p>
+                <p class="person__text">{t(person.bodyKey)}</p>
+
+                <div class="person__contact">
+                  <a href={`mailto:${person.email}`}>{person.email}</a>
+                  <a href={person.phoneHref}>{person.phone}</a>
+                </div>
+
+                <div class="person__actions">
+                  <a class="person__btn" href={`mailto:${person.email}`}>{t('ct.team.emailCta')}</a>
+                  <a class="person__btn person__btn--quiet" href={person.phoneHref}>{t('ct.team.phoneCta')}</a>
+                  <a class="person__btn person__btn--quiet person__btn--linkedin" href={person.linkedin} target="_blank" rel="noreferrer" aria-label={`LinkedIn – ${t(person.nameKey)}`} title={`LinkedIn – ${t(person.nameKey)}`}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4V10h4v1.5A5 5 0 0 1 16 8ZM2 9h4v12H2V9Zm2-7a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6. Arbeidsøyeblikk -->
+  <section class="ab-moment" data-reveal>
+    <div class="ab-wrap">
+      <div class="moment">
+        <div class="moment__media">
+          <Image
+            class="moment__photo"
+            src={momentHandshake}
+            alt={t('ab.moment.imageAlt')}
+            width={1100}
+            widths={[560, 800, 1100, 1440]}
+            sizes="(min-width: 60rem) 56vw, 92vw"
+            format="webp"
+            quality={82}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <div class="moment__copy">
+          <h2 class="ab-head">{t('ab.moment.title')}</h2>
+          <p class="moment__body">{t('ab.moment.body')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Tall -->
+  <section class="ab-numbers" data-reveal>
+    <div class="ab-wrap">
+      <ul class="numbers">
+        {
+          numbers.map((item) => (
+            <li class="number">
+              <span class="number__value">{item.value}</span>
+              <span class="number__label">{t(item.labelKey)}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8. Avslutning -->
+  <section class="ab-final" data-reveal>
+    <div class="ab-wrap">
+      <div class="final">
+        <div class="final__media">
+          <div class="final__visual">
+            <span class="final__accent" aria-hidden="true"></span>
+            <Image
+              class="final__photo"
+              src={aboutFinal}
+              alt={t('ab.final.imageAlt')}
+              width={900}
+              widths={[480, 700, 900, 1200]}
+              sizes="(min-width: 56rem) 44vw, 92vw"
+              format="webp"
+              quality={82}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <p class="final__disclaimer">{t('ab.heroDisclaimer')}</p>
+        </div>
+
+        <div class="final__copy">
+          <h2 class="final__title">{t('ab.final.title')}</h2>
+          <p class="final__body">{t('ab.final.body')}</p>
+          <Button href={BOOKING_URL} external>{t('ab.final.cta')}</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<script>
+  // Inntoning på scroll, som på de andre sidene. Heroen er utelatt — den
+  // animeres ved innlasting i stedet.
+  const sections = document.querySelectorAll<HTMLElement>('[data-reveal]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+    for (const section of sections) section.classList.add('is-visible');
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+    );
+
+    for (const section of sections) observer.observe(section);
+  }
+</script>
+
+<style>
+  /* --- Felles --- */
+
+  .ab-wrap {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .ab-wrap {
+      padding: 0 2rem;
+    }
+  }
+
+  .ab > section {
+    padding: 5rem 0;
+  }
+
+  @media (min-width: 48rem) {
+    .ab > section {
+      padding: 7rem 0;
+    }
+  }
+
+  .ab-head {
+    margin: 0 0 2.5rem;
+    color: var(--color-ink);
+    font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .ab-head--center {
+    max-width: 24ch;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  /* Felles plassholderflate for alle bildene på siden. */
+  .member__frame,
+  /* :global fordi <Image> er en egen komponent og ikke får scope-attributtet. */
+  .ab-hero__media :global(.ab-hero__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    max-height: 62vh;
+    object-fit: cover;
+    background: var(--color-canvas);
+  }
+
+  .member__frame svg,
+
+  .member__frame span,
+
+  /* --- Inntoning --- */
+
+  [data-reveal] .story__copy,
+  [data-reveal] .shot,
+  [data-reveal] .ab-head,
+  [data-reveal] .place,
+  [data-reveal] .value,
+  [data-reveal] .person,
+  [data-reveal] .moment__media,
+  [data-reveal] .moment__copy,
+  [data-reveal] .number,
+  [data-reveal] .final {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 640ms ease,
+      transform 640ms ease;
+  }
+
+  [data-reveal].is-visible .story__copy,
+  [data-reveal].is-visible .shot,
+  [data-reveal].is-visible .ab-head,
+  [data-reveal].is-visible .place,
+  [data-reveal].is-visible .value,
+  [data-reveal].is-visible .person,
+  [data-reveal].is-visible .moment__media,
+  [data-reveal].is-visible .moment__copy,
+  [data-reveal].is-visible .number,
+  [data-reveal].is-visible .final {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Forskjøvet: elementene vandrer inn etter hverandre, ikke samtidig. */
+  [data-reveal].is-visible .shot:nth-child(2),
+  [data-reveal].is-visible .place:nth-child(2),
+  [data-reveal].is-visible .value:nth-child(2),
+  [data-reveal].is-visible .person:nth-child(2),
+  [data-reveal].is-visible .number:nth-child(2),
+  [data-reveal].is-visible .moment__copy {
+    transition-delay: 110ms;
+  }
+
+  [data-reveal].is-visible .shot:nth-child(3),
+  [data-reveal].is-visible .value:nth-child(3),
+  [data-reveal].is-visible .person:nth-child(3),
+  [data-reveal].is-visible .number:nth-child(3) {
+    transition-delay: 220ms;
+  }
+
+  [data-reveal].is-visible .value:nth-child(4),
+  [data-reveal].is-visible .number:nth-child(4) {
+    transition-delay: 330ms;
+  }
+
+  /* --- 1. Hero --- */
+
+  .ab-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--color-surface);
+    overflow: hidden;
+    padding: calc(var(--header-height) + 2rem) 0 2.5rem !important;
+  }
+
+  .ab-hero::before {
+    content: '';
+    position: absolute;
+    top: -18rem;
+    right: -14rem;
+    width: 48rem;
+    height: 48rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 68%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
+  .ab-hero__inner {
+    position: relative;
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+    width: 100%;
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .ab-hero__inner {
+      padding: 0 2rem;
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .ab-hero__inner {
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr);
+      gap: clamp(3rem, 6vw, 4.5rem);
+    }
+  }
+
+  /* Teksten tones inn og løftes ved innlasting — subtilt, som beskrevet. */
+  .ab-hero__copy > * {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: hero-in 760ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .ab-hero__copy > *:nth-child(2) {
+    animation-delay: 110ms;
+  }
+
+  .ab-hero__copy > *:nth-child(3) {
+    animation-delay: 220ms;
+  }
+
+  @keyframes hero-in {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .ab-hero__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(2.25rem, 4.8vw, 3.5rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .ab-hero__intro {
+    max-width: 46ch;
+    margin: 1.75rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: clamp(1rem, 1.5vw, 1.1875rem);
+    line-height: 1.75;
+  }
+
+  .ab-hero__facts {
+    margin: 2.5rem 0 0;
+    padding-top: 1.5rem;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* Bildet skalerer svakt ned ved innlasting, 1.03 → 1.00. */
+  .ab-hero__media {
+    overflow: hidden;
+    border-radius: 0.5rem 3rem 0.5rem 3rem;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 24px 56px rgb(30 48 58 / 0.14);
+    animation: hero-zoom 1100ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .ab-hero__figure {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .ab-hero__disclaimer {
+    margin-top: 0.625rem;
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    text-align: right;
+  }
+
+  @keyframes hero-zoom {
+    from {
+      transform: scale(1.03);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  .ab-hero__placeholder {
+    aspect-ratio: 4 / 3;
+    max-height: 62vh;
+    border: 0;
+  }
+
+  /* --- 2. Historien --- */
+
+  .ab-story {
+    background: var(--color-canvas);
+  }
+
+  .story {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 60rem) {
+    .story {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+      gap: clamp(3rem, 6vw, 5rem);
+      align-items: center;
+    }
+  }
+
+  .story__text {
+    max-width: 52ch;
+    margin: 0 0 1.25rem;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  .story__text:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Scrapbook: bildene ligger i et grid med ulik størrelse og forskyvning. */
+  .story__shots {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .shot {
+    margin: 0;
+  }
+
+  .shot__media {
+    overflow: hidden;
+    border-radius: 0.5rem 1.75rem 0.5rem 1.75rem;
+  }
+
+  /* :global fordi <Image> er en egen komponent og ikke får scope-attributtet.
+     Hvert bilde har sitt eget sideforhold — GTS-bildet er stående, de to andre
+     liggende — så de får hver sin regel under. */
+  .shot__media :global(.shot__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: var(--color-canvas);
+  }
+
+  .shot figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.875rem;
+  }
+
+  .shot__caption {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-brand);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .shot--2 .shot__caption {
+    color: var(--color-accent-deep);
+  }
+
+  .shot--3 .shot__caption {
+    color: var(--color-brand-dark);
+  }
+
+  .shot__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: var(--color-line);
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 1px;
+    transition:
+      color 200ms ease,
+      text-decoration-color 200ms ease;
+  }
+
+  .shot__link:hover {
+    color: var(--color-brand);
+    text-decoration-color: var(--color-brand);
+  }
+
+
+
+  @media (min-width: 40rem) {
+    /* Første bilde spenner over begge spaltene — det er hovedbildet, og det
+       eneste med en lenke videre. De to under deler raden. */
+    .shot--1 {
+      grid-column: 1 / -1;
+    }
+
+    .shot--1 .shot__media {
+      border-radius: 0.5rem 3rem 0.5rem 3rem;
+    }
+
+    .shot--1 .shot__media :global(.shot__photo) {
+      aspect-ratio: 16 / 9;
+    }
+
+    /* GTS-bildet er stående, så det får et høyere utsnitt enn nabobildet. */
+    .shot--2 .shot__media :global(.shot__photo) {
+      aspect-ratio: 4 / 5;
+    }
+
+    .shot--3 {
+      /* Forskjøvet ned, så raden ikke blir helt symmetrisk. */
+      margin-top: 3rem;
+    }
+
+    .shot--3 .shot__media :global(.shot__photo) {
+      aspect-ratio: 4 / 3.2;
+    }
+  }
+
+  /* --- 3. Stedene --- */
+
+  .ab-places {
+    background: var(--color-surface);
+  }
+
+  .places {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .places {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 3rem;
+    }
+  }
+
+  .place__media {
+    overflow: hidden;
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+  }
+
+  /* :global fordi <Image> er en egen komponent. */
+  .place__media :global(.place__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: var(--color-canvas);
+  }
+
+  .place__name {
+    margin: 1.75rem 0 0.75rem;
+    color: var(--color-ink);
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .place__body {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  /* Ruten mellom stedene. Linjene skaleres fra midten når seksjonen vises. */
+  .route {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    max-width: 34rem;
+    margin: 3.5rem auto 0;
+    color: var(--color-line);
+  }
+
+  .route__dot {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-brand);
+  }
+
+  .route__line {
+    flex: 1;
+    height: 2px;
+    color: var(--color-line);
+    transform: scaleX(0);
+    transition: transform 900ms cubic-bezier(0.4, 0, 0.2, 1) 200ms;
+  }
+
+  .route__line:first-of-type {
+    transform-origin: left center;
+  }
+
+  .route__line:last-of-type {
+    transform-origin: right center;
+  }
+
+  .is-visible .route__line {
+    transform: scaleX(1);
+  }
+
+  .route__label {
+    flex: none;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* --- 4. Verdiene --- */
+
+  .ab-values {
+    background: var(--color-canvas);
+  }
+
+  .values {
+    display: grid;
+    gap: 3.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .values {
+      gap: 4.5rem;
+    }
+  }
+
+  .value {
+    position: relative;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 56rem) {
+    .value {
+      grid-template-columns: auto minmax(0, 1fr) minmax(0, 0.7fr);
+      gap: 2.5rem;
+      align-items: center;
+    }
+  }
+
+  /* Nummeret er stort og svakt — det gir rytme uten å konkurrere med teksten. */
+  /* Numrene veksler mellom de to merkefargene, slik at raden får rytme uten at
+     fargen blir tilfeldig dekor. */
+  .value__num {
+    color: var(--color-brand);
+    opacity: 0.18;
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .value:nth-child(even) .value__num {
+    color: var(--color-accent);
+  }
+
+  .value__title {
+    margin: 0 0 0.75rem;
+    color: var(--color-ink);
+    font-size: clamp(1.25rem, 2.4vw, 1.625rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  .value__body {
+    max-width: 52ch;
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .value__media {
+    overflow: hidden;
+    border-radius: 0.5rem 1.75rem 0.5rem 1.75rem;
+  }
+
+  /* :global fordi <Image> er en egen komponent og ikke får scope-attributtet. */
+  .value__media :global(.value__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--color-canvas);
+  }
+
+  /* --- 5. Teamet --- */
+
+  .ab-team {
+    background: var(--color-surface);
+  }
+
+  .team {
+    display: grid;
+    gap: 1.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .team {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .member__link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      border-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .member__link:hover,
+  .member__link:focus-visible {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 22px 48px rgb(30 48 58 / 0.12);
+  }
+
+  /* Farget strek øverst, i samme tone som rollemerkelappen under. */
+  .member__link::before {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--color-brand);
+  }
+
+  .member:nth-child(2) .member__link::before {
+    background: var(--color-accent);
+  }
+
+  .member:nth-child(3) .member__link::before {
+    background: var(--color-sky);
+  }
+
+  .member__media {
+    display: block;
+    overflow: hidden;
+  }
+
+  .member__frame {
+    aspect-ratio: 4 / 4.4;
+    border: 0;
+    /* Svak zoom ved hover — 1.03, som beskrevet. */
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .member__link:hover .member__frame,
+  .member__link:focus-visible .member__frame {
+    transform: scale(1.03);
+  }
+
+  .member__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.75rem;
+    /* Innholdet løftes noen piksler ved hover. */
+    transition: transform 240ms ease;
+  }
+
+  .member__link:hover .member__body,
+  .member__link:focus-visible .member__body {
+    transform: translateY(-3px);
+  }
+
+  .member__name {
+    display: block;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  /* Rollen som merkelapp i stedet for løs tekst. Hvert kort får sin egen tone,
+     så raden ikke blir tre identiske blå. */
+  .member__role {
+    display: inline-block;
+    margin-top: 0.625rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .member:nth-child(2) .member__role {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-deep);
+  }
+
+  .member:nth-child(3) .member__role {
+    background: var(--color-sky-soft);
+    color: var(--color-brand-dark);
+  }
+
+  .member__text {
+    display: block;
+    margin-top: 1rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+
+
+  /* LinkedIn-lenken tones fram ved hover i stedet for å ligge synlig hele
+     tiden — kortet holder seg rolig til man faktisk peker på det. */
+  .member__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    color: var(--color-brand);
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 240ms ease,
+      transform 240ms ease;
+  }
+
+  .member__link:hover .member__cta,
+  .member__link:focus-visible .member__cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .member__cta svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+  }
+
+  .member__arrow {
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .member__link:hover .member__arrow {
+    transform: translateX(3px);
+  }
+
+  /* Personkortene speiler kontaktsiden. */
+  .persons {
+    display: grid;
+    gap: 1.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .persons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .person {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    overflow: hidden;
+    transition: border-color 240ms ease, box-shadow 240ms ease;
+  }
+
+  .person:hover {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 22px 48px rgb(30 48 58 / 0.12);
+  }
+
+  .person__media { overflow: hidden; }
+
+  .person__media :global(.person__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 18%;
+    background: var(--color-canvas);
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .person:hover :global(.person__photo) { transform: scale(1.025); }
+
+  .person__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.75rem;
+  }
+
+  .person__name {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .person__role {
+    margin: 0.25rem 0 0;
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .person__location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 0.625rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .person__location svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    color: var(--color-brand);
+  }
+
+  .person__text {
+    margin: 1rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .person__contact {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .person__contact a {
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .person__contact a:hover { color: var(--color-brand); }
+
+  .person__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+  }
+
+  .person__btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--color-brand);
+    border-radius: 999px;
+    background: var(--color-brand);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+  }
+
+  .person__btn:hover { background: var(--color-brand-dark); border-color: var(--color-brand-dark); }
+
+  .person__btn--quiet {
+    background: transparent;
+    border-color: var(--color-line);
+    color: var(--color-ink);
+  }
+
+  .person__btn--quiet:hover {
+    background: transparent;
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  .person__btn--linkedin {
+    justify-content: center;
+    width: 2.25rem;
+    padding: 0;
+  }
+
+  .person__btn--linkedin svg { width: 1rem; height: 1rem; }
+
+  /* --- 6. Arbeidsøyeblikk --- */
+
+  .ab-moment {
+    background: var(--color-canvas);
+  }
+
+  .moment {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 60rem) {
+    .moment {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: clamp(3rem, 6vw, 4.5rem);
+      align-items: center;
+    }
+  }
+
+  .moment__media {
+    overflow: hidden;
+    border-radius: 0.5rem 3rem 0.5rem 3rem;
+  }
+
+  /* :global fordi <Image> er en egen komponent og ikke får scope-attributtet. */
+  .moment__media :global(.moment__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: var(--color-canvas);
+  }
+
+  .moment__body {
+    max-width: 46ch;
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  /* --- 7. Tall --- */
+
+  /* Mørk flate mot slutten. Bryter den mekaniske hvit/grå-vekslingen, og gjør
+     tallene til et tydelig holdepunkt i stedet for enda en lys rad. */
+  .ab-numbers {
+    position: relative;
+    background: var(--color-ink);
+    overflow: hidden;
+  }
+
+  .ab-numbers::before,
+  .ab-numbers::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .ab-numbers::before {
+    top: -18rem;
+    left: -12rem;
+    width: 40rem;
+    height: 40rem;
+    background: radial-gradient(circle, rgb(17 132 205 / 0.24) 0%, transparent 68%);
+  }
+
+  .ab-numbers::after {
+    bottom: -20rem;
+    right: -14rem;
+    width: 38rem;
+    height: 38rem;
+    background: radial-gradient(circle, rgb(137 88 254 / 0.22) 0%, transparent 70%);
+  }
+
+  .ab-numbers .ab-wrap {
+    position: relative;
+  }
+
+  .numbers {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  @media (min-width: 48rem) {
+    .numbers {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .number__value {
+    display: block;
+    color: #fff;
+    font-size: clamp(2.25rem, 5vw, 3.25rem);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .number__label {
+    display: block;
+    margin-top: 0.625rem;
+    color: rgb(255 255 255 / 0.6);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* --- 8. Avslutning --- */
+
+  .ab-final {
+    position: relative;
+    background: var(--color-canvas);
+    overflow: hidden;
+  }
+
+  /* Et lilla skjær i hjørnet gjør avslutningen varmere enn en flat grå rad. */
+  .ab-final::before {
+    content: '';
+    position: absolute;
+    bottom: -20rem;
+    right: -14rem;
+    width: 42rem;
+    height: 42rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-accent-soft) 0%, transparent 68%);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .ab-final .ab-wrap {
+    position: relative;
+  }
+
+  .final {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 56rem) {
+    .final {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+      gap: clamp(3rem, 6vw, 4.5rem);
+    }
+  }
+
+  .final__media {
+    position: relative;
+  }
+
+  .shot__disclaimer {
+    margin-left: auto;
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    text-align: right;
+  }
+
+  .final__visual {
+    position: relative;
+  }
+
+  .final__disclaimer {
+    position: relative;
+    z-index: 1;
+    margin: 0.625rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    text-align: right;
+  }
+
+  .final__accent {
+    position: absolute;
+    z-index: 0;
+    left: -1.25rem;
+    bottom: -1.25rem;
+    width: 55%;
+    height: 50%;
+    border-radius: 0.5rem 4rem 0.5rem 4rem;
+    background: var(--color-accent);
+    opacity: 0.14;
+  }
+
+  /* :global fordi <Image> er en egen komponent og ikke får scope-attributtet. */
+  .final__media :global(.final__photo) {
+    display: block;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 3rem 0.5rem 3rem 0.5rem;
+    background: var(--color-canvas);
+  }
+
+  .final__title {
+    margin: 0;
+    max-width: 20ch;
+    color: var(--color-ink);
+    font-size: clamp(1.625rem, 3.2vw, 2.25rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  .final__body {
+    max-width: 46ch;
+    margin: 1.25rem 0 2rem;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ab-hero__copy > *,
+    .ab-hero__media {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+
+    .route__line {
+      transform: scaleX(1);
+      transition: none;
+    }
+
+    .member__link:hover .member__frame,
+    .member__link:hover .member__body,
+    .member__link:hover .member__arrow {
+      transform: none;
+    }
+  }
+</style>

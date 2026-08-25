@@ -15,6 +15,9 @@ interface Props {
   description?: string;
   type?: 'website' | 'article';
   image?: string;
+  /** Følger med `image`. Utelatt betyr standardformatet 1200×630. */
+  imageWidth?: number;
+  imageHeight?: number;
   noindex?: boolean;
   /** Overstyrer canonical der en side finnes på flere URL-er. */
   canonical?: string;
@@ -29,7 +32,9 @@ const {
   title,
   description,
   type = 'website',
-  image = site.ogImage,
+  image,
+  imageWidth = 1200,
+  imageHeight = 630,
   noindex = false,
   canonical: canonicalOverride,
   availableLocales = LOCALES,
@@ -39,13 +44,24 @@ const locale = localeFromPath(Astro.url.pathname);
 const meta = LOCALE_META[locale];
 const localeMeta = SITE_META[locale];
 
+// Delebildet finnes i én variant per språk, slik at taglinen i bildet er på
+// samme språk som siden det deles fra. Sider som sender inn sitt eget bilde
+// (kundecase, blogginnlegg) overstyrer dette.
+const defaultOgImage = locale === DEFAULT_LOCALE ? site.ogImage : `/og-default-${locale}.png`;
+const shareImage = image ?? defaultOgImage;
+
 // Forsiden bruker full tittel; undersider får " | Samsari" bak seg.
 const fullTitle = title ? `${title} | ${site.name}` : localeMeta.defaultTitle;
 const metaDescription = description ?? localeMeta.defaultDescription;
 
-/** Absolutt URL uten trailing slash — men aldri tom, forsiden må bli site.url. */
-const absolute = (path: string) =>
-  new URL(path, site.url).href.replace(/\/$/, '') || site.url;
+/** Absolutt URL i samme trailing-slash-format som det genererte sitemapet. */
+const absolute = (path: string) => {
+  const url = new URL(path, site.url);
+  if (!url.pathname.endsWith('/') && !url.pathname.split('/').at(-1)?.includes('.')) {
+    url.pathname += '/';
+  }
+  return url.href;
+};
 
 const canonical = canonicalOverride ?? absolute(Astro.url.pathname);
 
@@ -57,7 +73,7 @@ const alternates = LOCALES.filter((l) => availableLocales.includes(l)).map((l) =
   href: absolute(localizePath(basePath, l)),
 }));
 
-const imageUrl = new URL(image, site.url).href;
+const imageUrl = new URL(shareImage, site.url).href;
 ---
 
 <title>{fullTitle}</title>
@@ -85,9 +101,20 @@ const imageUrl = new URL(image, site.url).href;
 <meta property="og:description" content={metaDescription} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={imageUrl} />
+{/* Uten dimensjoner må LinkedIn hente bildet før det kan vises, og faller
+    ofte tilbake til ingen forhåndsvisning ved aller første deling. */}
+<meta property="og:image:width" content={String(imageWidth)} />
+<meta property="og:image:height" content={String(imageHeight)} />
+<meta property="og:image:alt" content={fullTitle} />
 <meta property="og:locale" content={meta.ogLocale} />
+{
+  LOCALES.filter((l) => l !== locale && availableLocales.includes(l)).map((l) => (
+    <meta property="og:locale:alternate" content={LOCALE_META[l].ogLocale} />
+  ))
+}
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={imageUrl} />
+<meta name="twitter:image:alt" content={fullTitle} />

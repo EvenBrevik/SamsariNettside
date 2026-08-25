@@ -142,6 +142,37 @@ export function servicesSchema(input: {
 }
 
 /**
+ * Om oss-siden med teamet. `employee` lar Google knytte personene til
+ * selskapet, som styrker kunnskapspanelet.
+ */
+export function aboutSchema(input: {
+  description: string;
+  url: string;
+  locale: Locale;
+  team: readonly { name: string; role: string }[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    url: input.url,
+    inLanguage: input.locale,
+    mainEntity: {
+      '@type': 'Organization',
+      name: site.name,
+      url: site.url,
+      description: input.description,
+      foundingDate: '2025',
+      employee: input.team.map((person) => ({
+        '@type': 'Person',
+        name: person.name,
+        jobTitle: person.role,
+        worksFor: { '@type': 'Organization', name: site.name },
+      })),
+    },
+  };
+}
+
+/**
  * FAQ-en som strukturerte data. Google kan vise spørsmålene direkte i
  * søkeresultatet, og de matcher det som faktisk står på siden.
  */

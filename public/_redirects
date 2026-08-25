@@ -1,7 +1,7 @@
 # Gamle engelske stier fra React-siden. Permanente så ranking og lenker følger med.
 # Statiske regler først. Splat-regler koster mer å slå opp.
 /services       /tjenester         301
-/products       /tjenester         301
+/products       /produkter         301
 /cases          /kundecase         301
 /blog           /blogg             301
 /about          /om-oss            301

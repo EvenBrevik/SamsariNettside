@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import ContactContent from '../../components/ContactContent.astro';
+import { breadcrumbSchema } from '../../data/schema';
+import { site, contact, people } from '../../data/site';
+import { LOCALES, DEFAULT_LOCALE, isLocale, localizePath } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import type { UIKeys } from '../../i18n/ui/nb';
+
+export function getStaticPaths() {
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale: param } = Astro.params;
+const locale = param && isLocale(param) ? param : DEFAULT_LOCALE;
+const t = useTranslations(locale);
+const pageUrl = new URL(localizePath('/kontakt', locale), site.url).href;
+
+const contactLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  url: pageUrl,
+  inLanguage: locale,
+  mainEntity: {
+    '@type': 'Organization',
+    name: site.name,
+    url: site.url,
+    email: contact.generalEmail,
+    telephone: contact.phone,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: contact.address.street,
+      postalCode: contact.address.postalCode,
+      addressLocality: contact.address.city,
+      addressCountry: contact.address.country,
+    },
+    contactPoint: people.map((person) => ({
+      '@type': 'ContactPoint',
+      name: t(`ab.team.${person.key}.name` as UIKeys),
+      email: person.email,
+      telephone: person.phone,
+      contactType: 'sales',
+      availableLanguage: ['no', 'en'],
+    })),
+  },
+};
+
+const breadcrumbLd = breadcrumbSchema([{ name: t('nav.contact'), url: pageUrl }], t('nav.home'));
+---
+
+<Base title={t('ct.seoTitle')} description={t('ct.seoDescription')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(contactLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <ContactContent />
+</Base>

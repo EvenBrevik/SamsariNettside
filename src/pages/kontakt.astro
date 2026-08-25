@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import ContactContent from '../components/ContactContent.astro';
+import { breadcrumbSchema } from '../data/schema';
+import { site, contact, people } from '../data/site';
+import { DEFAULT_LOCALE } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import type { UIKeys } from '../i18n/ui/nb';
+
+const t = useTranslations(DEFAULT_LOCALE);
+const pageUrl = new URL('/kontakt', site.url).href;
+
+// ContactPage med ett kontaktpunkt per person, slik at Google ser hvem man
+// faktisk kan nå og hva hver enkelt dekker.
+const contactLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  url: pageUrl,
+  inLanguage: DEFAULT_LOCALE,
+  mainEntity: {
+    '@type': 'Organization',
+    name: site.name,
+    url: site.url,
+    email: contact.generalEmail,
+    telephone: contact.phone,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: contact.address.street,
+      postalCode: contact.address.postalCode,
+      addressLocality: contact.address.city,
+      addressCountry: contact.address.country,
+    },
+    contactPoint: people.map((person) => ({
+      '@type': 'ContactPoint',
+      name: t(`ab.team.${person.key}.name` as UIKeys),
+      email: person.email,
+      telephone: person.phone,
+      contactType: 'sales',
+      availableLanguage: ['no', 'en'],
+    })),
+  },
+};
+
+const breadcrumbLd = breadcrumbSchema([{ name: t('nav.contact'), url: pageUrl }], t('nav.home'));
+---
+
+<Base title={t('ct.seoTitle')} description={t('ct.seoDescription')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(contactLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <ContactContent />
+</Base>

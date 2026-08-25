@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import AboutContent from '../../components/AboutContent.astro';
+import { aboutSchema, breadcrumbSchema } from '../../data/schema';
+import { site } from '../../data/site';
+import { LOCALES, DEFAULT_LOCALE, isLocale, localizePath } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import type { UIKeys } from '../../i18n/ui/nb';
+
+export function getStaticPaths() {
+  return LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale: param } = Astro.params;
+const locale = param && isLocale(param) ? param : DEFAULT_LOCALE;
+const t = useTranslations(locale);
+
+const pageUrl = new URL(localizePath('/om-oss', locale), site.url).href;
+
+const aboutLd = aboutSchema({
+  description: t('ab.seoDescription'),
+  url: pageUrl,
+  locale,
+  team: (['oliver', 'even', 'adrian'] as const).map((key) => ({
+    name: t(`ab.team.${key}.name` as UIKeys),
+    role: t(`ab.team.${key}.role` as UIKeys),
+  })),
+});
+
+const breadcrumbLd = breadcrumbSchema([{ name: t('nav.about'), url: pageUrl }], t('nav.home'));
+---
+
+<Base title={t('ab.seoTitle')} description={t('ab.seoDescription')}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(aboutLd)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  </Fragment>
+
+  <AboutContent />
+</Base>

@@ -177,6 +177,8 @@ export const sv: Record<UIKeys, string> = {
   'privacy.title': 'Integritetspolicy',
   'privacy.intro':
     'Denna policy förklarar vilka personuppgifter Samsari samlar in när du använder vår webbplats eller kontaktar oss, vad vi använder dem till och vilka rättigheter du har.',
+  'privacy.seoDescription':
+    'Så behandlar Samsari personuppgifter: vad vi samlar in, vad vi använder det till, vilka kakor vi använder och vilka rättigheter du har.',
   'privacy.updated': 'Senast uppdaterad',
 
   'privacy.controller.title': 'Personuppgiftsansvarig',
@@ -300,7 +302,10 @@ export const sv: Record<UIKeys, string> = {
     'Samsari hjälper till med allt från mindre automatiseringar och AI-lösningar till kompletta interna system och kundportaler. Vi kan förbättra det ni redan har, eller bygga något nytt när behovet kräver det.',
   'sv.cta': 'Berätta vad ni vill förbättra',
   'sv.disciplines': 'Rådgivning · Utveckling · Integrationer · Automatisering · Förvaltning',
-  'sv.heroImageAlt': 'Bild från vårt arbete kommer',
+  'sv.heroImageAlt': 'Abstrakt bild av en person i rörelse',
+
+  'sv.approachImageAlt': 'Ett kontor med föråldrad teknik fortfarande i bruk',
+  'sv.fitImageAlt': 'En vuxen kungspingvin mitt i en flock ungar',
 
   'sv.needs.title': 'Vad behöver ni hjälp med?',
   'sv.needs.body':
@@ -449,11 +454,9 @@ export const sv: Record<UIKeys, string> = {
   'pr.title': 'Programvara utvecklad för konkreta behov',
   'pr.intro':
     'Vi utvecklar egna produkter för arbetsprocesser och branscher där vi ser att befintliga lösningar inte täcker behovet tillräckligt väl.',
-  'pr.imageAlt': 'Skärmbild kommer',
 
   'pr.suits': 'Passar för',
   'pr.features': 'Viktiga funktioner',
-  'pr.readMore': 'Läs mer',
   'pr.status.active': 'Aktiv produkt',
   'pr.status.building': 'Under utveckling',
 
@@ -508,6 +511,167 @@ export const sv: Record<UIKeys, string> = {
     'Vi visar gärna hur lösningen fungerar och bedömer om den passar era behov.',
   'pr.final.cta': 'Boka en demo',
 
+  // ---- Om oss ----
+  'ab.seoTitle': 'Om oss: teamet bakom Samsari',
+  'ab.seoDescription':
+    'Samsari är ett norskt teknikbolag i Kristiansund och Stavanger. Möt människorna som bygger programvara, automatisering och AI-lösningar.',
+  'ab.title': 'Vi bygger Samsari tillsammans',
+  'ab.intro':
+    'Samsari är ett norskt teknikbolag med rötter i Kristiansund och närvaro i Stavanger. Vi bygger programvara, automatisering och AI-lösningar nära de människor som faktiskt ska använda dem.',
+  'ab.facts': 'Kristiansund · Stavanger · Grundat 2025',
+  'ab.heroImageAlt': 'Många människor som tillsammans reser en byggnad med Samsari-emblemet på gaveln',
+  'ab.heroDisclaimer': 'AI-genererad illustrationsbild',
+
+  'ab.story.title': 'Det började inte med en affärsplan',
+  'ab.story.p1':
+    'Samsari startades av Oliver Lysø och Even Brevik efter flera år med IT-utbildning, lärlingstid och praktiskt utvecklingsarbete. Yrkesbeviset och erfarenheten från arbetslivet gav oss en grund vi fortfarande bygger på i dag: förstå problemet först och bygg tekniken sedan.',
+  'ab.story.p2':
+    'Det som började med utveckling av lösningar och automatisering har sedan vuxit till kundprojekt, egna produkter och ett team med ambitionen att bygga teknik som faktiskt skapar värde.',
+  'ab.story.img1': 'Oliver och Even under lärlingstiden',
+  'ab.story.img2': 'Oliver och Even som mentorer på GreenTechSee 2025',
+  'ab.story.img3': 'Oliver och Even i Samsari-arbete',
+  'ab.story.cap1': 'Lärlingstid',
+  'ab.story.cap2': 'Mentorer GreenTechSee 2025',
+  'ab.story.cap3': 'Vi bygger vidare',
+  'ab.story.link1': 'Läs artikeln hos Sparebank 1 Nordmøre',
+
+  'ab.places.title': 'Från Nordmøre till Rogaland',
+  'ab.places.distance': '640 km',
+  'ab.places.kristiansund.name': 'Kristiansund',
+  'ab.places.kristiansund.body':
+    'Här började mycket av vår historia. Skola, lärlingstid och erfarenhet från näringslivet på Nordmøre har haft stor betydelse för hur Samsari blev till.',
+  'ab.places.kristiansund.imageAlt': 'Bild från Kristiansund kommer',
+  'ab.places.stavanger.name': 'Stavanger',
+  'ab.places.stavanger.body':
+    'I Stavanger-regionen arbetar vi nära ett varierat näringsliv inom bland annat industri, teknik, energi och finans.',
+  'ab.places.stavanger.imageAlt': 'Bild från Stavanger-regionen kommer',
+
+  'ab.values.title': 'Så vill vi arbeta',
+  'ab.values.v1.title': 'Vi får jobbet gjort',
+  'ab.values.v1.body':
+    'En bra idé är värd lite om den aldrig kommer till användning. Vi gillar korta vägar från problem till lösning och prioriterar framdrift framför onödig komplexitet.',
+  'ab.values.v1.imageAlt': 'En lösning tar form på skärmen',
+  'ab.values.v2.title': 'Vi bygger för människorna som ska använda det',
+  'ab.values.v2.body':
+    'Ett system kan vara tekniskt imponerande och ändå misslyckas. Därför lägger vi stor vikt vid enkelhet, användarupplevelse och att lösningen faktiskt används.',
+  'ab.values.v2.imageAlt': 'Utveckling under arbete',
+  'ab.values.v3.title': 'Vi bygger inte något bara för att vi kan',
+  'ab.values.v3.body':
+    'Ibland räcker Power Automate. Andra gånger krävs ett helt nytt system. Vi väljer lösningen som passar problemet – inte tekniken vi råkar vilja använda.',
+  'ab.values.v3.imageAlt': 'Skiss av lösningsriktningar på whiteboard',
+  'ab.values.v4.title': 'Vi fortsätter att lära',
+  'ab.values.v4.body':
+    'AI och programvara rör sig snabbt. Vi testar ny teknik, utvecklar egna produkter och tar med oss det vi lär oss tillbaka till kundarbetet.',
+  'ab.values.v4.imageAlt': 'Arbete med produktutveckling',
+
+  'ab.team.title': 'Människorna bakom Samsari',
+  'ab.team.linkedin': 'Se LinkedIn',
+  'ab.team.oliver.name': 'Oliver Lysø',
+  'ab.team.oliver.role': 'VD & Medgrundare',
+  'ab.team.oliver.body':
+    'Arbetar med lösningsdesign, utveckling och affärsutveckling och följer ofta projekten hela vägen från första problemställning till färdig lösning.',
+  'ab.team.oliver.skills': 'AI · Power Platform · Systemutveckling · Affär',
+  'ab.team.oliver.imageAlt': 'Porträtt av Oliver Lysø kommer',
+  'ab.team.even.name': 'Even Brevik',
+  'ab.team.even.role': 'Medgrundare & utvecklare',
+  'ab.team.even.body':
+    'Arbetar med utveckling, teknisk arkitektur och produktutveckling över Samsaris kundprojekt och egna lösningar.',
+  'ab.team.even.skills': 'Utveckling · Arkitektur · Integrationer · Produkter',
+  'ab.team.even.imageAlt': 'Porträtt av Even Brevik kommer',
+  'ab.team.adrian.name': 'Adrian Rurkowski',
+  'ab.team.adrian.role': 'Produktansvarig, Forge Engine & Business Developer',
+  'ab.team.adrian.body':
+    'Adrian arbetar med Forge Engine, kunduppföljning och affärsutveckling, med särskilt fokus på tillverknings- och laserindustrin.',
+  'ab.team.adrian.skills': 'Forge Engine · Försäljning · Kunduppföljning · Affärsutveckling',
+  'ab.team.adrian.imageAlt': 'Porträtt av Adrian Rurkowski kommer',
+
+  'ab.moment.title': 'Ni arbetar direkt med oss',
+  'ab.moment.body':
+    'Hos Samsari är vägen kort mellan personen som förstår problemet och personen som bygger lösningen. Ni möter utvecklarna och produktfolket direkt, utan flera lager av projektledning emellan.',
+  'ab.moment.imageAlt': 'Handslag efter ett möte',
+
+  'ab.numbers.founded': 'Grundat',
+  'ab.numbers.people': 'i teamet',
+  'ab.numbers.places': 'platser',
+  'ab.numbers.products': 'egna produkter',
+
+  'ab.final.title': 'Vi är fortfarande ett litet team. Det gillar vi.',
+  'ab.final.body':
+    'Det gör att vi kan röra oss snabbt, känna projekten väl och arbeta nära människorna vi bygger för.',
+  'ab.final.cta': 'Boka ett samtal',
+  'ab.final.imageAlt': 'Det lilla teamet på Samsari',
+
+  // ---- Kontakt ----
+  'ct.seoTitle': 'Kontakta oss: boka ett möte eller ring direkt',
+  'ct.seoDescription':
+    'Boka ett förutsättningslöst samtal, skicka ett mejl eller ring oss direkt. Du behöver inte veta vilken lösning du behöver innan du hör av dig.',
+  'ct.eyebrow': 'Kontakta oss',
+  'ct.title': 'Låt oss ta ett samtal',
+  'ct.intro':
+    'Har ni ett projekt, en idé eller något i arbetsvardagen som borde fungera bättre? Boka ett möte eller hör av dig direkt till oss. Du behöver inte veta exakt vilken lösning du behöver innan du hör av dig.',
+  'ct.cta': 'Boka ett möte',
+  'ct.ctaNote': 'Förutsättningslöst · Microsoft Teams · Välj tid själv',
+  'ct.heroImageAlt': 'Stavanger centrum sett från Breiavatnet',
+
+  'ct.methods.title': 'Välj det som passar dig',
+  'ct.methods.book.title': 'Boka ett möte',
+  'ct.methods.book.lead': 'Hitta en tid som passar',
+  'ct.methods.book.body':
+    'Boka ett förutsättningslöst samtal direkt i vår kalender. Berätta gärna kort vad ni vill diskutera, så kan vi förbereda oss.',
+  'ct.methods.book.cta': 'Boka ett möte',
+  'ct.methods.email.title': 'Skicka ett mejl',
+  'ct.methods.email.body':
+    'Osäker på vem du bör kontakta? Skicka ett mejl till vår allmänna adress, så ser vi till att det når rätt person.',
+  'ct.methods.email.cta': 'Skicka mejl',
+  'ct.methods.phone.title': 'Ring oss',
+  'ct.methods.phone.body': 'Vill du hellre ta ett snabbt samtal? Ring oss direkt.',
+  'ct.methods.phone.cta': 'Ring oss',
+
+  'ct.team.title': 'Kontakta oss direkt',
+  'ct.team.body':
+    'Du behöver inte gå via en växel eller en säljavdelning. Hör av dig direkt till den av oss som passar bäst för det du vill prata om.',
+  'ct.team.emailCta': 'Skicka mejl',
+  'ct.team.phoneCta': 'Ring',
+  'ct.team.even.role': 'CTO & Medgrundare',
+  'ct.team.oliver.body':
+    'Hör gärna av dig till Oliver om nya projekt, samarbeten, AI, automatisering eller om du är osäker på var du ska börja.',
+  'ct.team.even.body':
+    'Even kan kontaktas om tekniska frågor, systemutveckling, integrationer och befintliga kundprojekt.',
+  'ct.team.adrian.body':
+    'Kontakta Adrian om Forge Engine, demo, tillverknings- och laserindustrin, partnerskap eller andra frågor kopplade till produkten.',
+
+  'ct.unsure.title': 'Osäker på vem du behöver?',
+  'ct.unsure.body':
+    'Det gör inget. Skicka ett mejl till hei@samsari.no, så tar vi det vidare internt.',
+
+  'ct.places.title': 'Var du hittar oss',
+  'ct.places.stavanger.name': 'Stavanger',
+  'ct.places.stavanger.body':
+    'Vi finns i Stavanger-regionen och träffar gärna kunder i Stavanger, Sandnes, Sola, Forus och områdena runt omkring.',
+  'ct.places.stavanger.note': 'Vill ni ses hos er? Vi kommer gärna på besök.',
+  'ct.places.stavanger.imageAlt': 'Bild från Stavanger-regionen kommer',
+  'ct.places.kristiansund.name': 'Kristiansund',
+  'ct.places.kristiansund.body':
+    'Samsari har rötter i Kristiansund och arbetar med verksamheter på Nordmøre och i områdena runt omkring. Vi har inget besökskontor i Kristiansund, men kommer gärna ut till er för möten och projektarbete i regionen.',
+  'ct.places.kristiansund.postal': 'Postadress',
+  'ct.places.kristiansund.imageAlt': 'Bild från Kristiansund kommer',
+
+  'ct.final.title': 'Ska vi titta på det tillsammans?',
+  'ct.final.body':
+    'Det behöver inte vara ett färdigt projekt. Har ni en utmaning, idé eller process ni överväger att förbättra tar vi gärna ett förutsättningslöst samtal.',
+  'ct.final.cta': 'Boka ett möte',
+  'ct.final.or': 'eller',
+  'ct.final.note': 'Du möter människorna som faktiskt ska arbeta med lösningen.',
+
+  'cases.seoTitle': 'Kundcase: lösningar vi har levererat',
+  'cases.seoDescription':
+    'Se vad vi har byggt för Maritime & Merchant Bank och Flematec — utmaningen de hade, vad vi utvecklade och vad det ledde till i praktiken.',
+  'blog.seoTitle': 'Insikt: guider om AI och Microsoft 365',
+  'blog.seoDescription':
+    'Tankar, guider och erfarenheter från vårt arbete med AI, Microsoft 365 och skräddarsydd utveckling. Sök och filtrera på de ämnen som är relevanta.',
+  'design.seoTitle': 'Design: logotyper, färger och riktlinjer',
+  'design.seoDescription':
+    'Ladda ner Samsari-logotypen i alla varianter, se färgpaletten med hex- och RGB-värden, och hitta riktlinjerna för hur varumärket ska användas.',
   'design.title': 'Design',
   'design.intro':
     'Logotyper, färger och riktlinjer för hur Samsari ska se ut. Ladda ner det du behöver och använd det som det är tänkt.',

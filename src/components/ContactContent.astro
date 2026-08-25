@@ -1,0 +1,1094 @@
+---
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import portraitOliver from '../assets/portrait-oliver.png';
+import portraitEven from '../assets/portrait-even.png';
+import portraitAdrian from '../assets/portrait-adrian.jpg';
+import placeStavanger from '../assets/place-stavanger.jpg';
+import placeKristiansund from '../assets/place-kristiansund.jpg';
+import contactHero from '../assets/contact-hero.jpg';
+import { BOOKING_URL, contact, people } from '../data/site';
+import { localeFromPath } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import type { UIKeys } from '../i18n/ui/nb';
+
+const locale = localeFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Portrettene, slått opp på nøkkel. Originalene er tunge PNG-er, så de går via
+// <Image> og konverteres til WebP i flere bredder ved bygg.
+const portraits: Record<string, ImageMetadata> = {
+  oliver: portraitOliver,
+  even: portraitEven,
+  adrian: portraitAdrian,
+};
+
+// Teamet: navn og stilling gjenbrukes fra om-oss-ordboken, mens teksten om hva
+// man kan kontakte hver enkelt om er egen for denne siden.
+const team = people.map((person) => ({
+  ...person,
+  portrait: portraits[person.key],
+  nameKey: `ab.team.${person.key}.name` as UIKeys,
+  roleKey: (person.key === 'even' ? 'ct.team.even.role' : `ab.team.${person.key}.role`) as UIKeys,
+  locationKey: (person.key === 'oliver' ? 'ct.places.stavanger.name' : 'ct.places.kristiansund.name') as UIKeys,
+  bodyKey: `ct.team.${person.key}.body` as UIKeys,
+}));
+
+// Stedene. Stavanger står først: det er der de fleste møtene skjer.
+const places = [
+  {
+    key: 'stavanger',
+    nameKey: 'ct.places.stavanger.name' as UIKeys,
+    bodyKey: 'ct.places.stavanger.body' as UIKeys,
+    noteKey: 'ct.places.stavanger.note' as UIKeys,
+    altKey: 'ct.places.stavanger.imageAlt' as UIKeys,
+    image: placeStavanger,
+  },
+  {
+    key: 'kristiansund',
+    nameKey: 'ct.places.kristiansund.name' as UIKeys,
+    bodyKey: 'ct.places.kristiansund.body' as UIKeys,
+    altKey: 'ct.places.kristiansund.imageAlt' as UIKeys,
+    image: placeKristiansund,
+    postal: true,
+  },
+];
+---
+
+<article class="ct">
+  <!-- 1. Hero -->
+  <section class="ct-hero">
+    <div class="ct-hero__inner">
+      <div class="ct-hero__copy">
+        <h1 class="ct-hero__title">{t('ct.title')}</h1>
+        <p class="ct-hero__intro">{t('ct.intro')}</p>
+
+        <div class="ct-hero__action">
+          <Button href={BOOKING_URL} external>{t('ct.cta')}</Button>
+        </div>
+      </div>
+
+      <div class="ct-hero__media">
+        <Image
+          class="ct-hero__photo"
+          src={contactHero}
+          alt={t('ct.heroImageAlt')}
+          width={780}
+          widths={[420, 600, 780]}
+          sizes="(min-width: 60rem) 48vw, 92vw"
+          format="webp"
+          quality={84}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Tre kontaktmetoder -->
+  <section class="ct-methods" data-reveal>
+    <div class="ct-wrap">
+      <h2 class="ct-head ct-head--center">{t('ct.methods.title')}</h2>
+
+      <ul class="methods">
+        <li class="method">
+          <a class="method__link" href={BOOKING_URL} target="_blank" rel="noreferrer">
+            <span class="method__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="17" rx="2" ry="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+              </svg>
+            </span>
+            <span class="method__title">{t('ct.methods.book.title')}</span>
+            <span class="method__value">{t('ct.methods.book.lead')}</span>
+            <span class="method__body">{t('ct.methods.book.body')}</span>
+            <span class="method__cta">
+              {t('ct.methods.book.cta')}
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" />
+              </svg>
+            </span>
+          </a>
+        </li>
+
+        <li class="method">
+          <a class="method__link" href={`mailto:${contact.generalEmail}`}>
+            <span class="method__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+                <path d="m2 7 10 6 10-6" />
+              </svg>
+            </span>
+            <span class="method__title">{t('ct.methods.email.title')}</span>
+            <span class="method__value">{contact.generalEmail}</span>
+            <span class="method__body">{t('ct.methods.email.body')}</span>
+            <span class="method__cta">
+              {t('ct.methods.email.cta')}
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" />
+              </svg>
+            </span>
+          </a>
+        </li>
+
+        <li class="method">
+          <a class="method__link" href={contact.phoneHref}>
+            <span class="method__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />
+              </svg>
+            </span>
+            <span class="method__title">{t('ct.methods.phone.title')}</span>
+            <span class="method__value">{contact.phone}</span>
+            <span class="method__body">{t('ct.methods.phone.body')}</span>
+            <span class="method__cta">
+              {t('ct.methods.phone.cta')}
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" />
+              </svg>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3. Teamet -->
+  <section class="ct-team" data-reveal>
+    <div class="ct-wrap">
+      <header class="ct-head-block">
+        <h2 class="ct-head">{t('ct.team.title')}</h2>
+        <p class="ct-head__body">{t('ct.team.body')}</p>
+      </header>
+
+      <ul class="persons">
+        {
+          team.map((person) => (
+            <li class="person">
+              <div class="person__media">
+                <Image
+                  class="person__photo"
+                  src={person.portrait}
+                  alt={t(person.nameKey)}
+                  width={640}
+                  widths={[360, 480, 640, 860]}
+                  sizes="(min-width: 48rem) 30vw, 92vw"
+                  format="webp"
+                  quality={82}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              <div class="person__body">
+                <h3 class="person__name">{t(person.nameKey)}</h3>
+                <p class="person__role">{t(person.roleKey)}</p>
+                <p class="person__location">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+                    <circle cx="12" cy="10" r="2.5" />
+                  </svg>
+                  {t(person.locationKey)}
+                </p>
+                <p class="person__text">{t(person.bodyKey)}</p>
+
+                <div class="person__contact">
+                  <a href={`mailto:${person.email}`}>{person.email}</a>
+                  <a href={person.phoneHref}>{person.phone}</a>
+                </div>
+
+                <div class="person__actions">
+                  <a class="person__btn" href={`mailto:${person.email}`}>
+                    {t('ct.team.emailCta')}
+                  </a>
+                  <a class="person__btn person__btn--quiet" href={person.phoneHref}>
+                    {t('ct.team.phoneCta')}
+                  </a>
+                  <a
+                    class="person__btn person__btn--quiet person__btn--linkedin"
+                    href={person.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`LinkedIn – ${t(person.nameKey)}`}
+                    title={`LinkedIn – ${t(person.nameKey)}`}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4V10h4v1.5A5 5 0 0 1 16 8ZM2 9h4v12H2V9Zm2-7a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. Usikker på hvem -->
+  <section class="ct-unsure" data-reveal>
+    <div class="ct-wrap">
+      <div class="unsure">
+        <div>
+          <h2 class="unsure__title">{t('ct.unsure.title')}</h2>
+          <p class="unsure__body">{t('ct.unsure.body')}</p>
+        </div>
+
+        <a class="unsure__link" href={`mailto:${contact.generalEmail}`}>
+          {contact.generalEmail}
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 + 6. Stedene, med geografisk detalj mellom -->
+  <section class="ct-places" data-reveal>
+    <div class="ct-wrap">
+      <h2 class="ct-head ct-head--center">{t('ct.places.title')}</h2>
+
+      <div class="places">
+        {
+          places.map((place) => (
+            <div class="place">
+              <div class="place__media">
+                <Image
+                  class="place__photo"
+                  src={place.image}
+                  alt={t(place.nameKey)}
+                  width={900}
+                  widths={[480, 700, 900, 1200]}
+                  sizes="(min-width: 48rem) 46vw, 92vw"
+                  format="webp"
+                  quality={82}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              <h3 class="place__name">{t(place.nameKey)}</h3>
+              <p class="place__body">{t(place.bodyKey)}</p>
+
+              {place.noteKey && <p class="place__note">{t(place.noteKey)}</p>}
+
+              {place.postal && (
+                <address class="place__postal">
+                  <span class="place__postal-label">{t('ct.places.kristiansund.postal')}</span>
+                  {contact.address.street}
+                  <br />
+                  {contact.address.postalCode} {contact.address.city}
+                </address>
+              )}
+            </div>
+          ))
+        }
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 7. Avsluttende CTA -->
+  <section class="ct-final" data-reveal>
+    <div class="ct-wrap">
+      <div class="ct-final__panel">
+        <h2 class="ct-final__title">{t('ct.final.title')}</h2>
+        <p class="ct-final__body">{t('ct.final.body')}</p>
+
+        <div class="ct-final__actions">
+          <Button href={BOOKING_URL} external>{t('ct.final.cta')}</Button>
+          <span class="ct-final__or">{t('ct.final.or')}</span>
+          <a class="ct-final__mail" href={`mailto:${contact.generalEmail}`}>
+            {contact.generalEmail}
+          </a>
+        </div>
+
+        <p class="ct-final__note">{t('ct.final.note')}</p>
+      </div>
+    </div>
+  </section>
+</article>
+
+<script>
+  // Inntoning på scroll, som på de andre sidene. Heroen animeres ved
+  // innlasting i stedet.
+  const sections = document.querySelectorAll<HTMLElement>('[data-reveal]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+    for (const section of sections) section.classList.add('is-visible');
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+    );
+
+    for (const section of sections) observer.observe(section);
+  }
+</script>
+
+<style>
+  /* --- Felles --- */
+
+  .ct-wrap {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .ct-wrap {
+      padding: 0 2rem;
+    }
+  }
+
+  .ct > section {
+    padding: 5rem 0;
+  }
+
+  @media (min-width: 48rem) {
+    .ct > section {
+      padding: 7rem 0;
+    }
+  }
+
+  .ct-head {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .ct-head--center {
+    max-width: 22ch;
+    margin-inline: auto;
+    margin-bottom: 3.5rem;
+    text-align: center;
+  }
+
+  .ct-head-block {
+    max-width: 46rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .ct-head__body {
+    margin: 1.25rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  /* Felles plassholderflate. */
+  /* :global fordi <Image> er en egen komponent og ikke får scope-attributtet.
+     Originalen er 780x520, så den skaleres ikke opp — `widths` stopper der. */
+  .ct-hero__media :global(.ct-hero__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 11;
+    max-height: 58vh;
+    object-fit: cover;
+    background: var(--color-canvas);
+  }
+
+
+
+  /* --- Inntoning --- */
+
+  [data-reveal] .ct-head,
+  [data-reveal] .ct-head-block,
+  [data-reveal] .method,
+  [data-reveal] .person,
+  [data-reveal] .unsure,
+  [data-reveal] .place,
+  [data-reveal] .ct-final__panel {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 620ms ease,
+      transform 620ms ease;
+  }
+
+  [data-reveal].is-visible .ct-head,
+  [data-reveal].is-visible .ct-head-block,
+  [data-reveal].is-visible .method,
+  [data-reveal].is-visible .person,
+  [data-reveal].is-visible .unsure,
+  [data-reveal].is-visible .place,
+  [data-reveal].is-visible .ct-final__panel {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* 80 ms mellom hvert kort, som beskrevet. */
+  [data-reveal].is-visible .method:nth-child(2),
+  [data-reveal].is-visible .person:nth-child(2),
+  [data-reveal].is-visible .place:nth-child(2) {
+    transition-delay: 80ms;
+  }
+
+  [data-reveal].is-visible .method:nth-child(3),
+  [data-reveal].is-visible .person:nth-child(3) {
+    transition-delay: 160ms;
+  }
+
+  /* --- 1. Hero --- */
+
+  .ct-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--color-surface);
+    overflow: hidden;
+    padding: calc(var(--header-height) + 2rem) 0 2.5rem !important;
+  }
+
+  .ct-hero::before {
+    content: '';
+    position: absolute;
+    top: -20rem;
+    right: -14rem;
+    width: 48rem;
+    height: 48rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-brand-soft) 0%, transparent 68%);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
+  .ct-hero__inner {
+    position: relative;
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+    width: 100%;
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .ct-hero__inner {
+      padding: 0 2rem;
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .ct-hero__inner {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+      gap: clamp(3rem, 6vw, 5rem);
+    }
+  }
+
+  /* Innholdet tones inn forskjøvet ved innlasting — samlet under 700 ms. */
+  .ct-hero__copy > * {
+    opacity: 0;
+    transform: translateY(15px);
+    animation: ct-in 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .ct-hero__copy > *:nth-child(2) {
+    animation-delay: 90ms;
+  }
+
+  .ct-hero__copy > *:nth-child(3) {
+    animation-delay: 180ms;
+  }
+
+  @keyframes ct-in {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .ct-hero__title {
+    margin: 1rem 0 0;
+    color: var(--color-ink);
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+
+  .ct-hero__intro {
+    max-width: 46ch;
+    margin: 1.75rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: clamp(1rem, 1.5vw, 1.1875rem);
+    line-height: 1.75;
+  }
+
+  .ct-hero__action {
+    margin-top: 2.5rem;
+  }
+
+  /* Svak nedskalering ved innlasting, 1.03 → 1.00. */
+  .ct-hero__media {
+    overflow: hidden;
+    border-radius: 0.5rem 3rem 0.5rem 3rem;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 24px 56px rgb(30 48 58 / 0.14);
+    animation: ct-zoom 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes ct-zoom {
+    from {
+      transform: scale(1.03);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  .place__frame {
+    aspect-ratio: 16 / 11;
+    max-height: 58vh;
+    border: 0;
+  }
+
+  /* --- 2. Kontaktmetoder --- */
+
+  .ct-methods {
+    background: var(--color-canvas);
+  }
+
+  .methods {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .methods {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .method__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 2rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    text-decoration: none;
+    transition:
+      border-color 240ms ease,
+      box-shadow 240ms ease,
+      transform 240ms ease;
+  }
+
+  .method__link:hover,
+  .method__link:focus-visible {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 20px 44px rgb(30 48 58 / 0.11);
+    transform: translateY(-3px);
+  }
+
+  .method__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.75rem;
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+  }
+
+  /* Midterste kort får aksentfargen, slik at raden ikke blir ensfarget. */
+  .method:nth-child(2) .method__icon {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-deep);
+  }
+
+  .method__icon svg {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .method__title {
+    display: block;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .method__value {
+    display: block;
+    margin-top: 0.375rem;
+    color: var(--color-brand);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .method:nth-child(2) .method__value {
+    color: var(--color-accent-deep);
+  }
+
+  .method__body {
+    display: block;
+    margin-top: 1rem;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .method__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: auto;
+    padding-top: 1.75rem;
+    color: var(--color-brand);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .method__cta svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .method__link:hover .method__cta svg,
+  .method__link:focus-visible .method__cta svg {
+    transform: translateX(4px);
+  }
+
+  /* --- 3. Teamet --- */
+
+  .ct-team {
+    background: var(--color-surface);
+  }
+
+  .persons {
+    display: grid;
+    gap: 1.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .persons {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .person {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+    overflow: hidden;
+    transition:
+      border-color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .person:hover {
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgb(30 48 58 / 0.06), 0 22px 48px rgb(30 48 58 / 0.12);
+  }
+
+  .person__media {
+    overflow: hidden;
+  }
+
+  /* Portrett i 4:5, med svak zoom ved hover. :global fordi <Image> er en egen
+     komponent og ikke får Astros scope-attributt. */
+  .person__media :global(.person__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    /* Ansiktene sitter i øvre halvdel — utsnittet forankres derfor oppover, så
+       hodene ikke kuttes når det kvadratiske bildet beskjæres til 4:5. */
+    object-position: 50% 18%;
+    background: var(--color-canvas);
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .person:hover :global(.person__photo) {
+    transform: scale(1.025);
+  }
+
+  .person__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.75rem;
+  }
+
+  .person__name {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .person__role {
+    margin: 0.25rem 0 0;
+    color: var(--color-brand);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .person__location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 0.625rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .person__location svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    color: var(--color-brand);
+  }
+
+  .person__text {
+    margin: 1rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .person__contact {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .person__contact a {
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .person__contact a:hover {
+    color: var(--color-brand);
+  }
+
+  .person__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+  }
+
+  .person__btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--color-brand);
+    border-radius: 999px;
+    background: var(--color-brand);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .person__btn:hover {
+    background: var(--color-brand-dark);
+    border-color: var(--color-brand-dark);
+  }
+
+  .person__btn--quiet {
+    background: transparent;
+    border-color: var(--color-line);
+    color: var(--color-ink);
+  }
+
+  .person__btn--quiet:hover {
+    background: transparent;
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  .person__btn--linkedin svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .person__btn--linkedin {
+    justify-content: center;
+    width: 2.25rem;
+    padding: 0;
+  }
+
+  /* --- 4. Usikker --- */
+
+  .ct-unsure {
+    background: var(--color-canvas);
+    /* Smalere seksjon: dette er et lite mellomspill, ikke en hovedseksjon. */
+    padding: 3.5rem 0 !important;
+  }
+
+  .unsure {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+    padding: 2rem 2.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem 2rem 0.5rem 2rem;
+  }
+
+  .unsure__title {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .unsure__body {
+    max-width: 52ch;
+    margin: 0.5rem 0 0;
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .unsure__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    flex: none;
+    color: var(--color-brand);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .unsure__link svg {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .unsure__link:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* --- 5. Stedene --- */
+
+  .ct-places {
+    background: var(--color-surface);
+  }
+
+  .places {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .places {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 3rem;
+    }
+  }
+
+  .place__media {
+    overflow: hidden;
+    border-radius: 0.5rem 2.5rem 0.5rem 2.5rem;
+  }
+
+  /* :global fordi <Image> er en egen komponent. Bildene er brede panoramaer,
+     så utsnittet forankres mot midten der byen faktisk er. */
+  .place__media :global(.place__photo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: 50% 50%;
+    background: var(--color-canvas);
+  }
+
+  .place__name {
+    margin: 1.75rem 0 0.75rem;
+    color: var(--color-ink);
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .place__body {
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .place__note {
+    margin: 0.875rem 0 0;
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .place__postal {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-line);
+    color: var(--color-ink-soft);
+    font-size: 0.9375rem;
+    font-style: normal;
+    line-height: 1.6;
+  }
+
+  .place__postal-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* --- 7. Avsluttende CTA --- */
+
+  .ct-final {
+    background: var(--color-surface);
+    padding-top: 0 !important;
+  }
+
+  .ct-final__panel {
+    position: relative;
+    padding: 3.5rem 1.75rem;
+    border-radius: 1rem 5rem 1rem 5rem;
+    background: linear-gradient(135deg, var(--color-brand) 0%, #4a3fd4 62%, var(--color-accent) 100%);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  @media (min-width: 48rem) {
+    .ct-final__panel {
+      padding: 4.5rem 3.5rem;
+    }
+  }
+
+  .ct-final__title {
+    max-width: 20ch;
+    margin: 0 auto;
+    color: #fff;
+    font-size: clamp(1.625rem, 3.4vw, 2.375rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .ct-final__body {
+    max-width: 52ch;
+    margin: 1.25rem auto 0;
+    color: rgb(255 255 255 / 0.85);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .ct-final__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.875rem 1.25rem;
+    margin-top: 2.25rem;
+  }
+
+  .ct-final__actions :global(.btn--primary) {
+    background: #fff;
+    color: var(--color-brand);
+    box-shadow: 0 2px 6px rgb(9 46 74 / 0.18), 0 14px 30px rgb(9 46 74 / 0.22);
+  }
+
+  .ct-final__actions :global(.btn--primary:hover) {
+    background: var(--color-brand-soft);
+    color: var(--color-brand-dark);
+  }
+
+  .ct-final__actions :global(.btn:focus-visible) {
+    outline-color: #fff;
+  }
+
+  .ct-final__or {
+    color: rgb(255 255 255 / 0.6);
+    font-size: 0.9375rem;
+  }
+
+  .ct-final__mail {
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: rgb(255 255 255 / 0.4);
+    text-underline-offset: 0.3em;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color 200ms ease;
+  }
+
+  .ct-final__mail:hover {
+    text-decoration-color: #fff;
+  }
+
+  .ct-final__mail:focus-visible {
+    outline-color: #fff;
+  }
+
+  .ct-final__note {
+    margin: 2rem 0 0;
+    color: rgb(255 255 255 / 0.7);
+    font-size: 0.8125rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ct-hero__copy > *,
+    .ct-hero__media {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+
+    .method__link:hover,
+    .person:hover :global(.person__photo),
+    .method__link:hover .method__cta svg,
+    .unsure__link:hover svg {
+      transform: none;
+    }
+  }
+</style>

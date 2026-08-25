@@ -1,0 +1,31 @@
+# Samsari
+
+> Samsari er et norsk teknologiselskap som utvikler skreddersydd programvare, automatisering, AI-løsninger, integrasjoner og egne digitale produkter. Selskapet holder til i Stavanger og Kristiansund.
+
+Denne filen gir en kort oversikt over det viktigste offentlige innholdet på samsari.no. Norsk er hovedspråket. Nettstedet finnes også på engelsk, dansk og svensk.
+
+## Hovedsider
+
+- [Forsiden](https://samsari.no/): Oversikt over Samsari, kompetanseområder, kundecaser og produkter.
+- [Tjenester](https://samsari.no/tjenester/): Automatisering, interne forretningssystemer, kunde- og partnerportaler, AI-agenter, Microsoft 365, integrasjoner og rapportering.
+- [Produkter](https://samsari.no/produkter/): Samsaris egne programvareprodukter, inkludert Prosjektportalen, Forge Engine og Savas.
+- [Kundecaser](https://samsari.no/kundecase/): Dokumenterte kundeprosjekter og resultater.
+- [Innsikt](https://samsari.no/blogg/): Artikler om teknologi, AI, automatisering, Power Platform og programvareutvikling.
+- [Om oss](https://samsari.no/om-oss/): Historien, menneskene, arbeidsmåten og verdiene bak Samsari.
+- [Kontakt](https://samsari.no/kontakt/): Kontaktinformasjon, møtebooking og direkte kontakt med teamet.
+
+## Utvalgte kundecaser
+
+- [Maritime & Merchant Bank ASA](https://samsari.no/kundecase/maritime-and-merchant-bank-asa/): Kundecase fra bank- og finanssektoren.
+- [Flematec](https://samsari.no/kundecase/flematec/): Kundecase fra industri og teknologi.
+
+## Andre språk
+
+- [English](https://samsari.no/en/)
+- [Dansk](https://samsari.no/da/)
+- [Svenska](https://samsari.no/sv/)
+
+## Teknisk
+
+- [XML-sitemap](https://samsari.no/sitemap-index.xml): Full liste over publiserte og indekserbare URL-er.
+- [Robots-regler](https://samsari.no/robots.txt): Regler for crawling.

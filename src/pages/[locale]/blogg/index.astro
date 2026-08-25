@@ -31,7 +31,7 @@ const listLd = caseListSchema(listed, t('blog.title'), t('blog.intro'));
 const breadcrumbLd = breadcrumbSchema([{ name: t('blog.title'), url: overviewUrl }], t('nav.home'));
 ---
 
-<Base title={t('blog.title')} description={t('blog.intro')}>
+<Base title={t('blog.seoTitle')} description={t('blog.seoDescription')}>
   <Fragment slot="head">
     <script type="application/ld+json" is:inline set:html={JSON.stringify(listLd)} />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />

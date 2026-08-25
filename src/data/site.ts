@@ -25,6 +25,35 @@ export const contact = {
   },
 } as const;
 
+/**
+ * De ansatte med egne kontaktopplysninger. Navn og stillinger ligger i
+ * ordbøkene (ab.team.*), siden de oversettes — her ligger bare det
+ * språknøytrale: e-post og telefon.
+ */
+export const people = [
+  {
+    key: 'oliver',
+    email: 'oliver@samsari.no',
+    phone: '+47 407 00 457',
+    phoneHref: 'tel:+4740700457',
+    linkedin: 'https://www.linkedin.com/in/oliver-lyso/',
+  },
+  {
+    key: 'even',
+    email: 'even@samsari.no',
+    phone: '+47 940 53 044',
+    phoneHref: 'tel:+4794053044',
+    linkedin: 'https://www.linkedin.com/in/evenbrevik/',
+  },
+  {
+    key: 'adrian',
+    email: 'adrian@samsari.no',
+    phone: '+47 405 70 555',
+    phoneHref: 'tel:+4740570555',
+    linkedin: 'https://www.linkedin.com/in/adrian-rurkowski-152ba4354/',
+  },
+] as const;
+
 export const social = {
   linkedin: 'https://www.linkedin.com/company/106360744/',
   instagram: 'https://www.instagram.com/samsari_no/',

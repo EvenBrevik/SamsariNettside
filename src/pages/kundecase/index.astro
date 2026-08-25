@@ -32,7 +32,7 @@ const breadcrumbLd = breadcrumbSchema(
 );
 ---
 
-<Base title={t('cases.title')} description={t('cases.intro')}>
+<Base title={t('cases.seoTitle')} description={t('cases.seoDescription')}>
   <Fragment slot="head">
     <script type="application/ld+json" is:inline set:html={JSON.stringify(listLd)} />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
