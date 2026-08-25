@@ -30,7 +30,13 @@ const team = people.map((person) => ({
   portrait: portraits[person.key],
   nameKey: `ab.team.${person.key}.name` as UIKeys,
   roleKey: (person.key === 'even' ? 'ct.team.even.role' : `ab.team.${person.key}.role`) as UIKeys,
-  locationKey: (person.key === 'oliver' ? 'ct.places.stavanger.name' : 'ct.places.kristiansund.name') as UIKeys,
+  locationKey: (
+    person.key === 'oliver'
+      ? 'ct.places.stavanger.name'
+      : person.key === 'adrian'
+        ? 'ct.places.trondheim.name'
+        : 'ct.places.kristiansund.name'
+  ) as UIKeys,
   bodyKey: `ct.team.${person.key}.body` as UIKeys,
 }));
 

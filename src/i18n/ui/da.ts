@@ -650,6 +650,7 @@ export const da: Record<UIKeys, string> = {
 
   'ct.places.title': 'Hvor du finder os',
   'ct.places.stavanger.name': 'Stavanger',
+  'ct.places.trondheim.name': 'Trondheim',
   'ct.places.stavanger.body':
     'Vi er til stede i Stavanger-regionen og mødes gerne med kunder i Stavanger, Sandnes, Sola, Forus og områderne omkring.',
   'ct.places.stavanger.note': 'Vil I mødes hos jer? Vi kommer gerne på besøg.',

@@ -687,6 +687,7 @@ export const nb = {
   // 5. Steder
   'ct.places.title': 'Hvor du finner oss',
   'ct.places.stavanger.name': 'Stavanger',
+  'ct.places.trondheim.name': 'Trondheim',
   'ct.places.stavanger.body':
     'Vi er til stede i Stavanger-regionen og møter gjerne kunder i Stavanger, Sandnes, Sola, Forus og områdene rundt.',
   'ct.places.stavanger.note': 'Vil dere møtes hos dere? Vi kommer gjerne på besøk.',

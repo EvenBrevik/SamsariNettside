@@ -647,6 +647,7 @@ export const en: Record<UIKeys, string> = {
 
   'ct.places.title': 'Where to find us',
   'ct.places.stavanger.name': 'Stavanger',
+  'ct.places.trondheim.name': 'Trondheim',
   'ct.places.stavanger.body':
     'We have a presence in the Stavanger region and are happy to meet clients in Stavanger, Sandnes, Sola, Forus and the surrounding areas.',
   'ct.places.stavanger.note': 'Would you rather meet at your place? We are happy to visit.',
