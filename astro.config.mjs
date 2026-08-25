@@ -8,7 +8,9 @@ import react from '@astrojs/react';
 
 export default defineConfig({
   site: 'https://samsari.no',
-  adapter: cloudflare(),
+  // Alle sider prerendres. Optimaliser derfor lokale bilder under bygg i stedet
+  // for å generere /_image-URL-er som krever Cloudflare Images ved kjøring.
+  adapter: cloudflare({ imageService: 'compile' }),
 
   // Norsk ligger på rot (/om-oss), øvrige språk får prefiks (/en/about).
   // `redirectToDefaultLocale: false` hindrer at /nb/... blir en duplikat-URL.
